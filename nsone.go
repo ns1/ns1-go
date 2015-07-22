@@ -35,9 +35,24 @@ type Zone struct {
 	Meta          map[string]string `json:"meta,omitempty"`
 }
 
+type Record struct {
+	Id     string `json:"id,omitempty"`
+	Zone   string `json:"zone,omitempty"`
+	Domain string `json:"domain,omitempty"`
+	Type   string `json:"type,omitempty"`
+}
+
 func NewZone(zone string) *Zone {
 	return &Zone{
 		Zone: zone,
+	}
+}
+
+func NewRecord(zone string, domain string, t string) *Record {
+	return &Record{
+		Zone:   zone,
+		Domain: domain,
+		Type:   t,
 	}
 }
 
@@ -82,19 +97,37 @@ func (c APIClient) GetZone(z *Zone) error {
 	return err
 }
 
+func (c APIClient) GetRecord(r *Record) error {
+	err := json.Unmarshal(c.GetThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type)), r)
+	return err
+}
+
 func (c APIClient) DeleteZone(z *Zone) error {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil)
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone))
+}
+
+func (c APIClient) doRequest(t string, uri string) (*http.Response, error) {
+	req, err := http.NewRequest(t, uri, nil)
 	if err != nil {
 		panic(err)
 	}
-	log.Println(resp)
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	log.Println(string(body))
+	req.Header.Add("X-NSONE-Key", c.ApiKey)
+	client := &http.Client{}
+	return client.Do(req)
+}
+
+func (c APIClient) DeleteThing(uri string) error {
+	resp, err := c.doRequest("DELETE", uri)
+	resp.Body.Close()
+	if err != nil {
+		panic(err)
+	}
+	// FIXME return status
 	return err
+}
+
+func (c APIClient) DeleteRecord(r *Record) error {
+	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%/%s", r.Zone, r.Domain, r.Type))
 }
 
 func (c APIClient) CreateZone(z *Zone) error {
@@ -118,5 +151,9 @@ func (c APIClient) CreateZone(z *Zone) error {
 	if err != nil {
 		panic(err)
 	}
+	return nil
+}
+
+func (c APIClient) CreateRecord(r *Record) error {
 	return nil
 }
