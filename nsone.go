@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -53,14 +54,14 @@ func (c APIClient) GetThing(uri string) []byte {
 		panic(err)
 	}
 	req.Header.Add("X-NSONE-Key", c.ApiKey)
-	fmt.Println(req)
+	log.Printf("[DEBUG] Get: %s", uri)
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(resp)
+	log.Println(resp)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	log.Println(string(body))
 	return body
 }
 
@@ -89,10 +90,10 @@ func (c APIClient) DeleteZone(z *Zone) error {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(resp)
+	log.Println(resp)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	log.Println(string(body))
 	return err
 }
 
@@ -109,10 +110,10 @@ func (c APIClient) CreateZone(z *Zone) error {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(resp)
+	log.Println(resp)
 	defer resp.Body.Close()
 	body, _ = ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	log.Println(string(body))
 	err = json.Unmarshal(body, z)
 	if err != nil {
 		panic(err)
