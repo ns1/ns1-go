@@ -89,21 +89,23 @@ func (c APIClient) GetZones() []Zone {
 	return zl
 }
 
-func (c APIClient) GetZone(z *Zone) error {
+func (c APIClient) GetZone(zone string) (Zone, error) {
+	z := nsone.NewZone(zone)
 	err := json.Unmarshal(c.GetThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone)), z)
 	if err != nil {
 		panic(err)
 	}
-	return err
+	return z, err
 }
 
-func (c APIClient) GetRecord(r *Record) error {
+func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
+	r := NewRecord(zone, domain, t)
 	err := json.Unmarshal(c.GetThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type)), r)
-	return err
+	return r, err
 }
 
-func (c APIClient) DeleteZone(z *Zone) error {
-	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone))
+func (c APIClient) DeleteZone(zone string) error {
+	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
 }
 
 func (c APIClient) doRequest(t string, uri string) (*http.Response, error) {
@@ -126,8 +128,8 @@ func (c APIClient) DeleteThing(uri string) error {
 	return err
 }
 
-func (c APIClient) DeleteRecord(r *Record) error {
-	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%/%s", r.Zone, r.Domain, r.Type))
+func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
+	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%/%s", zone, domain, t))
 }
 
 func (c APIClient) CreateZone(z *Zone) error {
