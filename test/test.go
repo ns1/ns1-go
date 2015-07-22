@@ -11,5 +11,5 @@ func main() {
 	z := nsone.NewZone("foo.com")
 	z.Hostmaster = "hostmaster@foo.com"
 	n.CreateZone(z)
-	n.DeleteZone(z)
+	n.DeleteZone("foo.com")
 }

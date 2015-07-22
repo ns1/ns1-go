@@ -138,6 +138,8 @@ func (c APIClient) CreateZone(z *Zone) error {
 		panic(err)
 	}
 	client := &http.Client{}
+	log.Println("MOO: CreateZone body:")
+	log.Println(string(body))
 	req, err := http.NewRequest("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), bytes.NewReader(body))
 	req.Header.Add("X-NSONE-Key", c.ApiKey)
 	req.Header.Add("Content-Type", "application/json")
@@ -145,10 +147,13 @@ func (c APIClient) CreateZone(z *Zone) error {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("MOO: Response")
 	log.Println(resp)
-	defer resp.Body.Close()
 	body, _ = ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	log.Println("MOO: Response body")
 	log.Println(string(body))
+
 	err = json.Unmarshal(body, z)
 	if err != nil {
 		panic(err)
