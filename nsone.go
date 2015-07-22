@@ -62,27 +62,9 @@ func New(k string) *APIClient {
 	}
 }
 
-func (c APIClient) GetThing(uri string) []byte {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", uri, nil)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
-	log.Printf("[DEBUG] Get: %s", uri)
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	log.Println(resp)
-	body, _ := ioutil.ReadAll(resp.Body)
-	log.Println(string(body))
-	return body
-}
-
 func (c APIClient) GetZones() []Zone {
 	var zl []Zone
-	err := json.Unmarshal(c.GetThing("https://api.nsone.net/v1/zones"), &zl)
+	err := json.Unmarshal(c.doHTTP("GET", "https://api.nsone.net/v1/zones", nil), &zl)
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +73,7 @@ func (c APIClient) GetZones() []Zone {
 
 func (c APIClient) GetZone(zone string) (*Zone, error) {
 	z := NewZone(zone)
-	err := json.Unmarshal(c.GetThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone)), z)
+	err := json.Unmarshal(c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil), z)
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +82,7 @@ func (c APIClient) GetZone(zone string) (*Zone, error) {
 
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
 	r := NewRecord(zone, domain, t)
-	err := json.Unmarshal(c.GetThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type)), r)
+	err := json.Unmarshal(c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil), r)
 	return r, err
 }
 
@@ -108,24 +90,31 @@ func (c APIClient) DeleteZone(zone string) error {
 	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
 }
 
-func (c APIClient) doRequest(t string, uri string) (*http.Response, error) {
-	req, err := http.NewRequest(t, uri, nil)
+func (c APIClient) doHTTP(method string, uri string, rbody []byte) []byte {
+	r := bytes.NewReader(rbody)
+	log.Printf("[DEBUG] %s: %s", method, uri)
+	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Add("X-NSONE-Key", c.ApiKey)
 	client := &http.Client{}
-	return client.Do(req)
-}
-
-func (c APIClient) DeleteThing(uri string) error {
-	resp, err := c.doRequest("DELETE", uri)
-	resp.Body.Close()
+	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
+	log.Println(resp)
+	body, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	log.Println(string(body))
+	return body
+
+}
+
+func (c APIClient) DeleteThing(uri string) error {
+	_ = c.doHTTP("DELETE", uri, nil)
 	// FIXME return status
-	return err
+	return nil
 }
 
 func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
@@ -133,24 +122,27 @@ func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
 }
 
 func (c APIClient) CreateZone(z *Zone) error {
-	body, err := json.Marshal(z)
+	rbody, err := json.Marshal(z)
 	if err != nil {
 		panic(err)
 	}
-	client := &http.Client{}
-	log.Println("MOO: CreateZone body:")
+	body := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
+	log.Println("MOO: Response body")
 	log.Println(string(body))
-	req, err := http.NewRequest("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), bytes.NewReader(body))
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
+
+	err = json.Unmarshal(body, z)
 	if err != nil {
 		panic(err)
 	}
-	log.Println("MOO: Response")
-	log.Println(resp)
-	body, _ = ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	return nil
+}
+
+func (c APIClient) UpdateZone(z *Zone) error {
+	rbody, err := json.Marshal(z)
+	if err != nil {
+		panic(err)
+	}
+	body := c.doHTTP("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
 	log.Println("MOO: Response body")
 	log.Println(string(body))
 
