@@ -36,10 +36,13 @@ type Zone struct {
 }
 
 type Record struct {
-	Id     string `json:"id,omitempty"`
-	Zone   string `json:"zone,omitempty"`
-	Domain string `json:"domain,omitempty"`
-	Type   string `json:"type,omitempty"`
+	Id      string            `json:"id,omitempty"`
+	Zone    string            `json:"zone,omitempty"`
+	Domain  string            `json:"domain,omitempty"`
+	Type    string            `json:"type,omitempty"`
+	Link    string            `json:"link,omitempty"`
+	Meta    map[string]string `json:"meta,omitempty"`
+	Answers map[string]string `json:"answers,omitempty"`
 }
 
 func NewZone(zone string) *Zone {
@@ -167,5 +170,20 @@ func (c APIClient) UpdateZone(z *Zone) error {
 }
 
 func (c APIClient) CreateRecord(r *Record) error {
+	rbody, err := json.Marshal(r)
+	if err != nil {
+		return err
+	}
+	body, err := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), rbody)
+	if err != nil {
+		return err
+	}
+	log.Println("MOO: Response body")
+	log.Println(string(body))
+
+	err = json.Unmarshal(body, r)
+	if err != nil {
+		return err
+	}
 	return nil
 }
