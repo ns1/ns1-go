@@ -35,6 +35,11 @@ type Zone struct {
 	Meta          map[string]string `json:"meta,omitempty"`
 }
 
+type Answer struct {
+	Answer []string               `json:"answer,omitempty"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
+}
+
 type Record struct {
 	Id      string            `json:"id,omitempty"`
 	Zone    string            `json:"zone,omitempty"`
@@ -42,7 +47,7 @@ type Record struct {
 	Type    string            `json:"type,omitempty"`
 	Link    string            `json:"link,omitempty"`
 	Meta    map[string]string `json:"meta,omitempty"`
-	Answers map[string]string `json:"answers,omitempty"`
+	Answers []Answer          `json:"answers,omitempty"`
 }
 
 func NewZone(zone string) *Zone {
