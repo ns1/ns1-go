@@ -62,27 +62,36 @@ func New(k string) *APIClient {
 	}
 }
 
-func (c APIClient) GetZones() []Zone {
+func (c APIClient) GetZones() ([]Zone, error) {
 	var zl []Zone
-	err := json.Unmarshal(c.doHTTP("GET", "https://api.nsone.net/v1/zones", nil), &zl)
+	body, err := c.doHTTP("GET", "https://api.nsone.net/v1/zones", nil)
 	if err != nil {
-		panic(err)
+		return zl, err
 	}
-	return zl
+	err = json.Unmarshal(body, &zl)
+	return zl, err
 }
 
 func (c APIClient) GetZone(zone string) (*Zone, error) {
 	z := NewZone(zone)
-	err := json.Unmarshal(c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil), z)
+	body, err := c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil)
 	if err != nil {
-		panic(err)
+		return z, err
+	}
+	err = json.Unmarshal(body, z)
+	if err != nil {
+		return z, err
 	}
 	return z, err
 }
 
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
 	r := NewRecord(zone, domain, t)
-	err := json.Unmarshal(c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil), r)
+	body, err := c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil)
+	if err != nil {
+		return r, err
+	}
+	err = json.Unmarshal(body, r)
 	return r, err
 }
 
@@ -90,31 +99,32 @@ func (c APIClient) DeleteZone(zone string) error {
 	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
 }
 
-func (c APIClient) doHTTP(method string, uri string, rbody []byte) []byte {
+func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, error) {
+	var body []byte
 	r := bytes.NewReader(rbody)
 	log.Printf("[DEBUG] %s: %s", method, uri)
 	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
-		panic(err)
+		return body, err
 	}
 	req.Header.Add("X-NSONE-Key", c.ApiKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return body, err
 	}
 	log.Println(resp)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	log.Println(string(body))
-	return body
+	return body, nil
 
 }
 
 func (c APIClient) DeleteThing(uri string) error {
-	_ = c.doHTTP("DELETE", uri, nil)
+	_, err := c.doHTTP("DELETE", uri, nil)
 	// FIXME return status
-	return nil
+	return err
 }
 
 func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
@@ -124,15 +134,18 @@ func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
 func (c APIClient) CreateZone(z *Zone) error {
 	rbody, err := json.Marshal(z)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	body := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
+	body, err := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
+	if err != nil {
+		return err
+	}
 	log.Println("MOO: Response body")
 	log.Println(string(body))
 
 	err = json.Unmarshal(body, z)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }
@@ -140,15 +153,15 @@ func (c APIClient) CreateZone(z *Zone) error {
 func (c APIClient) UpdateZone(z *Zone) error {
 	rbody, err := json.Marshal(z)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	body := c.doHTTP("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
+	body, err := c.doHTTP("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
 	log.Println("MOO: Response body")
 	log.Println(string(body))
 
 	err = json.Unmarshal(body, z)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }
