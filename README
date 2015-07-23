@@ -15,7 +15,7 @@ A simple golang client for the NSOne API: https://api.nsone.net/
         api.CreateZone(z)
 
         r := nsone.NewRecord("foo.com", "www.foo.com", "A")
-        r.Answers = []nsone.Answer{nsone.Answer{Answer: ["1.1.1.1"]}}
+        r.Answers = []nsone.Answer{nsone.Answer{Answer: "1.1.1.1"}}
         api.CreateRecord(r)
 
         api.DeleteZone("foo.com")
