@@ -6,7 +6,10 @@ import (
 )
 
 func main() {
-	n := nsone.New("fF4uiAIL9wntC7Bdar0a")
+	if k := os.Getenv("NSONE_APIKEY"); k == "" {
+		fmt.Println("NSONE_APIKEY environment variable is not set, giving up")
+	}
+	n := nsone.New(k)
 	fmt.Println(n.GetZones())
 	z := nsone.NewZone("foo.com")
 	z.Hostmaster = "hostmaster@foo.com"
