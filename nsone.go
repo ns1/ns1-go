@@ -136,7 +136,7 @@ func (c APIClient) DeleteThing(uri string) error {
 }
 
 func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
-	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%/%s", zone, domain, t))
+	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", zone, domain, t))
 }
 
 func (c APIClient) CreateZone(z *Zone) error {
