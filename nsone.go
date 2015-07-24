@@ -3,6 +3,7 @@ package nsone
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -122,6 +123,9 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, erro
 		return body, err
 	}
 	log.Println(resp)
+	if resp.StatusCode != 200 {
+		return body, errors.New(resp.Status)
+	}
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	log.Println(string(body))
