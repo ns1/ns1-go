@@ -14,9 +14,15 @@ type APIClient struct {
 	ApiKey string
 }
 
+type ZoneSecondaryServer struct {
+	Ip     string `json:"ip"`
+	Port   int    `json:"port,omitempty"`
+	Notify bool   `json:"notify"`
+}
+
 type ZonePrimary struct {
-	Enabled     bool     `json:"enabled"`
-	Secondaries []string `json:"secondaries,omitempty"`
+	Enabled     bool                  `json:"enabled"`
+	Secondaries []ZoneSecondaryServer `json:"secondaries"`
 }
 
 type ZoneSecondary struct {
@@ -62,8 +68,32 @@ type Record struct {
 }
 
 func NewZone(zone string) *Zone {
-	return &Zone{
+	z := Zone{
 		Zone: zone,
+	}
+	z.MakePrimary()
+	return &z
+}
+
+func (z Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
+	z.Secondary = ZoneSecondary{
+		Enabled: false,
+	}
+	z.Primary = ZonePrimary{
+		Enabled:     true,
+		Secondaries: secondaries,
+	}
+}
+
+func (z Zone) MakeSecondary(ip string) {
+	z.Secondary = ZoneSecondary{
+		Primary_ip:   ip,
+		Primary_port: 53,
+		Enabled:      true,
+	}
+	z.Primary = ZonePrimary{
+		Enabled:     false,
+		Secondaries: []ZoneSecondaryServer{},
 	}
 }
 
