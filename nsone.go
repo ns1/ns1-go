@@ -111,7 +111,7 @@ func (c APIClient) DeleteZone(zone string) error {
 func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, error) {
 	var body []byte
 	r := bytes.NewReader(rbody)
-	log.Printf("[DEBUG] %s: %s", method, uri)
+	log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
 	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
 		return body, err
@@ -123,11 +123,11 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, erro
 		return body, err
 	}
 	log.Println(resp)
-	if resp.StatusCode != 200 {
-		return body, errors.New(resp.Status)
-	}
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return body, errors.New(fmt.Sprintf("%s: %s", resp.Status, string(body)))
+	}
 	log.Println(string(body))
 	return body, nil
 
