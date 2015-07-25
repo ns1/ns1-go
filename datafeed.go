@@ -16,8 +16,8 @@ type DataFeed struct {
 	SourceId string            `json:"-"`
 	Id       string            `json:"id,omitempty"`
 	Name     string            `json:"name"`
-	Config   map[string]string `json"config,omitempty"`
-	Data     map[string]string `json"config,omitempty"`
+	Config   map[string]string `json:"config,omitempty"`
+	Data     map[string]string `json:"data,omitempty"`
 }
 
 func NewDataFeed(source_id string) *DataFeed {
