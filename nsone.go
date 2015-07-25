@@ -40,37 +40,33 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, erro
 	if resp.StatusCode != 200 {
 		return body, errors.New(fmt.Sprintf("%s: %s", resp.Status, string(body)))
 	}
-	log.Println(string(body))
+	log.Println(fmt.Sprintf("Response body: %s", string(body)))
 	return body, nil
 
 }
 
+func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpack_into interface{}) error {
+	body, err := c.doHTTP(method, uri, rbody)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(body, unpack_into)
+}
+
 func (c APIClient) DeleteThing(uri string) error {
 	_, err := c.doHTTP("DELETE", uri, nil)
-	// FIXME return status
 	return err
 }
 
 func (c APIClient) GetZones() ([]Zone, error) {
 	var zl []Zone
-	body, err := c.doHTTP("GET", "https://api.nsone.net/v1/zones", nil)
-	if err != nil {
-		return zl, err
-	}
-	err = json.Unmarshal(body, &zl)
+	err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/zones", nil, &zl)
 	return zl, err
 }
 
 func (c APIClient) GetZone(zone string) (*Zone, error) {
 	z := NewZone(zone)
-	body, err := c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil)
-	if err != nil {
-		return z, err
-	}
-	err = json.Unmarshal(body, z)
-	if err != nil {
-		return z, err
-	}
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
 	return z, err
 }
 
@@ -83,18 +79,7 @@ func (c APIClient) CreateZone(z *Zone) error {
 	if err != nil {
 		return err
 	}
-	body, err := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
-	if err != nil {
-		return err
-	}
-	log.Println("MOO: Response body")
-	log.Println(string(body))
-
-	err = json.Unmarshal(body, z)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.doHTTPUnmarshal("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody, z)
 }
 
 func (c APIClient) UpdateZone(z *Zone) error {
@@ -102,15 +87,7 @@ func (c APIClient) UpdateZone(z *Zone) error {
 	if err != nil {
 		return err
 	}
-	body, err := c.doHTTP("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody)
-	log.Println("MOO: Response body")
-	log.Println(string(body))
-
-	err = json.Unmarshal(body, z)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.doHTTPUnmarshal("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody, z)
 }
 
 func (c APIClient) CreateRecord(r *Record) error {
@@ -118,27 +95,12 @@ func (c APIClient) CreateRecord(r *Record) error {
 	if err != nil {
 		return err
 	}
-	body, err := c.doHTTP("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), rbody)
-	if err != nil {
-		return err
-	}
-	log.Println("MOO: Response body")
-	log.Println(string(body))
-
-	err = json.Unmarshal(body, r)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.doHTTPUnmarshal("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), rbody, r)
 }
 
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
 	r := NewRecord(zone, domain, t)
-	body, err := c.doHTTP("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil)
-	if err != nil {
-		return r, err
-	}
-	err = json.Unmarshal(body, r)
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
 	return r, err
 }
 
