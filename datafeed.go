@@ -13,7 +13,7 @@ package nsone
 						}
 */
 type DataFeed struct {
-	SourceId string            `json:""`
+	SourceId string            `json:"-"`
 	Id       string            `json:"id,omitempty"`
 	Name     string            `json:"name"`
 	Config   map[string]string `json"config,omitempty"`
