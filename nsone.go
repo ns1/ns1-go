@@ -149,3 +149,19 @@ func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
 func (c APIClient) UpdateRecord(r *Record) error {
 	return errors.New("UpdateRecord not implemented")
 }
+
+func (c APIClient) CreateDataSource(r *DataSource) error {
+	return errors.New("CreateDataSource not implemented")
+}
+
+func (c APIClient) GetDataSource(id string) (*DataSource, error) {
+	return nil, errors.New("GetDataSource not implemented")
+}
+
+func (c APIClient) DeleteDataSource(id string) error {
+	return errors.New("DeleteDataSource not implemented")
+}
+
+func (c APIClient) UpdateDataSource(d *DataSource) error {
+	return errors.New("UpdateDataSource not implemented")
+}
