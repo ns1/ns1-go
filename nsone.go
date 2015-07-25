@@ -125,3 +125,20 @@ func (c APIClient) DeleteDataSource(id string) error {
 func (c APIClient) UpdateDataSource(ds *DataSource) error {
 	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", ds.Id), ds)
 }
+func (c APIClient) CreateDataFeed(df *DataFeed) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s", df.SourceId), df)
+}
+
+func (c APIClient) GetDataFeed(ds_id string, df_id string) (*DataFeed, error) {
+	df := NewDataFeed(ds_id)
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id), nil, &df)
+	return &df, err
+}
+
+func (c APIClient) DeleteDataFeed(ds_id string, df_id string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id))
+}
+
+func (c APIClient) UpdateDataFeed(df *DataFeed) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", df.SourceId, df.Id), df)
+}
