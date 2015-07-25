@@ -42,14 +42,15 @@ type Zone struct {
 	Zone          string            `json:"zone,omitempty"`
 	Refresh       int               `json:"refresh,omitempty"`
 	Expiry        int               `json:"expiry,omitempty"`
-	Primary       ZonePrimary       `json:"primary,omitempty"`
+	Primary       *ZonePrimary      `json:"primary,omitempty"`
 	Dns_servers   []string          `json:"dns_servers,omitempty"`
 	Networks      []int             `json:"networks,omitempty"`
 	Network_pools []string          `json:"network_pools,omitempty"`
 	Hostmaster    string            `json:"hostmaster,omitempty"`
 	Pool          string            `json:"pool,omitempty"`
 	Meta          map[string]string `json:"meta,omitempty"`
-	Secondary     ZoneSecondary     `json:"secondary,omitempty"`
+	Secondary     *ZoneSecondary    `json:"secondary,omitempty"`
+	Link          string            `json:"link"`
 }
 
 type Answer struct {
@@ -62,9 +63,9 @@ type Record struct {
 	Zone    string            `json:"zone,omitempty"`
 	Domain  string            `json:"domain,omitempty"`
 	Type    string            `json:"type,omitempty"`
-	Link    string            `json:"link,omitempty"`
+	Link    string            `json:"link"`
 	Meta    map[string]string `json:"meta,omitempty"`
-	Answers []Answer          `json:"answers,omitempty"`
+	Answers []Answer          `json:"answers"`
 }
 
 func NewZone(zone string) *Zone {
@@ -75,34 +76,57 @@ func NewZone(zone string) *Zone {
 	return &z
 }
 
-func (z Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
-	z.Secondary = ZoneSecondary{
+func (z *Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
+	z.Secondary = &ZoneSecondary{
 		Enabled: false,
 	}
-	z.Primary = ZonePrimary{
+	z.Primary = &ZonePrimary{
 		Enabled:     true,
 		Secondaries: secondaries,
 	}
 }
 
-func (z Zone) MakeSecondary(ip string) {
-	z.Secondary = ZoneSecondary{
+func (z *Zone) MakeSecondary(ip string) {
+	z.Secondary = &ZoneSecondary{
+		Enabled:      true,
 		Primary_ip:   ip,
 		Primary_port: 53,
-		Enabled:      true,
 	}
-	z.Primary = ZonePrimary{
-		Enabled:     false,
-		Secondaries: []ZoneSecondaryServer{},
+	z.Primary = &ZonePrimary{
+		Enabled: false,
 	}
+}
+
+func (z *Zone) LinkTo(to string) {
+	z.Meta = nil
+	z.Ttl = 0
+	z.Nx_ttl = 0
+	z.Retry = 0
+	z.Refresh = 0
+	z.Expiry = 0
+	z.Primary = nil
+	z.Dns_servers = nil
+	z.Networks = nil
+	z.Network_pools = nil
+	z.Hostmaster = ""
+	z.Pool = ""
+	z.Secondary = nil
+	z.Link = to
 }
 
 func NewRecord(zone string, domain string, t string) *Record {
 	return &Record{
-		Zone:   zone,
-		Domain: domain,
-		Type:   t,
+		Zone:    zone,
+		Domain:  domain,
+		Type:    t,
+		Answers: make([]Answer, 0),
 	}
+}
+
+func (r *Record) LinkTo(to string) {
+	r.Meta = nil
+	r.Answers = make([]Answer, 0)
+	r.Link = to
 }
 
 func New(k string) *APIClient {
