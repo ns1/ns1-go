@@ -131,8 +131,8 @@ func (c APIClient) CreateDataFeed(df *DataFeed) error {
 
 func (c APIClient) GetDataFeed(ds_id string, df_id string) (*DataFeed, error) {
 	df := NewDataFeed(ds_id)
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id), nil, &df)
-	return &df, err
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id), nil, df)
+	return df, err
 }
 
 func (c APIClient) DeleteDataFeed(ds_id string, df_id string) error {
