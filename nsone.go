@@ -53,7 +53,15 @@ func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpa
 	return json.Unmarshal(body, unpack_into)
 }
 
-func (c APIClient) DeleteThing(uri string) error {
+func (c APIClient) doHTTPBoth(method string, uri string, s interface{}) error {
+	rbody, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+	return c.doHTTPUnmarshal(method, uri, rbody, s)
+}
+
+func (c APIClient) doHTTPDelete(uri string) error {
 	_, err := c.doHTTP("DELETE", uri, nil)
 	return err
 }
@@ -71,31 +79,19 @@ func (c APIClient) GetZone(zone string) (*Zone, error) {
 }
 
 func (c APIClient) DeleteZone(zone string) error {
-	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
 }
 
 func (c APIClient) CreateZone(z *Zone) error {
-	rbody, err := json.Marshal(z)
-	if err != nil {
-		return err
-	}
-	return c.doHTTPUnmarshal("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody, z)
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
 }
 
 func (c APIClient) UpdateZone(z *Zone) error {
-	rbody, err := json.Marshal(z)
-	if err != nil {
-		return err
-	}
-	return c.doHTTPUnmarshal("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), rbody, z)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
 }
 
 func (c APIClient) CreateRecord(r *Record) error {
-	rbody, err := json.Marshal(r)
-	if err != nil {
-		return err
-	}
-	return c.doHTTPUnmarshal("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), rbody, r)
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
 }
 
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
@@ -105,25 +101,27 @@ func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, err
 }
 
 func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
-	return c.DeleteThing(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", zone, domain, t))
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", zone, domain, t))
 }
 
 func (c APIClient) UpdateRecord(r *Record) error {
-	return errors.New("UpdateRecord not implemented")
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/ones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
 }
 
-func (c APIClient) CreateDataSource(r *DataSource) error {
-	return errors.New("CreateDataSource not implemented")
+func (c APIClient) CreateDataSource(ds *DataSource) error {
+	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/data/sources", ds)
 }
 
 func (c APIClient) GetDataSource(id string) (*DataSource, error) {
-	return nil, errors.New("GetDataSource not implemented")
+	ds := DataSource{}
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", id), nil, &ds)
+	return &ds, err
 }
 
 func (c APIClient) DeleteDataSource(id string) error {
-	return errors.New("DeleteDataSource not implemented")
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", id))
 }
 
-func (c APIClient) UpdateDataSource(d *DataSource) error {
-	return errors.New("UpdateDataSource not implemented")
+func (c APIClient) UpdateDataSource(ds *DataSource) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", ds.Id), ds)
 }
