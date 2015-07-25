@@ -9,15 +9,17 @@ type FeedDestination struct {
 type DataSource struct {
 	Id           string            `json:"id,omitempty"`
 	Name         string            `json:"name"`
-	SourceType   string            `json"source_type"`
-	Config       map[string]string `json"config,omitempty"`
-	Status       string            `json"status,omitempty"`
-	Destinations []FeedDestination `json"destinations,omitempty"`
+	SourceType   string            `json:"sourcetype"`
+	Config       map[string]string `json:"config,omitempty"`
+	Status       string            `json:"status,omitempty"`
+	Destinations []FeedDestination `json:"destinations,omitempty"`
 }
 
 func NewDataSource(name string, source_type string) *DataSource {
+	cf := make(map[string]string, 0)
 	return &DataSource{
 		Name:       name,
 		SourceType: source_type,
+		Config:     cf,
 	}
 }
