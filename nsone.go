@@ -105,7 +105,7 @@ func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
 }
 
 func (c APIClient) UpdateRecord(r *Record) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/ones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
 }
 
 func (c APIClient) CreateDataSource(ds *DataSource) error {
@@ -131,14 +131,14 @@ func (c APIClient) CreateDataFeed(df *DataFeed) error {
 
 func (c APIClient) GetDataFeed(ds_id string, df_id string) (*DataFeed, error) {
 	df := NewDataFeed(ds_id)
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id), nil, df)
+	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", ds_id, df_id), nil, df)
 	return df, err
 }
 
 func (c APIClient) DeleteDataFeed(ds_id string, df_id string) error {
-	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s/%s", ds_id, df_id))
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", ds_id, df_id))
 }
 
 func (c APIClient) UpdateDataFeed(df *DataFeed) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", df.SourceId, df.Id), df)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceId, df.Id), df)
 }

@@ -36,7 +36,7 @@ type Zone struct {
 	Pool          string            `json:"pool,omitempty"`
 	Meta          map[string]string `json:"meta,omitempty"`
 	Secondary     *ZoneSecondary    `json:"secondary,omitempty"`
-	Link          string            `json:"link"`
+	Link          string            `json:"link,omitempty"`
 }
 
 func NewZone(zone string) *Zone {
@@ -48,12 +48,13 @@ func NewZone(zone string) *Zone {
 }
 
 func (z *Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
-	z.Secondary = &ZoneSecondary{
-		Enabled: false,
-	}
+	z.Secondary = nil
 	z.Primary = &ZonePrimary{
 		Enabled:     true,
 		Secondaries: secondaries,
+	}
+	if z.Primary.Secondaries == nil {
+		z.Primary.Secondaries = make([]ZoneSecondaryServer, 0)
 	}
 }
 
@@ -63,8 +64,10 @@ func (z *Zone) MakeSecondary(ip string) {
 		Primary_ip:   ip,
 		Primary_port: 53,
 	}
+	s := make([]ZoneSecondaryServer, 0)
 	z.Primary = &ZonePrimary{
-		Enabled: false,
+		Enabled:     false,
+		Secondaries: s,
 	}
 }
 
