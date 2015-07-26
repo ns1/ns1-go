@@ -66,13 +66,17 @@ resource "nsone_record" "www" {
     type = "A"
     answers {
       answer = "198.51.132.28"
-      meta_field = "enabled"
-      meta_feed = "${nsone_datafeed.exampledc1.id}"
+      meta {
+        field = "up"
+        feed = "${nsone_datafeed.exampledc1.id}"
+      }
     }
     answers {
       answer = "198.51.132.228"
-      meta_feed = "${nsone_datafeed.exampledc3.id}"
-      meta_field = "enabled"
+        meta {
+          feed = "${nsone_datafeed.exampledc3.id}"
+          field = "up"
+        }
     }
 }
 
