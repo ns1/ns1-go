@@ -32,7 +32,7 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return body, resp.StatusCode, err
+		return body, 510, err
 	}
 	log.Println(resp)
 	body, _ = ioutil.ReadAll(resp.Body)
