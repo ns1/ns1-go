@@ -10,13 +10,50 @@ A simple golang client for the NSOne API: https://api.nsone.net/
 
     func main() {
         api := nsone.New("xxxxxxx")
-    
+
+        ds := nsone.NewDataSource("mydatasource", "nsone_apiv1")
+        err := api.CreateDataSource(ds)
+        if err != nil {
+          panic(err)
+        }
+
+        dc1_feed_config := make(map[string]string)
+        dc1_feed_config["label"] = "exampledc1"
+        df_dc1 := nsone.NewFeed(ds.Id)
+        df_dc1.Config = dc1_feed_config
+        err = api.CreateDataFeed(df_dc1)
+        if err != nil {
+            panic(err)
+        }    
+
+        dc2_feed_config := make(map[string]string)
+        dc2_feed_config["label"] = "exampledc2"
+        df_dc2 := nsone.NewFeed(ds.Id)
+        df_dc2.Config = dc2_feed_config
+        err = api.CreateDataFeed(df_dc2)
+        if err != nil {
+            panic(err)
+        }
+
         z := nsone.NewZone("foo.com")
-        api.CreateZone(z)
+        err = api.CreateZone(z)
+        if err != nil {
+            panic(err)
+        }
 
         r := nsone.NewRecord("foo.com", "www.foo.com", "A")
-        r.Answers = []nsone.Answer{nsone.Answer{Answer: []string{"1.1.1.1"}}}
-        api.CreateRecord(r)
+        answers := make([]nsone.Answer, 2)
+        answers[0] = nsone.NewAnswer
+        answers[1] = nsone.NewAnswer
+        answers[0].Answer = []string{"1.1.1.1"}
+        answers[1].Answer = []string{"1.1.1.1"}
+        answers[0].Answer.Meta["up"] = nsone.NewMetaFeed(df_dc1.Id)
+        answers[1].Answer.Meta["up"] = nsone.NewMetaFeed(df_dc2.Id)
+        r.Answers = answers
+        err = api.CreateRecord(r)
+        if err != nil {
+            panic(err)
+        }
 
         api.DeleteZone("foo.com")
     }

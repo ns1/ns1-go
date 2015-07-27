@@ -68,13 +68,13 @@ resource "nsone_record" "www" {
       answer = "198.51.132.28"
       meta {
         field = "up"
-        feed = "${nsone_datafeed.exampledc1.id}"
+        feed = "${nsone_datafeed.exampledc3.id}"
       }
     }
     answers {
       answer = "198.51.132.228"
         meta {
-          feed = "${nsone_datafeed.exampledc3.id}"
+          feed = "${nsone_datafeed.exampledc1.id}"
           field = "up"
         }
     }
