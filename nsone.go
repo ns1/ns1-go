@@ -20,37 +20,37 @@ func New(k string) *APIClient {
 	}
 }
 
-func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, error) {
+func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int, error) {
 	var body []byte
 	r := bytes.NewReader(rbody)
 	log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
 	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
-		return body, err
+		return body, 510, err
 	}
 	req.Header.Add("X-NSONE-Key", c.ApiKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return body, err
+		return body, resp.StatusCode, err
 	}
 	log.Println(resp)
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return body, errors.New(fmt.Sprintf("%s: %s", resp.Status, string(body)))
+		return body, resp.StatusCode, errors.New(fmt.Sprintf("%s: %s", resp.Status, string(body)))
 	}
 	log.Println(fmt.Sprintf("Response body: %s", string(body)))
-	return body, nil
+	return body, resp.StatusCode, nil
 
 }
 
-func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpack_into interface{}) error {
-	body, err := c.doHTTP(method, uri, rbody)
+func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpack_into interface{}) (int, error) {
+	body, status, err := c.doHTTP(method, uri, rbody)
 	if err != nil {
-		return err
+		return status, err
 	}
-	return json.Unmarshal(body, unpack_into)
+	return status, json.Unmarshal(body, unpack_into)
 }
 
 func (c APIClient) doHTTPBoth(method string, uri string, s interface{}) error {
@@ -58,23 +58,29 @@ func (c APIClient) doHTTPBoth(method string, uri string, s interface{}) error {
 	if err != nil {
 		return err
 	}
-	return c.doHTTPUnmarshal(method, uri, rbody, s)
+	_, err = c.doHTTPUnmarshal(method, uri, rbody, s)
+	return err
 }
 
 func (c APIClient) doHTTPDelete(uri string) error {
-	_, err := c.doHTTP("DELETE", uri, nil)
+	_, _, err := c.doHTTP("DELETE", uri, nil)
 	return err
 }
 
 func (c APIClient) GetZones() ([]Zone, error) {
 	var zl []Zone
-	err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/zones", nil, &zl)
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/zones", nil, &zl)
 	return zl, err
 }
 
 func (c APIClient) GetZone(zone string) (*Zone, error) {
 	z := NewZone(zone)
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
+	if status == 404 {
+		z.Id = ""
+		z.Zone = ""
+		return z, nil
+	}
 	return z, err
 }
 
@@ -96,7 +102,14 @@ func (c APIClient) CreateRecord(r *Record) error {
 
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
 	r := NewRecord(zone, domain, t)
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
+	if status == 404 {
+		r.Id = ""
+		r.Zone = ""
+		r.Domain = ""
+		r.Type = ""
+		return r, nil
+	}
 	return r, err
 }
 
@@ -114,7 +127,7 @@ func (c APIClient) CreateDataSource(ds *DataSource) error {
 
 func (c APIClient) GetDataSource(id string) (*DataSource, error) {
 	ds := DataSource{}
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", id), nil, &ds)
+	_, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", id), nil, &ds)
 	return &ds, err
 }
 
@@ -131,7 +144,13 @@ func (c APIClient) CreateDataFeed(df *DataFeed) error {
 
 func (c APIClient) GetDataFeed(ds_id string, df_id string) (*DataFeed, error) {
 	df := NewDataFeed(ds_id)
-	err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", ds_id, df_id), nil, df)
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", ds_id, df_id), nil, df)
+	if status == 404 {
+		df.SourceId = ""
+		df.Id = ""
+		df.Name = ""
+		return df, nil
+	}
 	return df, err
 }
 
