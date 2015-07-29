@@ -63,6 +63,10 @@ An *experimental* golang client for the NSOne API: https://api.nsone.net/
 Just checkout this library to your GOPATH as usual. If you're writing a standard go program
 using this library, that should be as simple as saying 'go get'
 
+# Refernce documentation
+
+See [the godoc](http://www.godoc.org/github.com/bobtfish/go-nsone-api)
+
 # Supported features
 
 ## Setup zones
