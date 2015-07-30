@@ -209,3 +209,32 @@ func (c APIClient) GetQPSStats() (v float64, err error) {
 	}
 	return v, nil
 }
+
+func (c APIClient) GetUsers() ([]User, error) {
+	var users []User
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/account/users", nil, &users)
+	return users, err
+}
+
+func (c APIClient) GetUser(username string) (User, error) {
+	var u User
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", username), nil, &u)
+	if status == 404 {
+		u.Username = ""
+		u.Name = ""
+		return u, nil
+	}
+	return u, err
+}
+
+func (c APIClient) CreateUser(u *User) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/users/%u", u.Username), &u)
+}
+
+func (c APIClient) DeleteUser(username string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", username))
+}
+
+func (c APIClient) UpdateUser(user *User) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", user.Username), user)
+}
