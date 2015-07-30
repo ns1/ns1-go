@@ -24,7 +24,7 @@ type MonitoringJob struct {
 	Config         map[string]string              `json:"config"`
 	Status         map[string]MonitoringJobStatus `json:"status"`
 	Rules          []MonitoringJobRule            `json:"rules"`
-	JobType        string                         `json:"jobtype"`
+	JobType        string                         `json:"job_type"`
 	Regions        []string                       `json:"regions"`
 	Active         bool                           `json:"active"`
 	Frequency      int                            `json:"frequency"`
@@ -35,7 +35,7 @@ type MonitoringJob struct {
 	NotifyRepeat   int                            `json:"notify_repeat"`
 	RapidRecheck   bool                           `json:"rapid_recheck"`
 	NotifyDelay    int                            `json:"notify_delay"`
-	NotifyList     []string                       `json:"notify_list"`
+	NotifyList     string                         `json:"notify_list"`
 	NotifyRegional bool                           `json:"notidy_regional"`
 	NotifyFailback bool                           `json:"notify_failback"`
 }

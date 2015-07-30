@@ -74,4 +74,43 @@ func TestUnmarshalMonitoringJobs(t *testing.T) {
 	if j.Id != "52a27d4397d5f07003fdbe7b" {
 		t.Error("Wrong ID")
 	}
+	conf := j.Config
+	if conf["host"] != "1.2.3.4" {
+		t.Error("Wrong host")
+	}
+	status := j.Status["global"]
+	if status.Since != 1389407609 {
+		t.Error("since has unexpected value")
+	}
+	if status.Status != "up" {
+		t.Error("Status is not up")
+	}
+	r := j.Rules[0]
+	if r.Key != "rtt" {
+		t.Error("RTT rule key is wrong")
+	}
+	if r.Value != 100 {
+		t.Error("RTT rule value is wrong")
+	}
+	if r.Comparison != "<" {
+		t.Error("RTT rule comparison is wrong")
+	}
+	if j.JobType != "ping" {
+		t.Error("Jobtype is wrong")
+	}
+	if j.Regions[0] != "lga" {
+		t.Error("First region is not lga")
+	}
+	if !j.Active {
+		t.Error("Job is not active")
+	}
+	if j.Frequency != 60 {
+		t.Error("Job frequency != 60")
+	}
+	if j.Policy != "quorum" {
+		t.Error("Job policy is not quorum")
+	}
+	if j.RegionScope != "fixed" {
+		t.Error("Job region scope is not fixed")
+	}
 }
