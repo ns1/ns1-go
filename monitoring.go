@@ -2,19 +2,49 @@ package nsone
 
 type MonitoringJobTypes map[string]MonitoringJobType
 type MonitoringJobType struct {
-	ShortDesc string
-	Config    MonitoringJobTypeConfig
-	Results   MonitoringJobTypeResults
-	Desc      string
+	ShortDesc string                   `json:"shortdesc"`
+	Config    MonitoringJobTypeConfig  `json:"config"`
+	Results   MonitoringJobTypeResults `json:"results"`
+	Desc      string                   `json:"desc"`
 }
-
 type MonitoringJobTypeConfig map[string]interface{}
 type MonitoringJobTypeResults map[string]MonitoringJobTypeResult
 type MonitoringJobTypeResult struct {
-	Comparators []string
-	Metric      bool
-	Validator   string
-	ShortDesc   string
-	Type        string
-	Desc        string
+	Comparators []string `json:"comparators"`
+	Metric      bool     `json:"metric"`
+	Validator   string   `json:"validator"`
+	ShortDesc   string   `json:"shortdesc"`
+	Type        string   `json:type"`
+	Desc        string   `json:"desc"`
+}
+
+type MonitoringJobs []MonitoringJob
+type MonitoringJob struct {
+	Id             string                         `json:"id,omitempty"`
+	Config         map[string]string              `json:"config"`
+	Status         map[string]MonitoringJobStatus `json:"status"`
+	Rules          []MonitoringJobRule            `json:"rules"`
+	JobType        string                         `json:"jobtype"`
+	Regions        []string                       `json:"regions"`
+	Active         bool                           `json:"active"`
+	Frequency      int                            `json:"frequency"`
+	Policy         string                         `json:"policy"`
+	RegionScope    string                         `json:"region_scope"`
+	Notes          string                         `json:"notes"`
+	Name           string                         `json:"name"`
+	NotifyRepeat   int                            `json:"notify_repeat"`
+	RapidRecheck   bool                           `json:"rapid_recheck"`
+	NotifyDelay    int                            `json:"notify_delay"`
+	NotifyList     []string                       `json:"notify_list"`
+	NotifyRegional bool                           `json:"notidy_regional"`
+	NotifyFailback bool                           `json:"notify_failback"`
+}
+type MonitoringJobStatus struct {
+	Since  int    `json:"since"`
+	Status string `json:"status"`
+}
+type MonitoringJobRule struct {
+	Key        string `json:"key"`
+	Value      int    `json:"value"`
+	Comparison string `json:"comparison"`
 }

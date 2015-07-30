@@ -162,8 +162,37 @@ func (c APIClient) UpdateDataFeed(df *DataFeed) error {
 	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceId, df.Id), df)
 }
 
-func (c APIClient) GetMonitoringJobTypess() (MonitoringJobTypes, error) {
+func (c APIClient) GetMonitoringJobTypes() (MonitoringJobTypes, error) {
 	var mjt MonitoringJobTypes
 	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobtypes", nil, &mjt)
 	return mjt, err
+}
+
+func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
+	var mj MonitoringJobs
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobs", nil, &mj)
+	return mj, err
+}
+
+func (c APIClient) GetMonitoringJob(id string) (MonitoringJob, error) {
+	var mj MonitoringJob
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id), nil, &mj)
+	if status == 404 {
+		mj.Id = ""
+		mj.Name = ""
+		return mj, nil
+	}
+	return mj, err
+}
+
+func (c APIClient) CreateMonitoringJob(mj *MonitoringJob) error {
+	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/monitoring/jobs", mj)
+}
+
+func (c APIClient) DeleteMonitoringJob(id string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id))
+}
+
+func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", mj.Id), mj)
 }

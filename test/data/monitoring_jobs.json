@@ -1,0 +1,39 @@
+[
+  {
+    "id": "52a27d4397d5f07003fdbe7b",
+    "config": {
+      "host": "1.2.3.4"
+    },
+    "status": {
+      "lga": {
+        "since": 1389407609,
+        "status": "up"
+      },
+      "global": {
+        "since": 1389407609,
+        "status": "up"
+      },
+      "sjc": {
+        "since": 1389404014,
+        "status": "up"
+      }
+    },
+    "rules": [
+      {
+        "key": "rtt",
+        "value": 100,
+        "comparison": "<"
+      }
+    ],
+    "job_type": "ping",
+    "regions": [
+      "lga",
+      "sjc"
+    ],
+    "active": true,
+    "frequency": 60,
+    "policy": "quorum",
+    "region_scope": "fixed"
+  }
+]
+
