@@ -1,16 +1,16 @@
 package nsone
 
-type MonitoringJobs map[string]MonitoringJob
-type MonitoringJob struct {
+type MonitoringJobTypes map[string]MonitoringJobType
+type MonitoringJobType struct {
 	ShortDesc string
-	Config    MonitoringJobConfig
-	Results   MonitoringJobResults
+	Config    MonitoringJobTypeConfig
+	Results   MonitoringJobTypeResults
 	Desc      string
 }
 
-type MonitoringJobConfig map[string]interface{}
-type MonitoringJobResults map[string]MonitoringJobResult
-type MonitoringJobResult struct {
+type MonitoringJobTypeConfig map[string]interface{}
+type MonitoringJobTypeResults map[string]MonitoringJobTypeResult
+type MonitoringJobTypeResult struct {
 	Comparators []string
 	Metric      bool
 	Validator   string

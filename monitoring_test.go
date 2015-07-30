@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"reflect"
+	//"reflect"
 	"testing"
 )
 
-func TestUnmarshalMonitoringJobs(t *testing.T) {
+func TestUnmarshalMonitoringJobTypes(t *testing.T) {
 	data, err := ioutil.ReadFile("test/data/monitoring_jobtypes.json")
 	if err != nil {
 		t.Error(err)
 	}
-	var m MonitoringJobs
+	var m MonitoringJobTypes
 	if err = json.Unmarshal(data, &m); err != nil {
 		t.Error(err)
 	}

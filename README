@@ -87,6 +87,9 @@ See [the godoc](http://www.godoc.org/github.com/bobtfish/go-nsone-api)
 ## Data feeds
     * Create data feeds linked to a data source with a label
 
+## NSOne monitoring
+    * Retrieve monitoring jobs
+
 # Unsupported features
 
 # Zones
@@ -97,7 +100,7 @@ See [the godoc](http://www.godoc.org/github.com/bobtfish/go-nsone-api)
   * Filter chains are currently unsupported (Terraform will ignore them if present however - so you can set these up manually)
 
 ## NSOne monitoring
-  * No support
+  * 
 
 ## Users / Account management / API keys
   * No support
