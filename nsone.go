@@ -161,3 +161,9 @@ func (c APIClient) DeleteDataFeed(ds_id string, df_id string) error {
 func (c APIClient) UpdateDataFeed(df *DataFeed) error {
 	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceId, df.Id), df)
 }
+
+func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
+	var mj MonitoringJobs
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobs", nil, &mj)
+	return zl, err
+}
