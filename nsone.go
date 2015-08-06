@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type RateLimit struct {
@@ -19,6 +20,22 @@ type RateLimit struct {
 
 func (rl RateLimit) PercentageLeft() int {
 	return rl.Remaining * 100 / rl.Limit
+}
+
+func (rl RateLimit) WaitTime() time.Duration {
+	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Limit)
+}
+
+func (rl RateLimit) WaitTimeRemaining() time.Duration {
+	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Remaining)
+}
+
+func (a *APIClient) RateLimitStrategyNone() {
+	a.RateLimitFunc = defaultRateLimitFunc
+}
+
+func (a *APIClient) RateLimitStrategySleep() {
+	a.RateLimitFunc = func(rl RateLimit) { time.Sleep(rl.WaitTimeRemaining()) }
 }
 
 type APIClient struct {
