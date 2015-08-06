@@ -10,13 +10,23 @@ import (
 	"net/http"
 )
 
-type APIClient struct {
-	ApiKey string
+type RateLimit struct {
+	Limit     int
+	Remaining int
+	Period    int
 }
+
+type APIClient struct {
+	ApiKey                  string
+	SlowDownOnRateLimitFunc func(RateLimit)
+}
+
+var defaultSlowDownNearRateLimitFunc = func(rl RateLimit) {}
 
 func New(k string) *APIClient {
 	return &APIClient{
 		ApiKey: k,
+		SlowDownNearRateLimitFunc: defaultSlowDownNearRateLimitFunc,
 	}
 }
 
@@ -37,6 +47,24 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	log.Println(resp)
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+	if resp.Header["X-Ratelimit-Limit"] != "" {
+		var remaining int
+		var period int
+		limit, err := strconv.Atoi(resp.Header["X-Ratelimit-Limit"])
+		if err == nil {
+			remaining, err = strconv.Atoi(resp.Header["X-Ratelimit-Remaining"])
+			if err == nil {
+				period, err = strconv.Atoi(resp.Header["X-Ratelimit-Period"])
+			}
+		}
+		if err == nil {
+			c.SlowDownNearRateLimitFunc(RateLimit{
+				Limit:     limit,
+				Remaining: remaining,
+				Period:    period,
+			})
+		}
+	}
 	if resp.StatusCode != 200 {
 		return body, resp.StatusCode, errors.New(fmt.Sprintf("%s: %s", resp.Status, string(body)))
 	}
