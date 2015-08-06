@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/bobtfish/go-nsone-api"
+	"log"
 	"os"
 )
 
@@ -12,6 +13,10 @@ func main() {
 		fmt.Println("NSONE_APIKEY environment variable is not set, giving up")
 	}
 	api := nsone.New(k)
+	api.RateLimitFunc = func(r nsone.RateLimit) {
+		log.Println("FOO Limit %d Remaining %d Period %d", r.Limit, r.Remaining, r.Period)
+	}
+
 	fmt.Println(api.GetZones())
 
 	z := nsone.NewZone("foo.com")
