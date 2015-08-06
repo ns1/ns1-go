@@ -38,7 +38,7 @@ func (a *APIClient) RateLimitStrategySleep() {
 	a.RateLimitFunc = func(rl RateLimit) {
 		remaining := rl.WaitTimeRemaining()
 		if a.debug {
-			log.Println("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", a.Limit, a.Remaining, a.Period, remaining)
+			log.Println("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", rl.Limit, rl.Remaining, rl.Period, remaining)
 		}
 		time.Sleep(remaining)
 	}
