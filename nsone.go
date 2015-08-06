@@ -35,12 +35,19 @@ func (a *APIClient) RateLimitStrategyNone() {
 }
 
 func (a *APIClient) RateLimitStrategySleep() {
-	a.RateLimitFunc = func(rl RateLimit) { time.Sleep(rl.WaitTimeRemaining()) }
+	a.RateLimitFunc = func(rl RateLimit) {
+		remaining := rl.WaitTimeRemaining()
+		if a.debug {
+			log.Println("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", a.Limit, a.Remaining, a.Period, remaining)
+		}
+		time.Sleep(remaining)
+	}
 }
 
 type APIClient struct {
 	ApiKey        string
 	RateLimitFunc func(RateLimit)
+	debug         bool
 }
 
 var defaultRateLimitFunc = func(rl RateLimit) {}
@@ -49,7 +56,12 @@ func New(k string) *APIClient {
 	return &APIClient{
 		ApiKey:        k,
 		RateLimitFunc: defaultRateLimitFunc,
+		debug:         false,
 	}
+}
+
+func (c *APIClient) Debug() {
+	c.debug = true
 }
 
 func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int, error) {
