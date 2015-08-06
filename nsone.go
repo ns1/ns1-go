@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type RateLimit struct {
@@ -16,17 +17,21 @@ type RateLimit struct {
 	Period    int
 }
 
-type APIClient struct {
-	ApiKey                  string
-	SlowDownOnRateLimitFunc func(RateLimit)
+func (rl RateLimit) PercentageLeft() int {
+	return rl.Remaining * 100 / rl.Limit
 }
 
-var defaultSlowDownNearRateLimitFunc = func(rl RateLimit) {}
+type APIClient struct {
+	ApiKey        string
+	RateLimitFunc func(RateLimit)
+}
+
+var defaultRateLimitFunc = func(rl RateLimit) {}
 
 func New(k string) *APIClient {
 	return &APIClient{
-		ApiKey: k,
-		SlowDownNearRateLimitFunc: defaultSlowDownNearRateLimitFunc,
+		ApiKey:        k,
+		RateLimitFunc: defaultRateLimitFunc,
 	}
 }
 
@@ -47,18 +52,18 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	log.Println(resp)
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	if resp.Header["X-Ratelimit-Limit"] != "" {
+	if len(resp.Header["X-Ratelimit-Limit"]) > 0 {
 		var remaining int
 		var period int
-		limit, err := strconv.Atoi(resp.Header["X-Ratelimit-Limit"])
+		limit, err := strconv.Atoi(resp.Header["X-Ratelimit-Limit"][0])
 		if err == nil {
-			remaining, err = strconv.Atoi(resp.Header["X-Ratelimit-Remaining"])
+			remaining, err = strconv.Atoi(resp.Header["X-Ratelimit-Remaining"][0])
 			if err == nil {
-				period, err = strconv.Atoi(resp.Header["X-Ratelimit-Period"])
+				period, err = strconv.Atoi(resp.Header["X-Ratelimit-Period"][0])
 			}
 		}
 		if err == nil {
-			c.SlowDownNearRateLimitFunc(RateLimit{
+			c.RateLimitFunc(RateLimit{
 				Limit:     limit,
 				Remaining: remaining,
 				Period:    period,
