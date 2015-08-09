@@ -1,8 +1,14 @@
 package nsone
 
 type Answer struct {
+	Region string              `json:"region,omitempty"`
 	Answer []string            `json:"answer,omitempty"`
 	Meta   map[string]MetaFeed `json:"meta,omitempty"`
+}
+
+type Filter struct {
+	Filter string
+	Config map[string]interface{}
 }
 
 type Record struct {
@@ -13,6 +19,17 @@ type Record struct {
 	Link    string            `json:"link,omitempty"`
 	Meta    map[string]string `json:"meta,omitempty"`
 	Answers []Answer          `json:"answers"`
+	Filters []Filter          `json:"filters,omitempty"`
+	Ttl     int               `json:"ttl,omitempty"`
+	Regions map[string]Region `json:"regions,omitempty"`
+}
+
+type Region struct {
+	Meta RegionMeta `json:"meta"`
+}
+
+type RegionMeta struct {
+	GeoRegion []string `json:"georegion,omitempty"`
 }
 
 type MetaFeed struct {
