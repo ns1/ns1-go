@@ -3,7 +3,7 @@ provider "nsone" {
 
 
 variable "tld" {
-    default = "yelp.tld.example"
+    default = "terraform.testing.example"
 }
 
 resource "nsone_datasource" "api" {
@@ -11,84 +11,60 @@ resource "nsone_datasource" "api" {
     sourcetype = "nsone_v1"
 }
 
-resource "nsone_datafeed" "uswest1-prod" {
-    name = "uswest1-prod"
+resource "nsone_datafeed" "uswest1" {
+    name = "uswest1"
     source_id = "${nsone_datasource.api.id}"
     config {
-      label = "uswest1-prod"
+      label = "uswest1"
     }
 }
 
-resource "nsone_datafeed" "sfo12-prod" {
-    name = "sfo12-prod"
+resource "nsone_datafeed" "useast1" {
+    name = "useast1"
     source_id = "${nsone_datasource.api.id}"
     config {
-      label = "sfo12-prod"
+      label = "useast1"
     }
 }
 
-resource "nsone_datafeed" "dc6-prod" {
-    name = "dc6-prod"
-    source_id = "${nsone_datasource.api.id}"
-    config {
-      label = "dc6-prod"
-    }
-}
-
-resource "nsone_zone" "yelp_tld" {
+resource "nsone_zone" "tld" {
     zone = "${var.tld}"
     ttl = 60
 }
 
 resource "nsone_record" "www" {
-    zone = "${nsone_zone.yelp_tld.zone}"
+    zone = "${nsone_zone.tld.zone}"
     domain = "www.${var.tld}"
-    type = "CNAME"
+    type = "CNAME" # Note, normally we'd use ALIAS here
     answers {
-      answer = "www.uswest1.yelp.com"
+      answer = "example-elb-uswest1.aws.amazon.com"
       meta {
         field = "high_watermark"
-        feed = "${nsone_datafeed.uswest1-prod.id}"
+        feed = "${nsone_datafeed.uswest1.id}"
       }
       meta {
         field = "low_watermark"
-        feed = "${nsone_datafeed.uswest1-prod.id}"
+        feed = "${nsone_datafeed.uswest1.id}"
       }
       meta {
         field = "connections"
-        feed = "${nsone_datafeed.uswest1-prod.id}"
+        feed = "${nsone_datafeed.uswest1.id}"
       }
     }
     answers {
-      answer = "www.sfo2.yelp.com"
+      answer = "example-elb-useast1.aws.amazon.com"
       meta {
         field = "high_watermark"
-        feed = "${nsone_datafeed.sfo12-prod.id}"
+        feed = "${nsone_datafeed.useast1.id}"
       }
       meta {
         field = "low_watermark"
-        feed = "${nsone_datafeed.sfo12-prod.id}"
+        feed = "${nsone_datafeed.useast1.id}"
       }
       meta {
         field = "connections"
-        feed = "${nsone_datafeed.sfo12-prod.id}"
-      }
-    }
-    answers {
-      answer = "www.iad1.yelp.com"
-      meta {
-        field = "high_watermark"
-        feed = "${nsone_datafeed.dc6-prod.id}"
-      }
-      meta {
-        field = "low_watermark"
-        feed = "${nsone_datafeed.dc6-prod.id}"
-      }
-      meta {
-        field = "connections"
-        feed = "${nsone_datafeed.dc6-prod.id}"
+        feed = "${nsone_datafeed.useast1.id}"
       }
     }
 }
 
-    
