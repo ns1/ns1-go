@@ -7,7 +7,7 @@ variable "tld" {
 }
 
 resource "nsone_datasource" "api" {
-    name = "nsone_updater"
+    name = "terraform_example"
     sourcetype = "nsone_v1"
 }
 
