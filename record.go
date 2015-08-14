@@ -7,8 +7,9 @@ type Answer struct {
 }
 
 type Filter struct {
-	Filter string
-	Config map[string]interface{}
+	Filter   string                 `json:"filter"`
+	Disabled bool                   `json:"disabled,omitempty"`
+	Config   map[string]interface{} `json:"config"`
 }
 
 type Record struct {
