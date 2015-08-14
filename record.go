@@ -30,6 +30,8 @@ type Region struct {
 
 type RegionMeta struct {
 	GeoRegion []string `json:"georegion,omitempty"`
+	Country   []string `json:"country,omitempty"`
+	USState   []string `json:"us_state,omitempty"`
 }
 
 type MetaFeed struct {
