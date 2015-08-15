@@ -21,8 +21,8 @@ type MonitoringJobTypeResult struct {
 type MonitoringJobs []MonitoringJob
 type MonitoringJob struct {
 	Id             string                         `json:"id,omitempty"`
-	Config         map[string]string              `json:"config"`
-	Status         map[string]MonitoringJobStatus `json:"status"`
+	Config         map[string]interface{}         `json:"config"`
+	Status         map[string]MonitoringJobStatus `json:"status,omitempty"`
 	Rules          []MonitoringJobRule            `json:"rules"`
 	JobType        string                         `json:"job_type"`
 	Regions        []string                       `json:"regions"`
