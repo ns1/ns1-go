@@ -311,12 +311,12 @@ func (c APIClient) GetApikey(id string) (Apikey, error) {
 	var k Apikey
 	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", id), nil, &k)
 	if status == 404 {
-		u.Id = ""
-		u.Key = ""
-		u.Name = ""
-		return u, nil
+		k.Id = ""
+		k.Key = ""
+		k.Name = ""
+		return k, nil
 	}
-	return u, err
+	return k, err
 }
 
 func (c APIClient) CreateApikey(k *Apikey) error {
@@ -329,4 +329,33 @@ func (c APIClient) DeleteApikey(id string) error {
 
 func (c APIClient) UpdateApikey(k *Apikey) error {
 	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.Id), k)
+}
+
+func (c APIClient) GetTeams() ([]Team, error) {
+	var teams []Team
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/account/teams", nil, &teams)
+	return teams, err
+}
+
+func (c APIClient) GetTeam(id string) (Team, error) {
+	var t Team
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", id), nil, &t)
+	if status == 404 {
+		t.Id = ""
+		t.Name = ""
+		return t, nil
+	}
+	return t, err
+}
+
+func (c APIClient) CreateTeam(t *Team) error {
+	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/account/teams/%s", &t)
+}
+
+func (c APIClient) DeleteTeam(id string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", id))
+}
+
+func (c APIClient) UpdateTeam(t *Team) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", t.Id), t)
 }
