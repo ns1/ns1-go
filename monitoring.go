@@ -44,7 +44,7 @@ type MonitoringJobStatus struct {
 	Status string `json:"status"`
 }
 type MonitoringJobRule struct {
-	Key        string `json:"key"`
-	Value      int    `json:"value"`
-	Comparison string `json:"comparison"`
+	Key        string      `json:"key"`
+	Value      interface{} `json:"value"`
+	Comparison string      `json:"comparison"`
 }
