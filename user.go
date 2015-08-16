@@ -1,23 +1,23 @@
 package nsone
 
 type User struct {
-	Name        string             `json:"name"`
-	Username    string             `json:"username"`
-	Notify      map[string]bool    `json:"notify"`
-	LastAccess  int                `json:"last_access,omitempty"`
-	Email       string             `json:"email"`
-	Teams       []string           `json:"teams"`
-	Permissions UserPermissionsMap `json:"permissions"`
+	Name        string          `json:"name"`
+	Username    string          `json:"username"`
+	Notify      map[string]bool `json:"notify"`
+	LastAccess  int             `json:"last_access,omitempty"`
+	Email       string          `json:"email"`
+	Teams       []string        `json:"teams"`
+	Permissions PermissionsMap  `json:"permissions"`
 }
 
-type UserPermissionsMap struct {
-	Dns        UserPermissionsDns        `json:"dns"`
-	Data       UserPermissionsData       `json:"data"`
-	Account    UserPermissionsAccount    `json:"account"`
-	Monitoring UserPermissionsMonitoring `json:"monitoring"`
+type PermissionsMap struct {
+	Dns        PermissionsDns        `json:"dns"`
+	Data       PermissionsData       `json:"data"`
+	Account    PermissionsAccount    `json:"account"`
+	Monitoring PermissionsMonitoring `json:"monitoring"`
 }
 
-type UserPermissionsDns struct {
+type PermissionsDns struct {
 	ViewZones           bool     `json:"view_zones"`
 	ManageZones         bool     `json:"manage_zones"`
 	ZonesAllowByDefault bool     `json:"zones_allow_by_default"`
@@ -25,13 +25,13 @@ type UserPermissionsDns struct {
 	ZonesAllow          []string `json:"zones_allow"`
 }
 
-type UserPermissionsData struct {
+type PermissionsData struct {
 	PushToDatafeeds   bool `json:"push_to_datafeeds"`
 	ManageDatasources bool `json:"manage_datasources"`
 	ManageDatafeeds   bool `json:"manage_datafeeds"`
 }
 
-type UserPermissionsAccount struct {
+type PermissionsAccount struct {
 	ManageUsers           bool `json:"manage_users"`
 	ManagePaymentMethods  bool `json:"manage_payment_methods"`
 	ManagePlan            bool `json:"manage_plan"`
@@ -41,7 +41,7 @@ type UserPermissionsAccount struct {
 	ViewActivityLog       bool `json:"view_activity_log"`
 	ViewInvoices          bool `json:"view_invoices"`
 }
-type UserPermissionsMonitoring struct {
+type PermissionsMonitoring struct {
 	ManageLists bool `json:"manage_lists"`
 	ManageJobs  bool `json:"manage_jobs"`
 	ViewJobs    bool `json:"view_jobs"`
