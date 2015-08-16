@@ -300,3 +300,33 @@ func (c APIClient) DeleteUser(username string) error {
 func (c APIClient) UpdateUser(user *User) error {
 	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", user.Username), user)
 }
+
+func (c APIClient) GetApikeys() ([]Apikey, error) {
+	var apikeys []Apikey
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/account/apikeys", nil, &apikeys)
+	return apikeys, err
+}
+
+func (c APIClient) GetApikey(id string) (Apikey, error) {
+	var k Apikey
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", id), nil, &k)
+	if status == 404 {
+		u.Id = ""
+		u.Key = ""
+		u.Name = ""
+		return u, nil
+	}
+	return u, err
+}
+
+func (c APIClient) CreateApikey(k *Apikey) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.Id), &k)
+}
+
+func (c APIClient) DeleteApikey(id string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", id))
+}
+
+func (c APIClient) UpdateApikey(k *Apikey) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.Id), k)
+}
