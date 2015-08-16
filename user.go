@@ -45,5 +45,4 @@ type UserPermissionsMonitoring struct {
 	ManageLists bool `json:"manage_lists"`
 	ManageJobs  bool `json:"manage_jobs"`
 	ViewJobs    bool `json:"view_jobs"`
-	ManageUsers bool `json:"manage_users"`
 }
