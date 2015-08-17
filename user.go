@@ -11,7 +11,7 @@ type User struct {
 }
 
 type NotificationSettings struct {
-	billing bool `json:"billing"`
+	Billing bool `json:"billing"`
 }
 
 type PermissionsMap struct {
