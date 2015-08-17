@@ -1,13 +1,17 @@
 package nsone
 
 type User struct {
-	Name        string          `json:"name"`
-	Username    string          `json:"username"`
-	Notify      map[string]bool `json:"notify"`
-	LastAccess  int             `json:"last_access,omitempty"`
-	Email       string          `json:"email"`
-	Teams       []string        `json:"teams"`
-	Permissions PermissionsMap  `json:"permissions"`
+	Name        string               `json:"name"`
+	Username    string               `json:"username"`
+	Notify      NotificationSettings `json:"notify"`
+	LastAccess  int                  `json:"last_access,omitempty"`
+	Email       string               `json:"email"`
+	Teams       []string             `json:"teams"`
+	Permissions PermissionsMap       `json:"permissions"`
+}
+
+type NotificationSettings struct {
+	billing bool `json:"billing"`
 }
 
 type PermissionsMap struct {
