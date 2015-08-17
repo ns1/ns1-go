@@ -290,7 +290,7 @@ func (c APIClient) GetUser(username string) (User, error) {
 }
 
 func (c APIClient) CreateUser(u *User) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/users/%u", u.Username), &u)
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", u.Username), &u)
 }
 
 func (c APIClient) DeleteUser(username string) error {
