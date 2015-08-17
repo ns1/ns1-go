@@ -349,7 +349,7 @@ func (c APIClient) GetTeam(id string) (Team, error) {
 }
 
 func (c APIClient) CreateTeam(t *Team) error {
-	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/account/teams/%s", &t)
+	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/account/teams", &t)
 }
 
 func (c APIClient) DeleteTeam(id string) error {
