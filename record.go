@@ -1,9 +1,9 @@
 package nsone
 
 type Answer struct {
-	Region string              `json:"region,omitempty"`
-	Answer []string            `json:"answer,omitempty"`
-	Meta   map[string]MetaFeed `json:"meta,omitempty"`
+	Region string                 `json:"region,omitempty"`
+	Answer []string               `json:"answer,omitempty"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }
 
 type Filter struct {
@@ -39,6 +39,8 @@ type MetaFeed struct {
 	Feed string `json:"feed"`
 }
 
+type MetaStatic string
+
 func NewRecord(zone string, domain string, t string) *Record {
 	return &Record{
 		Zone:    zone,
@@ -50,7 +52,7 @@ func NewRecord(zone string, domain string, t string) *Record {
 
 func NewAnswer() Answer {
 	return Answer{
-		Meta: make(map[string]MetaFeed),
+		Meta: make(map[string]interface{}),
 	}
 }
 
