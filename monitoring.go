@@ -30,7 +30,7 @@ type MonitoringJob struct {
 	Frequency      int                            `json:"frequency"`
 	Policy         string                         `json:"policy"`
 	RegionScope    string                         `json:"region_scope"`
-	Notes          string                         `json:"notes,omitempty"`
+	Notes          string                         `json:"notes"`
 	Name           string                         `json:"name"`
 	NotifyRepeat   int                            `json:"notify_repeat"`
 	RapidRecheck   bool                           `json:"rapid_recheck"`
