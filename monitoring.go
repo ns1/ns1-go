@@ -32,7 +32,6 @@ type MonitoringJob struct {
 	RegionScope    string                         `json:"region_scope"`
 	Notes          string                         `json:"notes,omitempty"`
 	Name           string                         `json:"name"`
-	Ssl            int                            `json:"ssl,omitempty"`
 	NotifyRepeat   int                            `json:"notify_repeat"`
 	RapidRecheck   bool                           `json:"rapid_recheck"`
 	NotifyDelay    int                            `json:"notify_delay"`
