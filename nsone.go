@@ -116,8 +116,6 @@ func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpa
 }
 
 func (c APIClient) doHTTPBoth(method string, uri string, s interface{}) error {
-	fmt.Println("DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-	fmt.Println(s)
 	rbody, err := json.Marshal(s)
 	if err != nil {
 		return err
