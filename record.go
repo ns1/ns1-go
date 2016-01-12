@@ -22,7 +22,7 @@ type Record struct {
 	Answers         []Answer          `json:"answers"`
 	Filters         []Filter          `json:"filters,omitempty"`
 	Ttl             int               `json:"ttl,omitempty"`
-	UseClientSubnet bool              `json:"use_client_subnet,omitempty"`
+	UseClientSubnet bool              `json:"use_client_subnet"`
 	Regions         map[string]Region `json:"regions,omitempty"`
 }
 
@@ -45,10 +45,11 @@ type MetaStatic string
 
 func NewRecord(zone string, domain string, t string) *Record {
 	return &Record{
-		Zone:    zone,
-		Domain:  domain,
-		Type:    t,
-		Answers: make([]Answer, 0),
+		Zone:            zone,
+		Domain:          domain,
+		Type:            t,
+		UseClientSubnet: true,
+		Answers:         make([]Answer, 0),
 	}
 }
 
