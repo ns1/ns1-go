@@ -81,7 +81,7 @@ func TestUnmarshalUsers(t *testing.T) {
 	if !pdata.ManageDatafeeds {
 		t.Error("manage data feeds")
 	}
-	pdns := p.Dns
+	pdns := p.DNS
 	if !pdns.ManageZones {
 		t.Error("manage zones")
 	}

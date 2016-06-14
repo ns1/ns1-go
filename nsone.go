@@ -52,7 +52,7 @@ func (c *APIClient) RateLimitStrategySleep() {
 
 // APIClient stores NS1 client state
 type APIClient struct {
-	ApiKey        string
+	APIKey        string
 	RateLimitFunc func(RateLimit)
 	debug         bool
 }
@@ -62,7 +62,7 @@ var defaultRateLimitFunc = func(rl RateLimit) {}
 // New takes an API Key and creates an *APIClient
 func New(k string) *APIClient {
 	return &APIClient{
-		ApiKey:        k,
+		APIKey:        k,
 		RateLimitFunc: defaultRateLimitFunc,
 		debug:         false,
 	}
@@ -83,7 +83,7 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	if err != nil {
 		return body, 510, err
 	}
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
+	req.Header.Add("X-NSONE-Key", c.APIKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -183,7 +183,7 @@ func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, err
 	r := NewRecord(zone, domain, t)
 	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
 	if status == 404 {
-		r.Id = ""
+		r.ID = ""
 		r.Zone = ""
 		r.Domain = ""
 		r.Type = ""
@@ -221,12 +221,12 @@ func (c APIClient) DeleteDataSource(id string) error {
 
 // UpdateDataSource takes a *DataSource modifies basic details of a data source
 func (c APIClient) UpdateDataSource(ds *DataSource) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", ds.Id), ds)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/sources/%s", ds.ID), ds)
 }
 
 // CreateDataFeed takes a *DataFeed and connects a new data feed to an existing data source
 func (c APIClient) CreateDataFeed(df *DataFeed) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s", df.SourceId), df)
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s", df.SourceID), df)
 }
 
 // GetDataFeed takes a data source ID and a data feed ID and returns the details of a single data feed
@@ -234,8 +234,8 @@ func (c APIClient) GetDataFeed(dsID string, dfID string) (*DataFeed, error) {
 	df := NewDataFeed(dsID)
 	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", dsID, dfID), nil, df)
 	if status == 404 {
-		df.SourceId = ""
-		df.Id = ""
+		df.SourceID = ""
+		df.ID = ""
 		df.Name = ""
 		return df, nil
 	}
@@ -249,7 +249,7 @@ func (c APIClient) DeleteDataFeed(dsID string, dfID string) error {
 
 // UpdateDataFeed takes a *DataFeed and modifies and existing data feed
 func (c APIClient) UpdateDataFeed(df *DataFeed) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceId, df.Id), df)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceID, df.ID), df)
 }
 
 // GetMonitoringJobTypes returns the list of all available monitoring job types
@@ -285,7 +285,7 @@ func (c APIClient) DeleteMonitoringJob(id string) error {
 
 // UpdateMonitoringJob takes a *MonitoringJob and change the configuration details of an existing monitoring job
 func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", mj.Id), mj)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", mj.ID), mj)
 }
 
 // GetQPSStats returns current queries per second (QPS) for the account
@@ -348,7 +348,7 @@ func (c APIClient) GetApikey(id string) (Apikey, error) {
 	var k Apikey
 	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", id), nil, &k)
 	if status == 404 {
-		k.Id = ""
+		k.ID = ""
 		k.Key = ""
 		k.Name = ""
 		return k, nil
@@ -358,7 +358,7 @@ func (c APIClient) GetApikey(id string) (Apikey, error) {
 
 // CreateApikey takes an *Apikey and creates a new API key
 func (c APIClient) CreateApikey(k *Apikey) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.Id), &k)
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.ID), &k)
 }
 
 // DeleteApikey takes an ID and deletes and API key
@@ -368,7 +368,7 @@ func (c APIClient) DeleteApikey(id string) error {
 
 // UpdateApikey takes an *Apikey and change name or access rights for an API key
 func (c APIClient) UpdateApikey(k *Apikey) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.Id), k)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/apikeys/%s", k.ID), k)
 }
 
 // GetTeams returns a list of all teams under the account
@@ -383,7 +383,7 @@ func (c APIClient) GetTeam(id string) (Team, error) {
 	var t Team
 	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", id), nil, &t)
 	if status == 404 {
-		t.Id = ""
+		t.ID = ""
 		t.Name = ""
 		return t, nil
 	}
@@ -402,5 +402,5 @@ func (c APIClient) DeleteTeam(id string) error {
 
 // UpdateTeam takes a *Team and change name or access rights for a team
 func (c APIClient) UpdateTeam(t *Team) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", t.Id), t)
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/teams/%s", t.ID), t)
 }
