@@ -1,7 +1,7 @@
 package nsone
 
 type FeedDestination struct {
-	Destid   string `json"destif"`
+	Destid   string `json"destid"`
 	Desttype string `json"desttype"`
 	Record   string `json"record"`
 }
