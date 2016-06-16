@@ -21,13 +21,13 @@ type ZoneSecondary struct {
 }
 
 type ZoneRecord struct {
-	Domain   string `json:"Domain,omitempty"`
-	Id       string `json:"id,omitempty"`
-	Link     string `json:"link,omitempty"`
-	ShortAns string `json:"short_answers,omitempty"`
-	Tier     int    `json:"tier,omitempty"`
-	Ttl      int    `json:"ttl,omitempty"`
-	Type     string `json:"type,omitempty"`
+	Domain   string   `json:"Domain,omitempty"`
+	Id       string   `json:"id,omitempty"`
+	Link     string   `json:"link,omitempty"`
+	ShortAns []string `json:"short_answers,omitempty"`
+	Tier     int      `json:"tier,omitempty"`
+	Ttl      int      `json:"ttl,omitempty"`
+	Type     string   `json:"type,omitempty"`
 }
 
 type Zone struct {
