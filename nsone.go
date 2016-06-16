@@ -38,7 +38,7 @@ func (a *APIClient) RateLimitStrategySleep() {
 	a.RateLimitFunc = func(rl RateLimit) {
 		remaining := rl.WaitTimeRemaining()
 		if a.debug {
-			log.Println("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", rl.Limit, rl.Remaining, rl.Period, remaining)
+			log.Printf("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", rl.Limit, rl.Remaining, rl.Period, remaining)
 		}
 		time.Sleep(remaining)
 	}
@@ -67,7 +67,9 @@ func (c *APIClient) Debug() {
 func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int, error) {
 	var body []byte
 	r := bytes.NewReader(rbody)
-	log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
+	if c.debug {
+		log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
+	}
 	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
 		return body, 510, err
