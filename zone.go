@@ -20,6 +20,16 @@ type ZoneSecondary struct {
 	Expired      bool   `json:"expired,omitempty"`
 }
 
+type ZoneRecord struct {
+	Domain   string `json:"Domain,omitempty"`
+	Id       string `json:"id,omitempty"`
+	Link     string `json:"link,omitempty"`
+	ShortAns string `json:"short_answers,omitempty"`
+	Tier     string `json:"tier,omitempty"`
+	Ttl      int    `json:"ttl,omitempty"`
+	Type     string `json:"type,omitempty"`
+}
+
 type Zone struct {
 	Id            string            `json:"id,omitempty"`
 	Ttl           int               `json:"ttl,omitempty"`
@@ -37,6 +47,7 @@ type Zone struct {
 	Meta          map[string]string `json:"meta,omitempty"`
 	Secondary     *ZoneSecondary    `json:"secondary,omitempty"`
 	Link          string            `json:"link,omitempty"`
+	Records       []ZoneRecord      `json:"records,omitempty"`
 }
 
 func NewZone(zone string) *Zone {
