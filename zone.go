@@ -23,6 +23,17 @@ type ZoneSecondary struct {
 	Expired      bool   `json:"expired,omitempty"`
 }
 
+// ZoneRecord wraps Zone's "records" attribute
+type ZoneRecord struct {
+	Domain   string   `json:"Domain,omitempty"`
+	Id       string   `json:"id,omitempty"`
+	Link     string   `json:"link,omitempty"`
+	ShortAns []string `json:"short_answers,omitempty"`
+	Tier     int      `json:"tier,omitempty"`
+	Ttl      int      `json:"ttl,omitempty"`
+	Type     string   `json:"type,omitempty"`
+}
+
 // Zone wraps an NS1 /zone resource
 type Zone struct {
 	Id            string            `json:"id,omitempty"`
@@ -41,6 +52,7 @@ type Zone struct {
 	Meta          map[string]string `json:"meta,omitempty"`
 	Secondary     *ZoneSecondary    `json:"secondary,omitempty"`
 	Link          string            `json:"link,omitempty"`
+	Records       []ZoneRecord      `json:"records,omitempty"`
 }
 
 // NewZone takes a zone domain name and creates a new primary *Zone

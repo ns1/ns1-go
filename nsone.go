@@ -76,7 +76,9 @@ func (c *APIClient) Debug() {
 func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int, error) {
 	var body []byte
 	r := bytes.NewReader(rbody)
-	log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
+	if c.debug {
+		log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
+	}
 	req, err := http.NewRequest(method, uri, r)
 	if err != nil {
 		return body, 510, err
@@ -87,7 +89,9 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	if err != nil {
 		return body, 510, err
 	}
-	log.Println(resp)
+	if c.debug {
+		log.Println(resp)
+	}
 	body, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if len(resp.Header["X-Ratelimit-Limit"]) > 0 {
@@ -111,7 +115,9 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 	if resp.StatusCode != 200 {
 		return body, resp.StatusCode, fmt.Errorf("%s: %s", resp.Status, string(body))
 	}
-	log.Println(fmt.Sprintf("Response body: %s", string(body)))
+	if c.debug {
+		log.Println(fmt.Sprintf("Response body: %s", string(body)))
+	}
 	return body, resp.StatusCode, nil
 
 }
