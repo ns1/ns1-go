@@ -15,11 +15,11 @@ func TestRateLimit(t *testing.T) {
 		t.Error("WaitTime is wrong duration ", r.WaitTime())
 	}
 	if r.PercentageLeft() != 100 {
-		t.Error("% != 100")
+		t.Error("PercentLeft != 100")
 	}
 	r.Remaining = 5
 	if r.PercentageLeft() != 50 {
-		t.Error("% != 50")
+		t.Error("PercentLeft != 50")
 	}
 	if r.WaitTime() != time.Second {
 		t.Error("WaitTime is wrong duration ", r.WaitTime())

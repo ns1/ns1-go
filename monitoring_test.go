@@ -2,7 +2,6 @@ package nsone
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	//"reflect"
 	"testing"
@@ -21,13 +20,13 @@ func TestUnmarshalMonitoringJobTypes(t *testing.T) {
 	if !exists {
 		t.Error("'ping' job does not exist")
 	}
-	exp_shortdesc := "Ping (ICMP)"
-	if job.ShortDesc != exp_shortdesc {
-		t.Error(fmt.Sprintf("Expected job.ShortDesc to be '%s', but was actually '%s'", exp_shortdesc, job.ShortDesc))
+	shortdesc := "Ping (ICMP)"
+	if job.ShortDesc != shortdesc {
+		t.Errorf("Expected job.ShortDesc to be '%s', but was actually '%s'", shortdesc, job.ShortDesc)
 	}
-	exp_desc := "Ping a host using ICMP packets."
-	if job.Desc != exp_desc {
-		t.Error(fmt.Sprintf("Expected job.Desc to be '%s', but was actually '%s'", exp_desc, job.Desc))
+	desc := "Ping a host using ICMP packets."
+	if job.Desc != desc {
+		t.Errorf("Expected job.Desc to be '%s', but was actually '%s'", desc, job.Desc)
 	}
 	results := job.Results
 	if results == nil {
@@ -46,9 +45,9 @@ func TestUnmarshalMonitoringJobTypes(t *testing.T) {
 	if r.Validator != "number" {
 		t.Error("validator not as expected")
 	}
-	r_exp_shortdesc := "Round trip time"
-	if r.ShortDesc != r_exp_shortdesc {
-		t.Error(fmt.Sprintf("Result ShortDesc wrong, expected '%s', got '%s'", r_exp_shortdesc, r.ShortDesc))
+	rShortdesc := "Round trip time"
+	if r.ShortDesc != rShortdesc {
+		t.Errorf("Result ShortDesc wrong, expected '%s', got '%s'", rShortdesc, r.ShortDesc)
 	}
 	if r.Type != "number" {
 		t.Error("Type is bad")
