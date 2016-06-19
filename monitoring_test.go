@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	//"reflect"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnmarshalMonitoringJobTypes(t *testing.T) {
@@ -85,12 +86,8 @@ func TestUnmarshalMonitoringJobs(t *testing.T) {
 		t.Error("Status is not up")
 	}
 	r := j.Rules[0]
-	if r.Key != "rtt" {
-		t.Error("RTT rule key is wrong")
-	}
-	if r.Value != 100 {
-		t.Error("RTT rule value is wrong")
-	}
+	assert.Equal(t, r.Key, "rtt", "RTT rule key is wrong")
+	assert.Equal(t, r.Value.(float64), float64(100), "RTT rule value is wrong")
 	if r.Comparison != "<" {
 		t.Error("RTT rule comparison is wrong")
 	}
