@@ -2,9 +2,9 @@ package nsone
 
 // FeedDestination wraps an element of a DataSource's "destinations" attribute
 type FeedDestination struct {
-	Destid   string `json"destid"`
-	Desttype string `json"desttype"`
-	Record   string `json"record"`
+	Destid   string `json:"destid"`
+	Desttype string `json:"desttype"`
+	Record   string `json:"record"`
 }
 
 // DataSource wraps an NS1 /data/sources resource

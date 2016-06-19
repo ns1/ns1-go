@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	//"reflect"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestUnmarshalMonitoringJobTypes(t *testing.T) {
