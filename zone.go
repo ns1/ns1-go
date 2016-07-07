@@ -53,6 +53,7 @@ type Zone struct {
 	Secondary     *ZoneSecondary    `json:"secondary,omitempty"`
 	Link          string            `json:"link,omitempty"`
 	Records       []ZoneRecord      `json:"records,omitempty"`
+	Serial        int               `json:"serial,omitempty"`
 }
 
 // NewZone takes a zone domain name and creates a new primary *Zone
