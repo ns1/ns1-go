@@ -1,5 +1,7 @@
 package nsone
 
+import "fmt"
+
 // User wraps an NS1 /account/users resource
 type User struct {
 	Name        string               `json:"name"`
@@ -57,4 +59,38 @@ type PermissionsMonitoring struct {
 	ManageLists bool `json:"manage_lists"`
 	ManageJobs  bool `json:"manage_jobs"`
 	ViewJobs    bool `json:"view_jobs"`
+}
+
+// GetUsers returns a list of all users with access to the account
+func (c APIClient) GetUsers() ([]User, error) {
+	var users []User
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/account/users", nil, &users)
+	return users, err
+}
+
+// GetUser takes a username and returns the details for a single user
+func (c APIClient) GetUser(username string) (User, error) {
+	var u User
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", username), nil, &u)
+	if status == 404 {
+		u.Username = ""
+		u.Name = ""
+		return u, nil
+	}
+	return u, err
+}
+
+// CreateUser takes a *User and creates a new user
+func (c APIClient) CreateUser(u *User) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", u.Username), &u)
+}
+
+// DeleteUser takes a username and deletes a user from the account
+func (c APIClient) DeleteUser(username string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", username))
+}
+
+// UpdateUser takes a *User and change contact details, notification settings or access rights for a user
+func (c APIClient) UpdateUser(user *User) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/account/users/%s", user.Username), user)
 }

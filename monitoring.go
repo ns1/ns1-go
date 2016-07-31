@@ -1,5 +1,7 @@
 package nsone
 
+import "fmt"
+
 // MonitoringJobTypes wraps an NS1 /monitoring/jobtypes resource
 type MonitoringJobTypes map[string]MonitoringJobType
 
@@ -63,4 +65,45 @@ type MonitoringJobRule struct {
 	Key        string      `json:"key"`
 	Value      interface{} `json:"value"`
 	Comparison string      `json:"comparison"`
+}
+
+// GetMonitoringJobTypes returns the list of all available monitoring job types
+func (c APIClient) GetMonitoringJobTypes() (MonitoringJobTypes, error) {
+	var mjt MonitoringJobTypes
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobtypes", nil, &mjt)
+	return mjt, err
+}
+
+// GetMonitoringJobs returns the list of all monitoring jobs for the account
+func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
+	var mj MonitoringJobs
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobs", nil, &mj)
+	return mj, err
+}
+
+// GetMonitoringJob takes an ID and returns details for a specific monitoring job
+func (c APIClient) GetMonitoringJob(id string) (MonitoringJob, error) {
+	var mj MonitoringJob
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id), nil, &mj)
+	if status == 404 {
+		mj.Id = ""
+		mj.Name = ""
+		return mj, nil
+	}
+	return mj, err
+}
+
+// CreateMonitoringJob takes a *MonitoringJob and creates a new monitoring job
+func (c APIClient) CreateMonitoringJob(mj *MonitoringJob) error {
+	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/monitoring/jobs", mj)
+}
+
+// DeleteMonitoringJob takes an ID and immediately terminates and deletes and existing monitoring job
+func (c APIClient) DeleteMonitoringJob(id string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id))
+}
+
+// UpdateMonitoringJob takes a *MonitoringJob and change the configuration details of an existing monitoring job
+func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", mj.Id), mj)
 }

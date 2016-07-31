@@ -1,5 +1,7 @@
 package nsone
 
+import "fmt"
+
 // ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
 type ZoneSecondaryServer struct {
 	Ip     string `json:"ip"`
@@ -106,4 +108,38 @@ func (z *Zone) LinkTo(to string) {
 	z.Pool = ""
 	z.Secondary = nil
 	z.Link = to
+}
+
+// GetZones returns all active zones and basic zone configuration details for each
+func (c APIClient) GetZones() ([]Zone, error) {
+	var zl []Zone
+	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/zones", nil, &zl)
+	return zl, err
+}
+
+// GetZone takes a zone and returns a single active zone and its basic configuration details
+func (c APIClient) GetZone(zone string) (*Zone, error) {
+	z := NewZone(zone)
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
+	if status == 404 {
+		z.Id = ""
+		z.Zone = ""
+		return z, nil
+	}
+	return z, err
+}
+
+// DeleteZone takes a zone and destroys an existing DNS zone and all records in the zone
+func (c APIClient) DeleteZone(zone string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
+}
+
+// CreateZone takes a *Zone and creates a new DNS zone
+func (c APIClient) CreateZone(z *Zone) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
+}
+
+// UpdateZone takes a *Zone and modifies basic details of a DNS zone
+func (c APIClient) UpdateZone(z *Zone) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
 }

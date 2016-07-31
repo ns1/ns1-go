@@ -1,5 +1,7 @@
 package nsone
 
+import "fmt"
+
 // Answer wraps the values of a Record's "filters" attribute
 type Answer struct {
 	Region string                 `json:"region,omitempty"`
@@ -80,4 +82,33 @@ func (r *Record) LinkTo(to string) {
 	r.Meta = nil
 	r.Answers = make([]Answer, 0)
 	r.Link = to
+}
+
+// CreateRecord takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type
+func (c APIClient) CreateRecord(r *Record) error {
+	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
+}
+
+// GetRecord takes a zone, domain and record type t and returns full configuration for a DNS record
+func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
+	r := NewRecord(zone, domain, t)
+	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
+	if status == 404 {
+		r.Id = ""
+		r.Zone = ""
+		r.Domain = ""
+		r.Type = ""
+		return r, nil
+	}
+	return r, err
+}
+
+// DeleteRecord takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details
+func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
+	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", zone, domain, t))
+}
+
+// UpdateRecord takes a *Record and modifies configuration details for an existing DNS record
+func (c APIClient) UpdateRecord(r *Record) error {
+	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
 }
