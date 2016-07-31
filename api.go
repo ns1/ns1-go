@@ -7,23 +7,48 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
 
+const (
+	defaultEndpoint = "https://api.nsone.net/v1/"
+)
+
+// Doer is a single method interface that allows a user to extend/augment an http.Client instance.
+// Note: http.Client satisfies the Doer interface.
+type Doer interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 // APIClient stores NS1 client state
 type APIClient struct {
-	ApiKey        string
+	// client handles all http communication.
+	// The default value is *http.Client
+	client *Doer
+
+	// NS1 rest endpoint, overrides default if given.
+	Endpoint *url.URL
+
+	// NS1 api key (value for http request header 'X-NSONE-Key')
+	ApiKey string
+
+	// Rate limiting strategy for the APIClient instance.
 	RateLimitFunc func(RateLimit)
-	debug         bool
+
+	// Enables verbose logs.
+	debug bool
 }
 
 // New takes an API Key and creates an *APIClient
 func New(k string) *APIClient {
+	endpoint, _ := url.Parse(defaultEndpoint)
 	return &APIClient{
+		client:        http.DefaultClient,
+		Endpoint:      endpoint,
 		ApiKey:        k,
 		RateLimitFunc: defaultRateLimitFunc,
-		debug:         false,
 	}
 }
 
