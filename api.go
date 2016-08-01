@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	defaultEndpoint = "https://api.nsone.net/v1/"
+	clientVersion    = "0.9.0"
+	defaultEndpoint  = "https://api.nsone.net/v1/"
+	defaultUserAgent = "Golang client-" + clientVersion
 )
 
 // Doer is a single method interface that allows a user to extend/augment an http.Client instance.
@@ -26,13 +28,16 @@ type Doer interface {
 type APIClient struct {
 	// client handles all http communication.
 	// The default value is *http.Client
-	client *Doer
+	client Doer
 
 	// NS1 rest endpoint, overrides default if given.
 	Endpoint *url.URL
 
-	// NS1 api key (value for http request header 'X-NSONE-Key')
+	// NS1 api key (value for http request header 'X-NSONE-Key').
 	ApiKey string
+
+	// NS1 go rest user agent (value for http request header 'User-Agent').
+	UserAgent string
 
 	// Rate limiting strategy for the APIClient instance.
 	RateLimitFunc func(RateLimit)
@@ -49,7 +54,28 @@ func New(k string) *APIClient {
 		Endpoint:      endpoint,
 		ApiKey:        k,
 		RateLimitFunc: defaultRateLimitFunc,
+		UserAgent:     defaultUserAgent,
 	}
+}
+
+func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
+	endpoint, _ := url.Parse(defaultEndpoint)
+
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
+	c := &APIClient{
+		client:        httpClient,
+		Endpoint:      endpoint,
+		RateLimitFunc: defaultRateLimitFunc,
+		UserAgent:     defaultUserAgent,
+	}
+
+	for _, option := range options {
+		option(c)
+	}
+	return c
 }
 
 // Debug enables debug logging
@@ -57,27 +83,67 @@ func (c *APIClient) Debug() {
 	c.debug = true
 }
 
-func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int, error) {
-	var body []byte
-	r := bytes.NewReader(rbody)
-	if c.debug {
-		log.Printf("[DEBUG] %s: %s (%s)", method, uri, string(rbody))
+type APIClientOption func(*APIClient)
+
+func SetClient(client Doer) APIClientOption {
+	return func(c *APIClient) { c.client = client }
+}
+
+func SetApiKey(key string) APIClientOption {
+	return func(c *APIClient) { c.ApiKey = key }
+}
+
+func SetEndpoint(endpoint string) APIClientOption {
+	return func(c *APIClient) { c.Endpoint, _ = url.Parse(endpoint) }
+}
+
+func SetUserAgent(ua string) APIClientOption {
+	return func(c *APIClient) { c.UserAgent = ua }
+}
+
+// Contains all http responses outside the 2xx range.
+type RestError struct {
+	Resp    *http.Response
+	Message string
+}
+
+// Satisfy std lib error interface.
+func (re *RestError) Error() string {
+	return fmt.Sprintf("%v %v: %d %v", re.Resp.Request.Method, re.Resp.Request.URL, re.Resp.StatusCode, re.Message)
+}
+
+// Handles parsing of rest api errors. Returns nil if no error.
+func CheckResponse(resp *http.Response) error {
+	if c := resp.StatusCode; c >= 200 && c <= 299 {
+		return nil
 	}
-	req, err := http.NewRequest(method, uri, r)
+
+	restError := &RestError{Resp: resp}
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, 510, err
+		return err
 	}
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	if len(b) == 0 {
+		return restError
+	}
+
+	json.Unmarshal(b, restError)
+	return restError
+}
+
+func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return body, 510, err
+		return nil, err
 	}
-	if c.debug {
-		log.Println(resp)
+	defer resp.Body.Close()
+
+	err = CheckResponse(resp)
+	if err != nil {
+		return resp, err
 	}
-	body, _ = ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+
+	// Update the clients' rate limit.
 	if len(resp.Header["X-Ratelimit-Limit"]) > 0 {
 		var remaining int
 		var period int
@@ -96,36 +162,47 @@ func (c APIClient) doHTTP(method string, uri string, rbody []byte) ([]byte, int,
 			})
 		}
 	}
-	if resp.StatusCode != 200 {
-		return body, resp.StatusCode, fmt.Errorf("%s: %s", resp.Status, string(body))
+
+	if v != nil {
+		// Try to decode body into the given type.
+		err := json.NewDecoder(resp.Body).Decode(&v)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	return resp, err
+}
+
+func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
+	rel, err := url.Parse(path)
+	if err != nil {
+		return nil, err
+	}
+
+	uri := c.Endpoint.ResolveReference(rel)
+
 	if c.debug {
-		log.Println(fmt.Sprintf("Response body: %s", string(body)))
+		log.Printf("[DEBUG] %s: %s (%s)", method, uri.String(), body)
 	}
-	return body, resp.StatusCode, nil
 
-}
+	// Encode body as json
+	buf := new(bytes.Buffer)
+	if body != nil {
+		err := json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-func (c APIClient) doHTTPUnmarshal(method string, uri string, rbody []byte, unpackInto interface{}) (int, error) {
-	body, status, err := c.doHTTP(method, uri, rbody)
+	req, err := http.NewRequest(method, uri.String(), buf)
 	if err != nil {
-		return status, err
+		return nil, err
 	}
-	return status, json.Unmarshal(body, unpackInto)
-}
 
-func (c APIClient) doHTTPBoth(method string, uri string, s interface{}) error {
-	rbody, err := json.Marshal(s)
-	if err != nil {
-		return err
-	}
-	_, err = c.doHTTPUnmarshal(method, uri, rbody, s)
-	return err
-}
-
-func (c APIClient) doHTTPDelete(uri string) error {
-	_, _, err := c.doHTTP("DELETE", uri, nil)
-	return err
+	req.Header.Add("X-NSONE-Key", c.ApiKey)
+	req.Header.Add("User-Agent", c.UserAgent)
+	return req, nil
 }
 
 // RateLimit stores X-Ratelimit-* headers

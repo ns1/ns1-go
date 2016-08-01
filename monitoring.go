@@ -69,41 +69,101 @@ type MonitoringJobRule struct {
 
 // GetMonitoringJobTypes returns the list of all available monitoring job types
 func (c APIClient) GetMonitoringJobTypes() (MonitoringJobTypes, error) {
+	path := "monitoring/jobtypes"
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	var mjt MonitoringJobTypes
-	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobtypes", nil, &mjt)
-	return mjt, err
+	_, err = c.Do(req, &mjt)
+	if err != nil {
+		return nil, err
+	}
+
+	return mjt, nil
 }
 
 // GetMonitoringJobs returns the list of all monitoring jobs for the account
 func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
+	path := "monitoring/jobs"
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	var mj MonitoringJobs
-	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/monitoring/jobs", nil, &mj)
-	return mj, err
+	_, err = c.Do(req, &mj)
+	if err != nil {
+		return nil, err
+	}
+
+	return mj, nil
 }
 
 // GetMonitoringJob takes an ID and returns details for a specific monitoring job
 func (c APIClient) GetMonitoringJob(id string) (MonitoringJob, error) {
 	var mj MonitoringJob
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id), nil, &mj)
-	if status == 404 {
-		mj.Id = ""
-		mj.Name = ""
-		return mj, nil
+	path := fmt.Sprintf("monitoring/jobs/%s", id)
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return mj, err
 	}
-	return mj, err
+
+	_, err = c.Do(req, &mj)
+	if err != nil {
+		return mj, err
+	}
+
+	return mj, nil
 }
 
-// CreateMonitoringJob takes a *MonitoringJob and creates a new monitoring job
-func (c APIClient) CreateMonitoringJob(mj *MonitoringJob) error {
-	return c.doHTTPBoth("PUT", "https://api.nsone.net/v1/monitoring/jobs", mj)
-}
+// // CreateMonitoringJob takes a *MonitoringJob and creates a new monitoring job
+// func (c APIClient) CreateMonitoringJob(mj *MonitoringJob) error {
+// 	path := fmt.Sprintf("monitoring/jobs/%s", MonitoringJob.Id)
+// 	req, err := c.NewRequest("PUT", path, &mj)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Update mon jobs' fields with data from api(ensure consistent)
+// 	_, err = c.Do(req, &mj)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 // DeleteMonitoringJob takes an ID and immediately terminates and deletes and existing monitoring job
 func (c APIClient) DeleteMonitoringJob(id string) error {
-	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id))
+	path := fmt.Sprintf("monitoring/jobs/%s", id)
+	req, err := c.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// UpdateMonitoringJob takes a *MonitoringJob and change the configuration details of an existing monitoring job
-func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", mj.Id), mj)
-}
+// // UpdateMonitoringJob takes a *MonitoringJob and change the configuration details of an existing monitoring job
+// func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
+// 	path := fmt.Sprintf("monitoring/jobs/%s", MonitoringJob.Id)
+// 	req, err := c.NewRequest("POST", path, &mj)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Update mon jobs' fields with data from api(ensure consistent)
+// 	_, err = c.Do(req, &mj)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }

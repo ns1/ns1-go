@@ -112,34 +112,85 @@ func (z *Zone) LinkTo(to string) {
 
 // GetZones returns all active zones and basic zone configuration details for each
 func (c APIClient) GetZones() ([]Zone, error) {
+	req, err := c.NewRequest("GET", "zones", nil)
+	if err != nil {
+		return nil, err
+	}
+
 	var zl []Zone
-	_, err := c.doHTTPUnmarshal("GET", "https://api.nsone.net/v1/zones", nil, &zl)
-	return zl, err
+	_, err = c.Do(req, &zl)
+	if err != nil {
+		return nil, err
+	}
+
+	return zl, nil
 }
 
 // GetZone takes a zone and returns a single active zone and its basic configuration details
 func (c APIClient) GetZone(zone string) (*Zone, error) {
-	z := NewZone(zone)
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
-	if status == 404 {
-		z.Id = ""
-		z.Zone = ""
-		return z, nil
+	path := fmt.Sprintf("zones/%s", zone)
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
 	}
-	return z, err
+
+	var z Zone
+	_, err = c.Do(req, &z)
+	if err != nil {
+		return nil, err
+	}
+
+	return &z, nil
 }
 
 // DeleteZone takes a zone and destroys an existing DNS zone and all records in the zone
 func (c APIClient) DeleteZone(zone string) error {
-	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s", zone))
+	path := fmt.Sprintf("zones/%s", zone)
+	req, err := c.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateZone takes a *Zone and creates a new DNS zone
 func (c APIClient) CreateZone(z *Zone) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
+	path := fmt.Sprintf("zones/%s", z.Zone)
+
+	req, err := c.NewRequest("PUT", path, &z)
+	if err != nil {
+		return err
+	}
+
+	// Update zones fields with data from api(ensure consistent)
+	_, err = c.Do(req, &z)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // UpdateZone takes a *Zone and modifies basic details of a DNS zone
 func (c APIClient) UpdateZone(z *Zone) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), z)
+	path := fmt.Sprintf("zones/%s", z.Zone)
+
+	req, err := c.NewRequest("POST", path, &z)
+	if err != nil {
+		return err
+	}
+
+	// Update zones fields with data from api(ensure consistent)
+	_, err = c.Do(req, &z)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

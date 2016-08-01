@@ -1,6 +1,9 @@
 package nsone
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Answer wraps the values of a Record's "filters" attribute
 type Answer struct {
@@ -54,6 +57,9 @@ type MetaStatic string
 
 // NewRecord takes a zone, domain and record type t and creates a *Record with UseClientSubnet: true & empty Answers
 func NewRecord(zone string, domain string, t string) *Record {
+	if !strings.HasSuffix(domain, zone) {
+		domain = fmt.Sprintf("%s.%s", domain, zone)
+	}
 	return &Record{
 		Zone:            zone,
 		Domain:          domain,
@@ -86,29 +92,70 @@ func (r *Record) LinkTo(to string) {
 
 // CreateRecord takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type
 func (c APIClient) CreateRecord(r *Record) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
+	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
+
+	req, err := c.NewRequest("PUT", path, &r)
+	if err != nil {
+		return err
+	}
+
+	// Update record fields with data from api(ensure consistent)
+	_, err = c.Do(req, &r)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetRecord takes a zone, domain and record type t and returns full configuration for a DNS record
 func (c APIClient) GetRecord(zone string, domain string, t string) (*Record, error) {
-	r := NewRecord(zone, domain, t)
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), nil, r)
-	if status == 404 {
-		r.Id = ""
-		r.Zone = ""
-		r.Domain = ""
-		r.Type = ""
-		return r, nil
+	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
+
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
 	}
-	return r, err
+
+	var r Record
+	_, err = c.Do(req, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
 }
 
 // DeleteRecord takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details
 func (c APIClient) DeleteRecord(zone string, domain string, t string) error {
-	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", zone, domain, t))
+	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
+	req, err := c.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // UpdateRecord takes a *Record and modifies configuration details for an existing DNS record
 func (c APIClient) UpdateRecord(r *Record) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/zones/%s/%s/%s", r.Zone, r.Domain, r.Type), r)
+	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
+
+	req, err := c.NewRequest("POST", path, &r)
+	if err != nil {
+		return err
+	}
+
+	// Update records fields with data from api(ensure consistent)
+	_, err = c.Do(req, &r)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

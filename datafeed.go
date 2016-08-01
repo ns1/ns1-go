@@ -18,28 +18,70 @@ func NewDataFeed(sourceID string) *DataFeed {
 
 // CreateDataFeed takes a *DataFeed and connects a new data feed to an existing data source
 func (c APIClient) CreateDataFeed(df *DataFeed) error {
-	return c.doHTTPBoth("PUT", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s", df.SourceId), df)
+	path := fmt.Sprintf("data/feeds/%s", df.SourceId)
+
+	req, err := c.NewRequest("PUT", path, &df)
+	if err != nil {
+		return err
+	}
+
+	// Update datafeed fields with data from api
+	_, err = c.Do(req, &df)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetDataFeed takes a data source ID and a data feed ID and returns the details of a single data feed
 func (c APIClient) GetDataFeed(dsID string, dfID string) (*DataFeed, error) {
 	df := NewDataFeed(dsID)
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", dsID, dfID), nil, df)
-	if status == 404 {
-		df.SourceId = ""
-		df.Id = ""
-		df.Name = ""
-		return df, nil
+
+	path := fmt.Sprintf("data/feeds/%s/%s", dsID, dfID)
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
 	}
-	return df, err
+
+	_, err = c.Do(req, df)
+	if err != nil {
+		return nil, err
+	}
+
+	return df, nil
 }
 
 // DeleteDataFeed takes a data source ID and a data feed ID and disconnects the feed from the data source and all attached destination metadata tables
 func (c APIClient) DeleteDataFeed(dsID string, dfID string) error {
-	return c.doHTTPDelete(fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", dsID, dfID))
+	path := fmt.Sprintf("data/feeds/%s/%s", dsID, dfID)
+	req, err := c.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // UpdateDataFeed takes a *DataFeed and modifies and existing data feed
 func (c APIClient) UpdateDataFeed(df *DataFeed) error {
-	return c.doHTTPBoth("POST", fmt.Sprintf("https://api.nsone.net/v1/data/feeds/%s/%s", df.SourceId, df.Id), df)
+	path := fmt.Sprintf("data/feeds/%s/%s", df.SourceId, df.Id)
+
+	req, err := c.NewRequest("POST", path, &df)
+	if err != nil {
+		return err
+	}
+
+	// Update datafeed fields with data from api(ensure consistent)
+	_, err = c.Do(req, &df)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
