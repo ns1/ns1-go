@@ -97,3 +97,20 @@ func (c APIClient) UpdateDataSource(ds *DataSource) error {
 
 	return nil
 }
+
+// PublishFeed takes a datasources' id and data to publish to the feed.
+func (c APIClient) PublishFeed(datasource_id string, data interface{}) error {
+	path := fmt.Sprintf("feed/%s", datasource_id)
+
+	req, err := c.NewRequest("POST", path, &data)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
