@@ -15,7 +15,12 @@ import (
 const (
 	clientVersion    = "0.9.0"
 	defaultEndpoint  = "https://api.nsone.net/v1/"
-	defaultUserAgent = "Golang client-" + clientVersion
+	defaultUserAgent = "go-ns1/" + clientVersion
+
+	headerAuth          = "X-NSONE-Key"
+	headerRateLimit     = "X-Ratelimit-Limit"
+	headerRateRemaining = "X-Ratelimit-Remaining"
+	headerRatePeriod    = "X-Ratelimit-Period"
 )
 
 // Doer is a single method interface that allows a user to extend/augment an http.Client instance.
@@ -39,7 +44,7 @@ type APIClient struct {
 	// NS1 go rest user agent (value for http request header 'User-Agent').
 	UserAgent string
 
-	// Rate limiting strategy for the APIClient instance.
+	// Func to call after response is returned in Do
 	RateLimitFunc func(RateLimit)
 
 	// Enables verbose logs.
@@ -101,34 +106,8 @@ func SetUserAgent(ua string) APIClientOption {
 	return func(c *APIClient) { c.UserAgent = ua }
 }
 
-// Contains all http responses outside the 2xx range.
-type RestError struct {
-	Resp    *http.Response
-	Message string
-}
-
-// Satisfy std lib error interface.
-func (re *RestError) Error() string {
-	return fmt.Sprintf("%v %v: %d %v", re.Resp.Request.Method, re.Resp.Request.URL, re.Resp.StatusCode, re.Message)
-}
-
-// Handles parsing of rest api errors. Returns nil if no error.
-func CheckResponse(resp *http.Response) error {
-	if c := resp.StatusCode; c >= 200 && c <= 299 {
-		return nil
-	}
-
-	restError := &RestError{Resp: resp}
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if len(b) == 0 {
-		return restError
-	}
-
-	json.Unmarshal(b, restError)
-	return restError
+func SetRateLimitFunc(ratefunc func(rl RateLimit)) APIClientOption {
+	return func(c *APIClient) { c.RateLimitFunc = ratefunc }
 }
 
 func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) {
@@ -138,29 +117,12 @@ func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) 
 	}
 	defer resp.Body.Close()
 
+	rl := parseRate(resp)
+	c.RateLimitFunc(rl)
+
 	err = CheckResponse(resp)
 	if err != nil {
 		return resp, err
-	}
-
-	// Update the clients' rate limit.
-	if len(resp.Header["X-Ratelimit-Limit"]) > 0 {
-		var remaining int
-		var period int
-		limit, err := strconv.Atoi(resp.Header["X-Ratelimit-Limit"][0])
-		if err == nil {
-			remaining, err = strconv.Atoi(resp.Header["X-Ratelimit-Remaining"][0])
-			if err == nil {
-				period, err = strconv.Atoi(resp.Header["X-Ratelimit-Period"][0])
-			}
-		}
-		if err == nil {
-			c.RateLimitFunc(RateLimit{
-				Limit:     limit,
-				Remaining: remaining,
-				Period:    period,
-			})
-		}
 	}
 
 	if v != nil {
@@ -182,10 +144,6 @@ func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Req
 
 	uri := c.Endpoint.ResolveReference(rel)
 
-	if c.debug {
-		log.Printf("[DEBUG] %s: %s (%s)", method, uri.String(), body)
-	}
-
 	// Encode body as json
 	buf := new(bytes.Buffer)
 	if body != nil {
@@ -195,15 +153,57 @@ func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Req
 		}
 	}
 
+	if c.debug {
+		log.Printf("[DEBUG] %s: %s (%s)", method, uri.String(), buf)
+	}
+
 	req, err := http.NewRequest(method, uri.String(), buf)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("X-NSONE-Key", c.ApiKey)
+	req.Header.Add(headerAuth, c.ApiKey)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
 }
+
+// Contains all http responses outside the 2xx range.
+type RestError struct {
+	Resp    *http.Response
+	Message string
+}
+
+// Satisfy std lib error interface.
+func (re *RestError) Error() string {
+	return fmt.Sprintf("%v %v: %d %v", re.Resp.Request.Method, re.Resp.Request.URL, re.Resp.StatusCode, re.Message)
+}
+
+// Handles parsing of rest api errors. Returns nil if no error.
+func CheckResponse(resp *http.Response) error {
+	if c := resp.StatusCode; c >= 200 && c <= 299 {
+		return nil
+	}
+
+	restError := &RestError{Resp: resp}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if len(b) == 0 {
+		return restError
+	}
+
+	err = json.Unmarshal(b, restError)
+	if err != nil {
+		return err
+	}
+
+	return restError
+}
+
+// Rate limiting strategy for the APIClient instance.
+type RateLimitFunc func(RateLimit)
 
 // RateLimit stores X-Ratelimit-* headers
 type RateLimit struct {
@@ -229,11 +229,6 @@ func (rl RateLimit) WaitTimeRemaining() time.Duration {
 	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Remaining)
 }
 
-// RateLimitStrategyNone sets RateLimitFunc to an empty func
-func (c *APIClient) RateLimitStrategyNone() {
-	c.RateLimitFunc = defaultRateLimitFunc
-}
-
 // RateLimitStrategySleep sets RateLimitFunc to sleep by WaitTimeRemaining
 func (c *APIClient) RateLimitStrategySleep() {
 	c.RateLimitFunc = func(rl RateLimit) {
@@ -243,4 +238,21 @@ func (c *APIClient) RateLimitStrategySleep() {
 		}
 		time.Sleep(remaining)
 	}
+}
+
+// parseRate parses rate related headers from http response.
+func parseRate(resp *http.Response) RateLimit {
+	var rl RateLimit
+
+	if limit := resp.Header.Get(headerRateLimit); limit != "" {
+		rl.Limit, _ = strconv.Atoi(limit)
+	}
+	if remaining := resp.Header.Get(headerRateRemaining); remaining != "" {
+		rl.Remaining, _ = strconv.Atoi(remaining)
+	}
+	if period := resp.Header.Get(headerRatePeriod); period != "" {
+		rl.Period, _ = strconv.Atoi(period)
+	}
+
+	return rl
 }
