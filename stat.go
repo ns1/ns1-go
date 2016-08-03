@@ -1,4 +1,4 @@
-package nsone
+package ns1
 
 // // GetQPSStats returns current queries per second (QPS) for the account
 // func (c APIClient) GetQPSStats() (v float64, err error) {

@@ -2,25 +2,26 @@ package main
 
 import (
 	"fmt"
-	"github.com/bobtfish/go-nsone-api"
 	"os"
+
+	"github.com/ns1/ns1-go"
 )
 
 func main() {
-	k := os.Getenv("NSONE_APIKEY")
+	k := os.Getenv("NS1_APIKEY")
 	if k == "" {
-		fmt.Println("NSONE_APIKEY environment variable is not set, giving up")
+		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
-	api := nsone.New(k)
+	api := ns1.New(k)
 	api.Debug()
 	api.RateLimitStrategySleep()
 	fmt.Println(api.GetZones())
 
-	z := nsone.NewZone("foo.com")
+	z := ns1.NewZone("foo.com")
 	api.CreateZone(z)
 
-	r := nsone.NewRecord("foo.com", "www.foo.com", "A")
-	r.Answers = []nsone.Answer{nsone.Answer{Answer: []string{"1.1.1.1"}}}
+	r := ns1.NewRecord("foo.com", "www.foo.com", "A")
+	r.Answers = []ns1.Answer{ns1.Answer{Answer: []string{"1.1.1.1"}}}
 	api.CreateRecord(r)
 
 	api.DeleteZone("foo.com")

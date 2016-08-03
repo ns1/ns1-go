@@ -1,4 +1,4 @@
-package nsone
+package ns1
 
 // Team wraps an NS1 /accounts/teams resource
 type Team struct {
