@@ -110,6 +110,11 @@ func (z *Zone) LinkTo(to string) {
 	z.Link = to
 }
 
+// Implementation of Stringer interface.
+func (z Zone) String() string {
+	return z.Zone
+}
+
 // GetZones returns all active zones and basic zone configuration details for each
 func (c APIClient) GetZones() ([]Zone, error) {
 	req, err := c.NewRequest("GET", "zones", nil)

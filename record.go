@@ -90,6 +90,11 @@ func (r *Record) LinkTo(to string) {
 	r.Link = to
 }
 
+// Implementation of Stringer interface.
+func (r Record) String() string {
+	return fmt.Sprintf("%s %s", r.Domain, r.Type)
+}
+
 // CreateRecord takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type
 func (c APIClient) CreateRecord(r *Record) error {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
