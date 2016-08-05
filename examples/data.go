@@ -3,32 +3,47 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/rest"
 )
 
 func main() {
-	k := os.Getenv("NSONE_APIKEY")
+	k := os.Getenv("NS1_APIKEY")
 	if k == "" {
-		fmt.Println("NSONE_APIKEY environment variable is not set, giving up")
+		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
-	// Initialize with only api key.
-	api := nsone.New(k)
 
-	api.Debug()
-	api.RateLimitStrategySleep()
+	httpClient := &http.Client{Timeout: time.Second * 10}
+	client := rest.NewAPIClient(httpClient, rest.SetAPIKey(k))
+
+	dataSources, err := client.DataSources.List()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, ds := range dataSources {
+		fmt.Println(ds)
+	}
 
 	// Create a zone to play in
-	z := nsone.NewZone("testzone.net")
-	err := api.CreateZone(z)
+	zone_name := "testdata.com"
+	err = client.Zones.Delete(zone_name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	z := ns1.NewZone(zone_name)
+	err = client.Zones.Create(z)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Construct/Create an NSONE API data source
-	ds := nsone.NewDataSource("my api source", "nsone_v1")
-	err = api.CreateDataSource(ds)
+	ds := ns1.NewDataSource("my api source", "nsone_v1")
+	err = client.DataSources.Create(ds)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,25 +51,25 @@ func main() {
 	// Construct feeds which will drive the meta data for each answer.
 	// We'll use the id of these feeds when we connect the feeds to the
 	// answer meta below.
-	feed1 := nsone.NewDataFeed(ds.Id)
+	feed1 := ns1.NewDataFeed(ds.ID)
 	feed1.Name = "feed to server1"
 	feed1.Config = map[string]string{
 		"label": "server1",
 	}
 
-	feed2 := nsone.NewDataFeed(ds.Id)
+	feed2 := ns1.NewDataFeed(ds.ID)
 	feed2.Name = "feed to server2"
 	feed2.Config = map[string]string{
 		"label": "server2",
 	}
 
 	// Create the feeds through the rest api.
-	err = api.CreateDataFeed(feed1)
+	err = client.DataFeeds.Create(feed1)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = api.CreateDataFeed(feed2)
+	err = client.DataFeeds.Create(feed2)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,24 +78,24 @@ func main() {
 	// specify the up filter so we can send traffic to only those nodes
 	// which are known to be up. We'll start with just the second answer up.
 	// Each 'up' meta value is a feed pointer, pointing to the feeds we created above.
-	r := nsone.NewRecord(z.Zone, "record", "A")
-	r.Answers = []nsone.Answer{
-		nsone.Answer{
+	r := ns1.NewRecord(z.Zone, "record", "A")
+	r.Answers = []*ns1.Answer{
+		&ns1.Answer{
 			Answer: []string{"1.1.1.1"},
-			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed1.Id}},
+			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed1.ID}},
 		},
-		nsone.Answer{
+		&ns1.Answer{
 			Answer: []string{"9.9.9.9"},
-			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed2.Id}},
+			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed2.ID}},
 		},
 	}
-	r.Filters = []nsone.Filter{
-		nsone.Filter{
+	r.Filters = []*ns1.Filter{
+		&ns1.Filter{
 			Filter: "up",
 			Config: map[string]interface{}{},
 		},
 	}
-	err = api.CreateRecord(r)
+	err = client.Records.Create(r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +105,7 @@ func main() {
 	update := make(map[string]interface{})
 	update["server1"] = map[string]bool{"up": true}
 	update["server2"] = map[string]bool{"up": false}
-	err = api.PublishFeed(ds.Id, update)
+	err = client.DataSources.PublishToFeed(ds.ID, update)
 	if err != nil {
 		log.Fatal(err)
 	}
