@@ -1,4 +1,4 @@
-package ns1
+package rest
 
 import (
 	"bytes"
@@ -31,9 +31,9 @@ type Doer interface {
 
 // Client manages communication with the NS1 Rest API.
 type APIClient struct {
-	// client handles all http communication.
-	// The default value is *http.Client
-	client Doer
+	// httpClient handles all rest api communication,
+	// and expects an *http.Client.
+	httpClient Doer
 
 	// NS1 rest endpoint, overrides default if given.
 	Endpoint *url.URL
@@ -54,22 +54,12 @@ type APIClient struct {
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
 	// Services used for communicating with different components of the NS1 API.
-	Zones    *ZonesService
-	Records  *RecordsService
-	Monitors *MonitorsService
+	DataFeeds   *DataFeedsService
+	DataSources *DataSourcesService
+	Monitors    *MonitorsService
+	Records     *RecordsService
+	Zones       *ZonesService
 }
-
-// // New takes an API Key and creates an *APIClient
-// func New(k string) *APIClient {
-// 	endpoint, _ := url.Parse(defaultEndpoint)
-// 	return &APIClient{
-// 		client:        http.DefaultClient,
-// 		Endpoint:      endpoint,
-// 		ApiKey:        k,
-// 		RateLimitFunc: defaultRateLimitFunc,
-// 		UserAgent:     defaultUserAgent,
-// 	}
-// }
 
 func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	endpoint, _ := url.Parse(defaultEndpoint)
@@ -79,16 +69,18 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	}
 
 	c := &APIClient{
-		client:        httpClient,
+		httpClient:    httpClient,
 		Endpoint:      endpoint,
 		RateLimitFunc: defaultRateLimitFunc,
 		UserAgent:     defaultUserAgent,
 	}
 
 	c.common.client = c
-	c.Zones = (*ZonesService)(&c.common)
-	c.Records = (*RecordsService)(&c.common)
+	c.DataFeeds = (*DataFeedsService)(&c.common)
+	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Monitors = (*MonitorsService)(&c.common)
+	c.Records = (*RecordsService)(&c.common)
+	c.Zones = (*ZonesService)(&c.common)
 
 	for _, option := range options {
 		option(c)
@@ -107,8 +99,8 @@ func (c *APIClient) Debug() {
 
 type APIClientOption func(*APIClient)
 
-func SetClient(client Doer) APIClientOption {
-	return func(c *APIClient) { c.client = client }
+func SetHTTPClient(httpClient Doer) APIClientOption {
+	return func(c *APIClient) { c.httpClient = httpClient }
 }
 
 func SetApiKey(key string) APIClientOption {
@@ -128,7 +120,7 @@ func SetRateLimitFunc(ratefunc func(rl RateLimit)) APIClientOption {
 }
 
 func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) {
-	resp, err := c.client.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

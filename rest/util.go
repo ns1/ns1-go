@@ -1,4 +1,4 @@
-package ns1
+package rest
 
 import (
 	"log"
@@ -7,10 +7,10 @@ import (
 
 // Implements Doer Interface. DoerFuncs are useful for adding
 // logging/instrumentation to the http.Client that is used
-// within the nsone.APIClient.
+// within the rest.APIClient.
 type DoerFunc func(*http.Request) (*http.Response, error)
 
-// Implementation of nsone.Doer interface. Calls itself on the
+// Implementation of rest.Doer interface. Calls itself on the
 // given http.Request.
 func (f DoerFunc) Do(r *http.Request) (*http.Response, error) {
 	return f(r)

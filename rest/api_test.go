@@ -1,4 +1,4 @@
-package ns1
+package rest
 
 import (
 	"testing"
