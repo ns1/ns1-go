@@ -2,35 +2,9 @@ package ns1
 
 import "fmt"
 
-// MonitoringJobTypes wraps an NS1 /monitoring/jobtypes resource
-type MonitoringJobTypes map[string]MonitoringJobType
-
-// MonitoringJobType wraps an element of MonitoringJobTypes
-type MonitoringJobType struct {
-	ShortDesc string                   `json:"shortdesc"`
-	Config    MonitoringJobTypeConfig  `json:"config"`
-	Results   MonitoringJobTypeResults `json:"results"`
-	Desc      string                   `json:"desc"`
-}
-
-// MonitoringJobTypeConfig wraps a MonitoringJobType's "config" attribute
-type MonitoringJobTypeConfig map[string]interface{}
-
-// MonitoringJobTypeResults wraps a MonitoringJobType's "results" attribute
-type MonitoringJobTypeResults map[string]MonitoringJobTypeResult
-
-// MonitoringJobTypeResult wraps an element of a MonitoringJobType's "results" attribute
-type MonitoringJobTypeResult struct {
-	Comparators []string `json:"comparators"`
-	Metric      bool     `json:"metric"`
-	Validator   string   `json:"validator"`
-	ShortDesc   string   `json:"shortdesc"`
-	Type        string   `json:"type"`
-	Desc        string   `json:"desc"`
-}
-
-// MonitoringJobs is just a MonitoringJob array
-type MonitoringJobs []MonitoringJob
+const (
+	monitorPath = "monitoring/jobs"
+)
 
 // MonitoringJob wraps an NS1 /monitoring/jobs resource
 type MonitoringJob struct {
@@ -54,6 +28,24 @@ type MonitoringJob struct {
 	NotifyFailback bool                           `json:"notify_failback"`
 }
 
+// MonitoringJobType wraps an element of MonitoringJobTypes
+type MonitoringJobType struct {
+	ShortDesc string                             `json:"shortdesc"`
+	Config    map[string]interface{}             `json:"config"`
+	Results   map[string]MonitoringJobTypeResult `json:"results"`
+	Desc      string                             `json:"desc"`
+}
+
+// MonitoringJobTypeResult wraps an element of a MonitoringJobType's "results" attribute
+type MonitoringJobTypeResult struct {
+	Comparators []string `json:"comparators"`
+	Metric      bool     `json:"metric"`
+	Validator   string   `json:"validator"`
+	ShortDesc   string   `json:"shortdesc"`
+	Type        string   `json:"type"`
+	Desc        string   `json:"desc"`
+}
+
 // MonitoringJobStatus wraps an value of a MonitoringJob's "status" attribute
 type MonitoringJobStatus struct {
 	Since  int    `json:"since"`
@@ -67,33 +59,19 @@ type MonitoringJobRule struct {
 	Comparison string      `json:"comparison"`
 }
 
-// GetMonitoringJobTypes returns the list of all available monitoring job types
-func (c APIClient) GetMonitoringJobTypes() (MonitoringJobTypes, error) {
-	path := "monitoring/jobtypes"
-	req, err := c.NewRequest("GET", path, nil)
+type MonitorsService service
+
+// List returns all monitoring jobs for the account.
+//
+// NS1 API docs: https://ns1.com/api/#jobs-get
+func (s *MonitorsService) List() ([]*MonitoringJob, error) {
+	req, err := s.client.NewRequest("GET", monitorPath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var mjt MonitoringJobTypes
-	_, err = c.Do(req, &mjt)
-	if err != nil {
-		return nil, err
-	}
-
-	return mjt, nil
-}
-
-// GetMonitoringJobs returns the list of all monitoring jobs for the account
-func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
-	path := "monitoring/jobs"
-	req, err := c.NewRequest("GET", path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var mj MonitoringJobs
-	_, err = c.Do(req, &mj)
+	mj := []*MonitoringJob{}
+	_, err = s.client.Do(req, &mj)
 	if err != nil {
 		return nil, err
 	}
@@ -101,49 +79,39 @@ func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
 	return mj, nil
 }
 
-// GetMonitoringJob takes an ID and returns details for a specific monitoring job
-func (c APIClient) GetMonitoringJob(id string) (MonitoringJob, error) {
+// Get takes an ID and returns details for a specific monitoring job.
+//
+// NS1 API docs: https://ns1.com/api/#jobs-jobid-get
+func (s *MonitorsService) Get(id string) (*MonitoringJob, error) {
+	path := fmt.Sprintf("%s/%s", monitorPath, id)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	var mj MonitoringJob
-	path := fmt.Sprintf("monitoring/jobs/%s", id)
-	req, err := c.NewRequest("GET", path, nil)
+	_, err = s.client.Do(req, &mj)
 	if err != nil {
-		return mj, err
+		return nil, err
 	}
 
-	_, err = c.Do(req, &mj)
-	if err != nil {
-		return mj, err
-	}
-
-	return mj, nil
+	return &mj, nil
 }
 
-// // CreateMonitoringJob takes a *MonitoringJob and creates a new monitoring job
-// func (c APIClient) CreateMonitoringJob(mj *MonitoringJob) error {
-// 	path := fmt.Sprintf("monitoring/jobs/%s", MonitoringJob.Id)
-// 	req, err := c.NewRequest("PUT", path, &mj)
-// 	if err != nil {
-// 		return err
-// 	}
+// Create takes a *MonitoringJob and creates a new monitoring job.
+//
+// NS1 API docs: https://ns1.com/api/#jobs-put
+func (s *MonitorsService) Create(mj *MonitoringJob) error {
+	path := fmt.Sprintf("%s/%s", monitorPath, mj.Id)
 
-// 	// Update mon jobs' fields with data from api(ensure consistent)
-// 	_, err = c.Do(req, &mj)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
-// DeleteMonitoringJob takes an ID and immediately terminates and deletes and existing monitoring job
-func (c APIClient) DeleteMonitoringJob(id string) error {
-	path := fmt.Sprintf("monitoring/jobs/%s", id)
-	req, err := c.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest("PUT", path, &mj)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Do(req, nil)
+	// Update mon jobs' fields with data from api(ensure consistent)
+	_, err = s.client.Do(req, &mj)
 	if err != nil {
 		return err
 	}
@@ -151,19 +119,61 @@ func (c APIClient) DeleteMonitoringJob(id string) error {
 	return nil
 }
 
-// // UpdateMonitoringJob takes a *MonitoringJob and change the configuration details of an existing monitoring job
-// func (c APIClient) UpdateMonitoringJob(mj *MonitoringJob) error {
-// 	path := fmt.Sprintf("monitoring/jobs/%s", MonitoringJob.Id)
-// 	req, err := c.NewRequest("POST", path, &mj)
-// 	if err != nil {
-// 		return err
-// 	}
+// Update takes a *MonitoringJob and change the configuration details of an existing monitoring job.
+//
+// NS1 API docs: https://ns1.com/api/#jobs-jobid-post
+func (s *MonitorsService) Update(mj *MonitoringJob) error {
+	path := fmt.Sprintf("%s/%s", monitorPath, mj.Id)
 
-// 	// Update mon jobs' fields with data from api(ensure consistent)
-// 	_, err = c.Do(req, &mj)
-// 	if err != nil {
-// 		return err
-// 	}
+	req, err := s.client.NewRequest("POST", path, &mj)
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	// Update mon jobs' fields with data from api(ensure consistent)
+	_, err = s.client.Do(req, &mj)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete takes an ID and immediately terminates and deletes and existing monitoring job.
+//
+// NS1 API docs: https://ns1.com/api/#jobs-jobid-delete
+func (s *MonitorsService) Delete(id string) error {
+	path := fmt.Sprintf("%s/%s", monitorPath, id)
+
+	req, err := s.client.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ListTypes returns all available monitoring job types.
+//
+// NS1 API docs: https://ns1.com/api/#jobtypes-get
+func (s *MonitorsService) ListTypes() ([]*MonitoringJobType, error) {
+	path := "monitoring/jobtypes"
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	mjt := []*MonitoringJobType{}
+	_, err = s.client.Do(req, &mjt)
+	if err != nil {
+		return nil, err
+	}
+
+	return mjt, nil
+}

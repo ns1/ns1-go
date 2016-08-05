@@ -2,39 +2,9 @@ package ns1
 
 import "fmt"
 
-// ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
-type ZoneSecondaryServer struct {
-	Ip     string `json:"ip"`
-	Port   int    `json:"port,omitempty"`
-	Notify bool   `json:"notify"`
-}
-
-// ZonePrimary wraps a Zone's "primary" attribute
-type ZonePrimary struct {
-	Enabled     bool                  `json:"enabled"`
-	Secondaries []ZoneSecondaryServer `json:"secondaries"`
-}
-
-// ZoneSecondary wraps a Zone's "secondary" attribute
-type ZoneSecondary struct {
-	Status       string `json:"status,omitempty"`
-	Last_xfr     int    `json:"last_xfr,omitempty"`
-	Primary_ip   string `json:"primary_ip,omitempty"`
-	Primary_port int    `json:"primary_port,omitempty"`
-	Enabled      bool   `json:"enabled"`
-	Expired      bool   `json:"expired,omitempty"`
-}
-
-// ZoneRecord wraps Zone's "records" attribute
-type ZoneRecord struct {
-	Domain   string   `json:"Domain,omitempty"`
-	Id       string   `json:"id,omitempty"`
-	Link     string   `json:"link,omitempty"`
-	ShortAns []string `json:"short_answers,omitempty"`
-	Tier     int      `json:"tier,omitempty"`
-	Ttl      int      `json:"ttl,omitempty"`
-	Type     string   `json:"type,omitempty"`
-}
+const (
+	zonePath = "zones"
+)
 
 // Zone wraps an NS1 /zone resource
 type Zone struct {
@@ -56,6 +26,45 @@ type Zone struct {
 	Link          string            `json:"link,omitempty"`
 	Records       []ZoneRecord      `json:"records,omitempty"`
 	Serial        int               `json:"serial,omitempty"`
+}
+
+// Implementation of Stringer interface.
+func (z Zone) String() string {
+	return z.Zone
+}
+
+// ZoneRecord wraps Zone's "records" attribute
+type ZoneRecord struct {
+	Domain   string   `json:"Domain,omitempty"`
+	Id       string   `json:"id,omitempty"`
+	Link     string   `json:"link,omitempty"`
+	ShortAns []string `json:"short_answers,omitempty"`
+	Tier     int      `json:"tier,omitempty"`
+	Ttl      int      `json:"ttl,omitempty"`
+	Type     string   `json:"type,omitempty"`
+}
+
+// ZonePrimary wraps a Zone's "primary" attribute
+type ZonePrimary struct {
+	Enabled     bool                  `json:"enabled"`
+	Secondaries []ZoneSecondaryServer `json:"secondaries"`
+}
+
+// ZoneSecondary wraps a Zone's "secondary" attribute
+type ZoneSecondary struct {
+	Status       string `json:"status,omitempty"`
+	Last_xfr     int    `json:"last_xfr,omitempty"`
+	Primary_ip   string `json:"primary_ip,omitempty"`
+	Primary_port int    `json:"primary_port,omitempty"`
+	Enabled      bool   `json:"enabled"`
+	Expired      bool   `json:"expired,omitempty"`
+}
+
+// ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
+type ZoneSecondaryServer struct {
+	Ip     string `json:"ip"`
+	Port   int    `json:"port,omitempty"`
+	Notify bool   `json:"notify"`
 }
 
 // NewZone takes a zone domain name and creates a new primary *Zone
@@ -110,20 +119,19 @@ func (z *Zone) LinkTo(to string) {
 	z.Link = to
 }
 
-// Implementation of Stringer interface.
-func (z Zone) String() string {
-	return z.Zone
-}
+type ZonesService service
 
-// GetZones returns all active zones and basic zone configuration details for each
-func (c APIClient) GetZones() ([]Zone, error) {
-	req, err := c.NewRequest("GET", "zones", nil)
+// List returns all active zones and basic zone configuration details for each.
+//
+// NS1 API docs: https://ns1.com/api/#zones-get
+func (s *ZonesService) List() ([]*Zone, error) {
+	req, err := s.client.NewRequest("GET", zonePath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var zl []Zone
-	_, err = c.Do(req, &zl)
+	zl := []*Zone{}
+	_, err = s.client.Do(req, &zl)
 	if err != nil {
 		return nil, err
 	}
@@ -131,16 +139,19 @@ func (c APIClient) GetZones() ([]Zone, error) {
 	return zl, nil
 }
 
-// GetZone takes a zone and returns a single active zone and its basic configuration details
-func (c APIClient) GetZone(zone string) (*Zone, error) {
-	path := fmt.Sprintf("zones/%s", zone)
-	req, err := c.NewRequest("GET", path, nil)
+// Get takes a zone name and returns a single active zone and its basic configuration details.
+//
+// NS1 API docs: https://ns1.com/api/#zones-zone-get
+func (s *ZonesService) Get(zone string) (*Zone, error) {
+	path := fmt.Sprintf("%s/%s", zonePath, zone)
+
+	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var z Zone
-	_, err = c.Do(req, &z)
+	_, err = s.client.Do(req, &z)
 	if err != nil {
 		return nil, err
 	}
@@ -148,15 +159,19 @@ func (c APIClient) GetZone(zone string) (*Zone, error) {
 	return &z, nil
 }
 
-// DeleteZone takes a zone and destroys an existing DNS zone and all records in the zone
-func (c APIClient) DeleteZone(zone string) error {
-	path := fmt.Sprintf("zones/%s", zone)
-	req, err := c.NewRequest("DELETE", path, nil)
+// Create takes a *Zone and creates a new DNS zone.
+//
+// NS1 API docs: https://ns1.com/api/#zones-put
+func (s *ZonesService) Create(z *Zone) error {
+	path := fmt.Sprintf("%s/%s", zonePath, z.Zone)
+
+	req, err := s.client.NewRequest("PUT", path, &z)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Do(req, nil)
+	// Update zones fields with data from api(ensure consistent)
+	_, err = s.client.Do(req, &z)
 	if err != nil {
 		return err
 	}
@@ -164,17 +179,19 @@ func (c APIClient) DeleteZone(zone string) error {
 	return nil
 }
 
-// CreateZone takes a *Zone and creates a new DNS zone
-func (c APIClient) CreateZone(z *Zone) error {
-	path := fmt.Sprintf("zones/%s", z.Zone)
+// Update takes a *Zone and modifies basic details of a DNS zone.
+//
+// NS1 API docs: https://ns1.com/api/#zones-post
+func (s *ZonesService) Update(z *Zone) error {
+	path := fmt.Sprintf("%s/%s", zonePath, z.Zone)
 
-	req, err := c.NewRequest("PUT", path, &z)
+	req, err := s.client.NewRequest("POST", path, &z)
 	if err != nil {
 		return err
 	}
 
 	// Update zones fields with data from api(ensure consistent)
-	_, err = c.Do(req, &z)
+	_, err = s.client.Do(req, &z)
 	if err != nil {
 		return err
 	}
@@ -182,17 +199,18 @@ func (c APIClient) CreateZone(z *Zone) error {
 	return nil
 }
 
-// UpdateZone takes a *Zone and modifies basic details of a DNS zone
-func (c APIClient) UpdateZone(z *Zone) error {
-	path := fmt.Sprintf("zones/%s", z.Zone)
+// Delete takes a zone and destroys an existing DNS zone and all records in the zone.
+//
+// NS1 API docs: https://ns1.com/api/#zones-delete
+func (s *ZonesService) Delete(zone string) error {
+	path := fmt.Sprintf("%s/%s", zonePath, zone)
 
-	req, err := c.NewRequest("POST", path, &z)
+	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return err
 	}
 
-	// Update zones fields with data from api(ensure consistent)
-	_, err = c.Do(req, &z)
+	_, err = s.client.Do(req, nil)
 	if err != nil {
 		return err
 	}

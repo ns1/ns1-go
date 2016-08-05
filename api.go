@@ -29,7 +29,7 @@ type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// APIClient stores NS1 client state
+// Client manages communication with the NS1 Rest API.
 type APIClient struct {
 	// client handles all http communication.
 	// The default value is *http.Client
@@ -49,19 +49,27 @@ type APIClient struct {
 
 	// Enables verbose logs.
 	debug bool
+
+	// From the excellent github-go client.
+	common service // Reuse a single struct instead of allocating one for each service on the heap.
+
+	// Services used for communicating with different components of the NS1 API.
+	Zones    *ZonesService
+	Records  *RecordsService
+	Monitors *MonitorsService
 }
 
-// New takes an API Key and creates an *APIClient
-func New(k string) *APIClient {
-	endpoint, _ := url.Parse(defaultEndpoint)
-	return &APIClient{
-		client:        http.DefaultClient,
-		Endpoint:      endpoint,
-		ApiKey:        k,
-		RateLimitFunc: defaultRateLimitFunc,
-		UserAgent:     defaultUserAgent,
-	}
-}
+// // New takes an API Key and creates an *APIClient
+// func New(k string) *APIClient {
+// 	endpoint, _ := url.Parse(defaultEndpoint)
+// 	return &APIClient{
+// 		client:        http.DefaultClient,
+// 		Endpoint:      endpoint,
+// 		ApiKey:        k,
+// 		RateLimitFunc: defaultRateLimitFunc,
+// 		UserAgent:     defaultUserAgent,
+// 	}
+// }
 
 func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	endpoint, _ := url.Parse(defaultEndpoint)
@@ -77,10 +85,19 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 		UserAgent:     defaultUserAgent,
 	}
 
+	c.common.client = c
+	c.Zones = (*ZonesService)(&c.common)
+	c.Records = (*RecordsService)(&c.common)
+	c.Monitors = (*MonitorsService)(&c.common)
+
 	for _, option := range options {
 		option(c)
 	}
 	return c
+}
+
+type service struct {
+	client *APIClient
 }
 
 // Debug enables debug logging
