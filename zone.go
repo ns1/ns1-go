@@ -18,7 +18,7 @@ type Zone struct {
 	Meta         map[string]string `json:"meta,omitempty"`
 	Secondary    *ZoneSecondary    `json:"secondary,omitempty"`
 	Link         string            `json:"link,omitempty"`
-	Records      []ZoneRecord      `json:"records,omitempty"`
+	Records      []*ZoneRecord     `json:"records,omitempty"`
 	Serial       int               `json:"serial,omitempty"`
 }
 

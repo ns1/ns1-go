@@ -13,8 +13,8 @@ type Record struct {
 	Type            string            `json:"type,omitempty"`
 	Link            string            `json:"link,omitempty"`
 	Meta            map[string]string `json:"meta,omitempty"`
-	Answers         []Answer          `json:"answers"`
-	Filters         []Filter          `json:"filters,omitempty"`
+	Answers         []*Answer         `json:"answers"`
+	Filters         []*Filter         `json:"filters,omitempty"`
 	TTL             int               `json:"ttl,omitempty"`
 	UseClientSubnet bool              `json:"use_client_subnet"`
 	Regions         map[string]Region `json:"regions,omitempty"`
@@ -35,42 +35,7 @@ func NewRecord(zone string, domain string, t string) *Record {
 		Domain:          domain,
 		Type:            t,
 		UseClientSubnet: true,
-		Answers:         make([]Answer, 0),
 	}
-}
-
-// Answer wraps the values of a Record's "filters" attribute
-type Answer struct {
-	Region string                 `json:"region,omitempty"`
-	Answer []string               `json:"answer,omitempty"`
-	Meta   map[string]interface{} `json:"meta,omitempty"`
-}
-
-// NewAnswer creates an empty Answer
-func NewAnswer() Answer {
-	return Answer{
-		Meta: make(map[string]interface{}),
-	}
-}
-
-// Filter wraps the values of a Record's "filters" attribute
-type Filter struct {
-	Filter   string                 `json:"filter"`
-	Disabled bool                   `json:"disabled,omitempty"`
-	Config   map[string]interface{} `json:"config"`
-}
-
-// Region wraps the values of a Record's "regions" attribute
-type Region struct {
-	Meta RegionMeta `json:"meta"`
-}
-
-// RegionMeta wraps the values of a Record's "regions.*.meta" attribute
-type RegionMeta struct {
-	GeoRegion []string `json:"georegion,omitempty"`
-	Country   []string `json:"country,omitempty"`
-	USState   []string `json:"us_state,omitempty"`
-	Up        bool     `json:"up,omitempty"`
 }
 
 // MetaFeed wraps an Answer.Metadata element which points to a feed
@@ -91,6 +56,5 @@ type MetaStatic string
 // LinkTo sets a Record Link to an FQDN and ensures no other record configuration is specified
 func (r *Record) LinkTo(to string) {
 	r.Meta = nil
-	r.Answers = make([]Answer, 0)
 	r.Link = to
 }

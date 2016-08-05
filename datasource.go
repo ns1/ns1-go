@@ -9,12 +9,12 @@ type FeedDestination struct {
 
 // DataSource wraps an NS1 /data/sources resource
 type DataSource struct {
-	ID           string            `json:"id,omitempty"`
-	Name         string            `json:"name"`
-	SourceType   string            `json:"sourcetype"`
-	Config       map[string]string `json:"config,omitempty"`
-	Status       string            `json:"status,omitempty"`
-	Destinations []FeedDestination `json:"destinations,omitempty"`
+	ID           string             `json:"id,omitempty"`
+	Name         string             `json:"name"`
+	SourceType   string             `json:"sourcetype"`
+	Config       map[string]string  `json:"config,omitempty"`
+	Status       string             `json:"status,omitempty"`
+	Destinations []*FeedDestination `json:"destinations,omitempty"`
 }
 
 // NewDataSource takes a name and sourceType and creates a new *DataSource

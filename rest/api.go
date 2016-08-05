@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -47,13 +46,11 @@ type APIClient struct {
 	// Func to call after response is returned in Do
 	RateLimitFunc func(RateLimit)
 
-	// Enables verbose logs.
-	debug bool
-
 	// From the excellent github-go client.
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
 	// Services used for communicating with different components of the NS1 API.
+	APIKeys     *APIKeysService
 	DataFeeds   *DataFeedsService
 	DataSources *DataSourcesService
 	Monitors    *MonitorsService
@@ -77,6 +74,7 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	}
 
 	c.common.client = c
+	c.APIKeys = (*APIKeysService)(&c.common)
 	c.DataFeeds = (*DataFeedsService)(&c.common)
 	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Monitors = (*MonitorsService)(&c.common)
@@ -91,11 +89,6 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 
 type service struct {
 	client *APIClient
-}
-
-// Debug enables debug logging
-func (c *APIClient) Debug() {
-	c.debug = true
 }
 
 // APIClientOption specifies a function for setting APIClient fields.
@@ -143,9 +136,8 @@ func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) 
 	}
 
 	if v != nil {
-		// Try to decode body into the given type.
-		err := json.NewDecoder(resp.Body).Decode(&v)
-		if err != nil {
+		// Try to unmarshal body into given type using streaming decoder.
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 			return nil, err
 		}
 	}
@@ -169,10 +161,6 @@ func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Req
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	if c.debug {
-		log.Printf("[DEBUG] %s: %s (%s)", method, uri.String(), buf)
 	}
 
 	req, err := http.NewRequest(method, uri.String(), buf)
@@ -251,9 +239,6 @@ func (rl RateLimit) WaitTimeRemaining() time.Duration {
 func (c *APIClient) RateLimitStrategySleep() {
 	c.RateLimitFunc = func(rl RateLimit) {
 		remaining := rl.WaitTimeRemaining()
-		if c.debug {
-			log.Printf("Rate limiting - Limit %d Remaining %d in period %d: Sleeping %dns", rl.Limit, rl.Remaining, rl.Period, remaining)
-		}
 		time.Sleep(remaining)
 	}
 }

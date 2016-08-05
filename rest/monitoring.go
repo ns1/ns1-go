@@ -22,13 +22,13 @@ func (s *MonitorsService) List() ([]*ns1.MonitoringJob, error) {
 		return nil, err
 	}
 
-	mj := []*ns1.MonitoringJob{}
-	_, err = s.client.Do(req, &mj)
+	mjl := []*ns1.MonitoringJob{}
+	_, err = s.client.Do(req, &mjl)
 	if err != nil {
 		return nil, err
 	}
 
-	return mj, nil
+	return mjl, nil
 }
 
 // Get takes an ID and returns details for a specific monitoring job.
