@@ -11,7 +11,7 @@ type APIKeysService service
 
 // List returns all api keys in the account.
 //
-// NS1 API docs: https://ns1.com/api/
+// NS1 API docs: https://ns1.com/api/#apikeys-get
 func (s *APIKeysService) List() ([]*ns1.APIKey, error) {
 	req, err := s.client.NewRequest("GET", apiKeyPath, nil)
 	if err != nil {

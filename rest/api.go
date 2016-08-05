@@ -55,6 +55,7 @@ type APIClient struct {
 	DataSources *DataSourcesService
 	Monitors    *MonitorsService
 	Records     *RecordsService
+	Users       *UsersService
 	Zones       *ZonesService
 }
 
@@ -79,6 +80,7 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Monitors = (*MonitorsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
+	c.Users = (*UsersService)(&c.common)
 	c.Zones = (*ZonesService)(&c.common)
 
 	for _, option := range options {

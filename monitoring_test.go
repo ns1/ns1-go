@@ -1,6 +1,10 @@
 package ns1
 
-//"reflect"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"testing"
+)
 
 // func TestUnmarshalMonitoringJobTypes(t *testing.T) {
 // 	data, err := ioutil.ReadFile("test/data/monitoring_jobtypes.json")
@@ -52,55 +56,55 @@ package ns1
 // 	}
 // }
 
-// func TestUnmarshalMonitoringJobs(t *testing.T) {
-// 	data, err := ioutil.ReadFile("test/data/monitoring_jobs.json")
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// 	var m MonitoringJobs
-// 	if err = json.Unmarshal(data, &m); err != nil {
-// 		t.Error(err)
-// 	}
-// 	if len(m) != 1 {
-// 		t.Error("Do not have any jobs")
-// 	}
-// 	j := m[0]
-// 	if j.Id != "52a27d4397d5f07003fdbe7b" {
-// 		t.Error("Wrong ID")
-// 	}
-// 	conf := j.Config
-// 	if conf["host"] != "1.2.3.4" {
-// 		t.Error("Wrong host")
-// 	}
-// 	status := j.Status["global"]
-// 	if status.Since != 1389407609 {
-// 		t.Error("since has unexpected value")
-// 	}
-// 	if status.Status != "up" {
-// 		t.Error("Status is not up")
-// 	}
-// 	r := j.Rules[0]
-// 	// assert.Equal(t, r.Key, "rtt", "RTT rule key is wrong")
-// 	// assert.Equal(t, r.Value.(float64), float64(100), "RTT rule value is wrong")
-// 	if r.Comparison != "<" {
-// 		t.Error("RTT rule comparison is wrong")
-// 	}
-// 	if j.JobType != "ping" {
-// 		t.Error("Jobtype is wrong")
-// 	}
-// 	if j.Regions[0] != "lga" {
-// 		t.Error("First region is not lga")
-// 	}
-// 	if !j.Active {
-// 		t.Error("Job is not active")
-// 	}
-// 	if j.Frequency != 60 {
-// 		t.Error("Job frequency != 60")
-// 	}
-// 	if j.Policy != "quorum" {
-// 		t.Error("Job policy is not quorum")
-// 	}
-// 	if j.RegionScope != "fixed" {
-// 		t.Error("Job region scope is not fixed")
-// 	}
-// }
+func TestUnmarshalMonitoringJobs(t *testing.T) {
+	data, err := ioutil.ReadFile("test/data/monitoring_jobs.json")
+	if err != nil {
+		t.Error(err)
+	}
+	mjl := []*MonitoringJob{}
+	if err = json.Unmarshal(data, &mjl); err != nil {
+		t.Error(err)
+	}
+	if len(mjl) != 1 {
+		t.Error("Do not have any jobs")
+	}
+	j := mjl[0]
+	if j.ID != "52a27d4397d5f07003fdbe7b" {
+		t.Error("Wrong ID")
+	}
+	conf := j.Config
+	if conf["host"] != "1.2.3.4" {
+		t.Error("Wrong host")
+	}
+	status := j.Status["global"]
+	if status.Since != 1389407609 {
+		t.Error("since has unexpected value")
+	}
+	if status.Status != "up" {
+		t.Error("Status is not up")
+	}
+	r := j.Rules[0]
+	// assert.Equal(t, r.Key, "rtt", "RTT rule key is wrong")
+	// assert.Equal(t, r.Value.(float64), float64(100), "RTT rule value is wrong")
+	if r.Comparison != "<" {
+		t.Error("RTT rule comparison is wrong")
+	}
+	if j.JobType != "ping" {
+		t.Error("Jobtype is wrong")
+	}
+	if j.Regions[0] != "lga" {
+		t.Error("First region is not lga")
+	}
+	if !j.Active {
+		t.Error("Job is not active")
+	}
+	if j.Frequency != 60 {
+		t.Error("Job frequency != 60")
+	}
+	if j.Policy != "quorum" {
+		t.Error("Job policy is not quorum")
+	}
+	if j.RegionScope != "fixed" {
+		t.Error("Job region scope is not fixed")
+	}
+}
