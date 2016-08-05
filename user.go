@@ -18,14 +18,14 @@ type NotificationSettings struct {
 
 // PermissionsMap wraps a User's "permissions" attribute
 type PermissionsMap struct {
-	Dns        PermissionsDns        `json:"dns"`
+	DNS        PermissionsDNS        `json:"dns"`
 	Data       PermissionsData       `json:"data"`
 	Account    PermissionsAccount    `json:"account"`
 	Monitoring PermissionsMonitoring `json:"monitoring"`
 }
 
-// PermissionsDns wraps a User's "permissions.dns" attribute
-type PermissionsDns struct {
+// PermissionsDNS wraps a User's "permissions.dns" attribute
+type PermissionsDNS struct {
 	ViewZones           bool     `json:"view_zones"`
 	ManageZones         bool     `json:"manage_zones"`
 	ZonesAllowByDefault bool     `json:"zones_allow_by_default"`

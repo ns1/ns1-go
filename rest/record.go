@@ -10,6 +10,7 @@ const (
 	recordPath = "zones"
 )
 
+// RecordsService handles 'zones/ZONE/DOMAIN/TYPE' endpoint.
 type RecordsService service
 
 // Get takes a zone, domain and record type t and returns full configuration for a DNS record.

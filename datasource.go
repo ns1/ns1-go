@@ -9,7 +9,7 @@ type FeedDestination struct {
 
 // DataSource wraps an NS1 /data/sources resource
 type DataSource struct {
-	Id           string            `json:"id,omitempty"`
+	ID           string            `json:"id,omitempty"`
 	Name         string            `json:"name"`
 	SourceType   string            `json:"sourcetype"`
 	Config       map[string]string `json:"config,omitempty"`

@@ -1,12 +1,5 @@
 package rest
 
-// Team wraps an NS1 /accounts/teams resource
-type Team struct {
-	Id          string         `json:"id,omitempty"`
-	Name        string         `json:"name"`
-	Permissions PermissionsMap `json:"permissions"`
-}
-
 // // GetTeams returns a list of all teams under the account
 // func (c APIClient) GetTeams() ([]Team, error) {
 // 	var teams []Team

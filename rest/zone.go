@@ -10,6 +10,7 @@ const (
 	zonePath = "zones"
 )
 
+// ZonesService handles 'zones' endpoint.
 type ZonesService service
 
 // List returns all active zones and basic zone configuration details for each.

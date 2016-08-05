@@ -29,7 +29,7 @@ type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// Client manages communication with the NS1 Rest API.
+// APIClient manages communication with the NS1 Rest API.
 type APIClient struct {
 	// httpClient handles all rest api communication,
 	// and expects an *http.Client.
@@ -39,7 +39,7 @@ type APIClient struct {
 	Endpoint *url.URL
 
 	// NS1 api key (value for http request header 'X-NSONE-Key').
-	ApiKey string
+	APIKey string
 
 	// NS1 go rest user agent (value for http request header 'User-Agent').
 	UserAgent string
@@ -61,6 +61,7 @@ type APIClient struct {
 	Zones       *ZonesService
 }
 
+// NewAPIClient constructs and returns a reference to an instantiated APIClient.
 func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 	endpoint, _ := url.Parse(defaultEndpoint)
 
@@ -97,28 +98,35 @@ func (c *APIClient) Debug() {
 	c.debug = true
 }
 
+// APIClientOption specifies a function for setting APIClient fields.
 type APIClientOption func(*APIClient)
 
+// SetHTTPClient sets an APIClient instances' httpClient.
 func SetHTTPClient(httpClient Doer) APIClientOption {
 	return func(c *APIClient) { c.httpClient = httpClient }
 }
 
-func SetApiKey(key string) APIClientOption {
-	return func(c *APIClient) { c.ApiKey = key }
+// SetAPIKey sets an APIClient instances' APIKey.
+func SetAPIKey(key string) APIClientOption {
+	return func(c *APIClient) { c.APIKey = key }
 }
 
+// SetEndpoint sets an APIClient instances' Endpoint.
 func SetEndpoint(endpoint string) APIClientOption {
 	return func(c *APIClient) { c.Endpoint, _ = url.Parse(endpoint) }
 }
 
+// SetUserAgent sets an APIClient instances' user agent.
 func SetUserAgent(ua string) APIClientOption {
 	return func(c *APIClient) { c.UserAgent = ua }
 }
 
+// SetRateLimitFunc sets an APIClient instances' RateLimitFunc.
 func SetRateLimitFunc(ratefunc func(rl RateLimit)) APIClientOption {
 	return func(c *APIClient) { c.RateLimitFunc = ratefunc }
 }
 
+// Do satisfies the Doer interface.
 func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -145,6 +153,7 @@ func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) 
 	return resp, err
 }
 
+// NewRequest constructs and returns a http.Request.
 func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(path)
 	if err != nil {
@@ -171,47 +180,47 @@ func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Req
 		return nil, err
 	}
 
-	req.Header.Add(headerAuth, c.ApiKey)
+	req.Header.Add(headerAuth, c.APIKey)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
 }
 
-// Contains all http responses outside the 2xx range.
-type RestError struct {
+// Error contains all http responses outside the 2xx range.
+type Error struct {
 	Resp    *http.Response
 	Message string
 }
 
 // Satisfy std lib error interface.
-func (re *RestError) Error() string {
+func (re *Error) Error() string {
 	return fmt.Sprintf("%v %v: %d %v", re.Resp.Request.Method, re.Resp.Request.URL, re.Resp.StatusCode, re.Message)
 }
 
-// Handles parsing of rest api errors. Returns nil if no error.
+// CheckResponse handles parsing of rest api errors. Returns nil if no error.
 func CheckResponse(resp *http.Response) error {
 	if c := resp.StatusCode; c >= 200 && c <= 299 {
 		return nil
 	}
 
-	restError := &RestError{Resp: resp}
+	restErr := &Error{Resp: resp}
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 	if len(b) == 0 {
-		return restError
+		return restErr
 	}
 
-	err = json.Unmarshal(b, restError)
+	err = json.Unmarshal(b, restErr)
 	if err != nil {
 		return err
 	}
 
-	return restError
+	return restErr
 }
 
-// Rate limiting strategy for the APIClient instance.
+// RateLimitFunc is rate limiting strategy for the APIClient instance.
 type RateLimitFunc func(RateLimit)
 
 // RateLimit stores X-Ratelimit-* headers

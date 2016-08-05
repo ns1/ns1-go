@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-// Implements Doer Interface. DoerFuncs are useful for adding
+// DoerFunc satisfies Interface. DoerFuncs are useful for adding
 // logging/instrumentation to the http.Client that is used
 // within the rest.APIClient.
 type DoerFunc func(*http.Request) (*http.Response, error)
 
-// Implementation of rest.Doer interface. Calls itself on the
+// Do is implementation of rest.Doer interface. Calls itself on the
 // given http.Request.
 func (f DoerFunc) Do(r *http.Request) (*http.Response, error) {
 	return f(r)

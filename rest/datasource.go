@@ -10,6 +10,7 @@ const (
 	dataSourcePath = "data/sources"
 )
 
+// DataSourcesService handles 'data/sources' endpoint.
 type DataSourcesService service
 
 // List returns all connected data sources.
@@ -75,7 +76,7 @@ func (s *DataSourcesService) Create(ds *ns1.DataSource) error {
 //
 // NS1 API docs: https://ns1.com/api/#sources-post
 func (s *DataSourcesService) Update(ds *ns1.DataSource) error {
-	path := fmt.Sprintf("%s/%s", dataSourcePath, ds.Id)
+	path := fmt.Sprintf("%s/%s", dataSourcePath, ds.ID)
 
 	req, err := s.client.NewRequest("POST", path, &ds)
 	if err != nil {

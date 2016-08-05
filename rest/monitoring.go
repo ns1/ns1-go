@@ -10,6 +10,7 @@ const (
 	monitorPath = "monitoring/jobs"
 )
 
+// MonitorsService handles 'monitoring/jobs' endpoint.
 type MonitorsService service
 
 // List returns all monitoring jobs for the account.
@@ -54,7 +55,7 @@ func (s *MonitorsService) Get(id string) (*ns1.MonitoringJob, error) {
 //
 // NS1 API docs: https://ns1.com/api/#jobs-put
 func (s *MonitorsService) Create(mj *ns1.MonitoringJob) error {
-	path := fmt.Sprintf("%s/%s", monitorPath, mj.Id)
+	path := fmt.Sprintf("%s/%s", monitorPath, mj.ID)
 
 	req, err := s.client.NewRequest("PUT", path, &mj)
 	if err != nil {
@@ -74,7 +75,7 @@ func (s *MonitorsService) Create(mj *ns1.MonitoringJob) error {
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-post
 func (s *MonitorsService) Update(mj *ns1.MonitoringJob) error {
-	path := fmt.Sprintf("%s/%s", monitorPath, mj.Id)
+	path := fmt.Sprintf("%s/%s", monitorPath, mj.ID)
 
 	req, err := s.client.NewRequest("POST", path, &mj)
 	if err != nil {
