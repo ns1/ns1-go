@@ -3,7 +3,7 @@ package rest
 import (
 	"fmt"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/data"
 )
 
 const (
@@ -16,13 +16,13 @@ type DataSourcesService service
 // List returns all connected data sources.
 //
 // NS1 API docs: https://ns1.com/api/#sources-get
-func (s *DataSourcesService) List() ([]*ns1.DataSource, error) {
+func (s *DataSourcesService) List() ([]*data.Source, error) {
 	req, err := s.client.NewRequest("GET", dataSourcePath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	dsl := []*ns1.DataSource{}
+	dsl := []*data.Source{}
 	_, err = s.client.Do(req, &dsl)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *DataSourcesService) List() ([]*ns1.DataSource, error) {
 // Get takes an ID returns the details for a single data source.
 //
 // NS1 API docs: https://ns1.com/api/#sources-source-get
-func (s *DataSourcesService) Get(id string) (*ns1.DataSource, error) {
+func (s *DataSourcesService) Get(id string) (*data.Source, error) {
 	path := fmt.Sprintf("%s/%s", dataSourcePath, id)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -42,7 +42,7 @@ func (s *DataSourcesService) Get(id string) (*ns1.DataSource, error) {
 		return nil, err
 	}
 
-	var ds ns1.DataSource
+	var ds data.Source
 	_, err = s.client.Do(req, &ds)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *DataSourcesService) Get(id string) (*ns1.DataSource, error) {
 // Create takes a *DataSource and creates a new data source.
 //
 // NS1 API docs: https://ns1.com/api/#sources-put
-func (s *DataSourcesService) Create(ds *ns1.DataSource) error {
+func (s *DataSourcesService) Create(ds *data.Source) error {
 	path := fmt.Sprintf("%s", dataSourcePath)
 
 	req, err := s.client.NewRequest("PUT", path, &ds)
@@ -75,7 +75,7 @@ func (s *DataSourcesService) Create(ds *ns1.DataSource) error {
 // NOTE: This does not 'publish' data. See PublishToFeed
 //
 // NS1 API docs: https://ns1.com/api/#sources-post
-func (s *DataSourcesService) Update(ds *ns1.DataSource) error {
+func (s *DataSourcesService) Update(ds *data.Source) error {
 	path := fmt.Sprintf("%s/%s", dataSourcePath, ds.ID)
 
 	req, err := s.client.NewRequest("POST", path, &ds)

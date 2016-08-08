@@ -1,6 +1,8 @@
 package rest
 
-import ns1 "github.com/ns1/ns1-go"
+import (
+	"github.com/ns1/ns1-go/account"
+)
 
 const (
 	apiKeyPath = "account/apikeys"
@@ -12,13 +14,13 @@ type APIKeysService service
 // List returns all api keys in the account.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-get
-func (s *APIKeysService) List() ([]*ns1.APIKey, error) {
+func (s *APIKeysService) List() ([]*account.APIKey, error) {
 	req, err := s.client.NewRequest("GET", apiKeyPath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	kl := []*ns1.APIKey{}
+	kl := []*account.APIKey{}
 	_, err = s.client.Do(req, &kl)
 	if err != nil {
 		return nil, err

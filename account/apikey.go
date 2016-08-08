@@ -1,4 +1,4 @@
-package ns1
+package account
 
 // Apikey wraps an NS1 /account/apikeys resource
 type APIKey struct {

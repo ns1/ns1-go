@@ -1,13 +1,15 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/data"
+	"github.com/ns1/ns1-go/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 
@@ -17,8 +19,20 @@ func main() {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	httpClient := &http.Client{Timeout: time.Second * 10}
-	client := rest.NewAPIClient(httpClient, rest.SetAPIKey(k))
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * 10,
+	}
+
+	// Adds logging to each http request.
+	doer := rest.Decorate(
+		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+
+	client := rest.NewClient(
+		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
 	dataSources, err := client.DataSources.List()
 	if err != nil {
@@ -35,14 +49,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	z := ns1.NewZone(zone_name)
+	z := dns.NewZone(zone_name)
 	err = client.Zones.Create(z)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Construct/Create an NSONE API data source
-	ds := ns1.NewDataSource("my api source", "nsone_v1")
+	ds := data.NewSource("my api source", "nsone_v1")
 	err = client.DataSources.Create(ds)
 	if err != nil {
 		log.Fatal(err)
@@ -51,13 +65,13 @@ func main() {
 	// Construct feeds which will drive the meta data for each answer.
 	// We'll use the id of these feeds when we connect the feeds to the
 	// answer meta below.
-	feed1 := ns1.NewDataFeed(ds.ID)
+	feed1 := data.NewFeed(ds.ID)
 	feed1.Name = "feed to server1"
 	feed1.Config = map[string]string{
 		"label": "server1",
 	}
 
-	feed2 := ns1.NewDataFeed(ds.ID)
+	feed2 := data.NewFeed(ds.ID)
 	feed2.Name = "feed to server2"
 	feed2.Config = map[string]string{
 		"label": "server2",
@@ -78,19 +92,19 @@ func main() {
 	// specify the up filter so we can send traffic to only those nodes
 	// which are known to be up. We'll start with just the second answer up.
 	// Each 'up' meta value is a feed pointer, pointing to the feeds we created above.
-	r := ns1.NewRecord(z.Zone, "record", "A")
-	r.Answers = []*ns1.Answer{
-		&ns1.Answer{
+	r := dns.NewRecord(z.Zone, "record", "A")
+	r.Answers = []*dns.Answer{
+		&dns.Answer{
 			Answer: []string{"1.1.1.1"},
 			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed1.ID}},
 		},
-		&ns1.Answer{
+		&dns.Answer{
 			Answer: []string{"9.9.9.9"},
 			Meta:   map[string]interface{}{"up": map[string]string{"feed": feed2.ID}},
 		},
 	}
-	r.Filters = []*ns1.Filter{
-		&ns1.Filter{
+	r.Filters = []*dns.Filter{
+		&dns.Filter{
 			Filter: "up",
 			Config: map[string]interface{}{},
 		},

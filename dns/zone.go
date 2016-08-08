@@ -1,4 +1,4 @@
-package ns1
+package dns
 
 // Zone wraps an NS1 /zone resource
 type Zone struct {

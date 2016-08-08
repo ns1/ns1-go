@@ -3,7 +3,7 @@ package rest
 import (
 	"fmt"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/dns"
 )
 
 const (
@@ -16,13 +16,13 @@ type ZonesService service
 // List returns all active zones and basic zone configuration details for each.
 //
 // NS1 API docs: https://ns1.com/api/#zones-get
-func (s *ZonesService) List() ([]*ns1.Zone, error) {
+func (s *ZonesService) List() ([]*dns.Zone, error) {
 	req, err := s.client.NewRequest("GET", zonePath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	zl := []*ns1.Zone{}
+	zl := []*dns.Zone{}
 	_, err = s.client.Do(req, &zl)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *ZonesService) List() ([]*ns1.Zone, error) {
 // Get takes a zone name and returns a single active zone and its basic configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#zones-zone-get
-func (s *ZonesService) Get(zone string) (*ns1.Zone, error) {
+func (s *ZonesService) Get(zone string) (*dns.Zone, error) {
 	path := fmt.Sprintf("%s/%s", zonePath, zone)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -42,7 +42,7 @@ func (s *ZonesService) Get(zone string) (*ns1.Zone, error) {
 		return nil, err
 	}
 
-	var z ns1.Zone
+	var z dns.Zone
 	_, err = s.client.Do(req, &z)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *ZonesService) Get(zone string) (*ns1.Zone, error) {
 // Create takes a *Zone and creates a new DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
-func (s *ZonesService) Create(z *ns1.Zone) error {
+func (s *ZonesService) Create(z *dns.Zone) error {
 	path := fmt.Sprintf("%s/%s", zonePath, z.Zone)
 
 	req, err := s.client.NewRequest("PUT", path, &z)
@@ -74,7 +74,7 @@ func (s *ZonesService) Create(z *ns1.Zone) error {
 // Update takes a *Zone and modifies basic details of a DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
-func (s *ZonesService) Update(z *ns1.Zone) error {
+func (s *ZonesService) Update(z *dns.Zone) error {
 	path := fmt.Sprintf("%s/%s", zonePath, z.Zone)
 
 	req, err := s.client.NewRequest("POST", path, &z)

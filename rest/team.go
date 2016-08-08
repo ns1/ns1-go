@@ -1,6 +1,6 @@
 package rest
 
-import ns1 "github.com/ns1/ns1-go"
+import "github.com/ns1/ns1-go/account"
 
 const (
 	teamPath = "account/teams"
@@ -12,13 +12,13 @@ type TeamsService service
 // List returns all teams in the account.
 //
 // NS1 API docs: https://ns1.com/api/#teams-get
-func (s *TeamsService) List() ([]*ns1.Team, error) {
+func (s *TeamsService) List() ([]*account.Team, error) {
 	req, err := s.client.NewRequest("GET", teamPath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	tl := []*ns1.Team{}
+	tl := []*account.Team{}
 	_, err = s.client.Do(req, &tl)
 	if err != nil {
 		return nil, err

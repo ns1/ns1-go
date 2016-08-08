@@ -1,4 +1,4 @@
-package ns1
+package dns
 
 // Filter wraps the values of a Record's "filters" attribute
 type Filter struct {

@@ -1,4 +1,4 @@
-package ns1
+package account
 
 // User wraps an NS1 /account/users resource
 type User struct {

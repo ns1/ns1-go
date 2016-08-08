@@ -1,4 +1,4 @@
-package ns1
+package monitoring
 
 import (
 	"encoding/json"
@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-// func TestUnmarshalMonitoringJobTypes(t *testing.T) {
+// func TestUnmarshalJobTypes(t *testing.T) {
 // 	data, err := ioutil.ReadFile("test/data/monitoring_jobtypes.json")
 // 	if err != nil {
 // 		t.Error(err)
 // 	}
-// 	m := []*MonitoringJobType{}
+// 	m := []*JobType{}
 // 	if err = json.Unmarshal(data, &m); err != nil {
 // 		t.Error(err)
 // 	}
@@ -56,12 +56,12 @@ import (
 // 	}
 // }
 
-func TestUnmarshalMonitoringJobs(t *testing.T) {
+func TestUnmarshalJobs(t *testing.T) {
 	data, err := ioutil.ReadFile("test/data/monitoring_jobs.json")
 	if err != nil {
 		t.Error(err)
 	}
-	mjl := []*MonitoringJob{}
+	mjl := []*Job{}
 	if err = json.Unmarshal(data, &mjl); err != nil {
 		t.Error(err)
 	}

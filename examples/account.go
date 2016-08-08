@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,8 +18,20 @@ func main() {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	httpClient := &http.Client{Timeout: time.Second * 10}
-	client := rest.NewAPIClient(httpClient, rest.SetAPIKey(k))
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * 10,
+	}
+
+	// Adds logging to each http request.
+	doer := rest.Decorate(
+		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+
+	client := rest.NewClient(
+		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
 	teams, err := client.Teams.List()
 	if err != nil {

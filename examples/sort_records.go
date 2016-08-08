@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,26 +10,26 @@ import (
 	"text/tabwriter"
 	"time"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 
-type byTTL []*ns1.Zone
+type byTTL []*dns.Zone
 
 func (x byTTL) Len() int           { return len(x) }
 func (x byTTL) Less(i, j int) bool { return x[i].TTL < x[j].TTL }
 func (x byTTL) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 type customSort struct {
-	z    []*ns1.Zone
-	less func(x, y *ns1.Zone) bool
+	z    []*dns.Zone
+	less func(x, y *dns.Zone) bool
 }
 
 func (x customSort) Len() int           { return len(x.z) }
 func (x customSort) Less(i, j int) bool { return x.less(x.z[i], x.z[j]) }
 func (x customSort) Swap(i, j int)      { x.z[i], x.z[j] = x.z[j], x.z[i] }
 
-func printZones(zones []*ns1.Zone) {
+func printZones(zones []*dns.Zone) {
 	const format = "%v\t%v\t%v\t%v\t%v\t\n"
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintf(tw, format, "Zone", "TTL", "NxTTL", "Retry", "Refresh")
@@ -45,8 +46,20 @@ func main() {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	httpClient := &http.Client{Timeout: time.Second * 10}
-	client := rest.NewAPIClient(httpClient, rest.SetAPIKey(k))
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * 10,
+	}
+
+	// Adds logging to each http request.
+	doer := rest.Decorate(
+		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+
+	client := rest.NewClient(
+		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
 	zones, err := client.Zones.List()
 	if err != nil {
@@ -56,7 +69,7 @@ func main() {
 	sort.Sort(byTTL(zones))
 	printZones(zones)
 
-	sort.Sort(customSort{zones, func(x, y *ns1.Zone) bool {
+	sort.Sort(customSort{zones, func(x, y *dns.Zone) bool {
 		if x.Zone != y.Zone {
 			return x.Zone < y.Zone
 		}

@@ -1,4 +1,4 @@
-package ns1
+package dns
 
 // Answer wraps the values of a Record's "filters" attribute
 type Answer struct {

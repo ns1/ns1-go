@@ -1,4 +1,4 @@
-package ns1
+package account
 
 import (
 	"encoding/json"

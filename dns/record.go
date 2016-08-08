@@ -1,4 +1,4 @@
-package ns1
+package dns
 
 import (
 	"fmt"
@@ -37,21 +37,6 @@ func NewRecord(zone string, domain string, t string) *Record {
 		UseClientSubnet: true,
 	}
 }
-
-// MetaFeed wraps an Answer.Metadata element which points to a feed
-type MetaFeed struct {
-	Feed string `json:"feed"`
-}
-
-// NewMetaFeed takes a feed_id and creates a MetaFeed
-func NewMetaFeed(feedID string) MetaFeed {
-	return MetaFeed{
-		Feed: feedID,
-	}
-}
-
-// MetaStatic wraps an Answer.Metadata element which just wraps a string
-type MetaStatic string
 
 // LinkTo sets a Record Link to an FQDN and ensures no other record configuration is specified
 func (r *Record) LinkTo(to string) {

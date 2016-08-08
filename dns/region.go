@@ -1,4 +1,4 @@
-package ns1
+package dns
 
 // Region wraps the values of a Record's "regions" attribute
 type Region struct {

@@ -3,7 +3,7 @@ package rest
 import (
 	"fmt"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/monitoring"
 )
 
 const (
@@ -16,13 +16,13 @@ type MonitorsService service
 // List returns all monitoring jobs for the account.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-get
-func (s *MonitorsService) List() ([]*ns1.MonitoringJob, error) {
+func (s *MonitorsService) List() ([]*monitoring.Job, error) {
 	req, err := s.client.NewRequest("GET", monitorPath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	mjl := []*ns1.MonitoringJob{}
+	mjl := []*monitoring.Job{}
 	_, err = s.client.Do(req, &mjl)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *MonitorsService) List() ([]*ns1.MonitoringJob, error) {
 // Get takes an ID and returns details for a specific monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-get
-func (s *MonitorsService) Get(id string) (*ns1.MonitoringJob, error) {
+func (s *MonitorsService) Get(id string) (*monitoring.Job, error) {
 	path := fmt.Sprintf("%s/%s", monitorPath, id)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -42,7 +42,7 @@ func (s *MonitorsService) Get(id string) (*ns1.MonitoringJob, error) {
 		return nil, err
 	}
 
-	var mj ns1.MonitoringJob
+	var mj monitoring.Job
 	_, err = s.client.Do(req, &mj)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *MonitorsService) Get(id string) (*ns1.MonitoringJob, error) {
 // Create takes a *MonitoringJob and creates a new monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-put
-func (s *MonitorsService) Create(mj *ns1.MonitoringJob) error {
+func (s *MonitorsService) Create(mj *monitoring.Job) error {
 	path := fmt.Sprintf("%s/%s", monitorPath, mj.ID)
 
 	req, err := s.client.NewRequest("PUT", path, &mj)
@@ -74,7 +74,7 @@ func (s *MonitorsService) Create(mj *ns1.MonitoringJob) error {
 // Update takes a *MonitoringJob and change the configuration details of an existing monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-post
-func (s *MonitorsService) Update(mj *ns1.MonitoringJob) error {
+func (s *MonitorsService) Update(mj *monitoring.Job) error {
 	path := fmt.Sprintf("%s/%s", monitorPath, mj.ID)
 
 	req, err := s.client.NewRequest("POST", path, &mj)
@@ -113,7 +113,7 @@ func (s *MonitorsService) Delete(id string) error {
 // ListTypes returns all available monitoring job types.
 //
 // NS1 API docs: https://ns1.com/api/#jobtypes-get
-func (s *MonitorsService) ListTypes() ([]*ns1.MonitoringJobType, error) {
+func (s *MonitorsService) ListTypes() ([]*monitoring.JobType, error) {
 	path := "monitoring/jobtypes"
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -121,7 +121,7 @@ func (s *MonitorsService) ListTypes() ([]*ns1.MonitoringJobType, error) {
 		return nil, err
 	}
 
-	mjt := []*ns1.MonitoringJobType{}
+	mjt := []*monitoring.JobType{}
 	_, err = s.client.Do(req, &mjt)
 	if err != nil {
 		return nil, err

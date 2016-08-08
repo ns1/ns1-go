@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/monitoring"
 	"github.com/ns1/ns1-go/rest"
 )
 
@@ -18,8 +19,20 @@ func main() {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	httpClient := &http.Client{Timeout: time.Second * 10}
-	client := rest.NewAPIClient(httpClient, rest.SetAPIKey(k))
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * 10,
+	}
+
+	// Adds logging to each http request.
+	doer := rest.Decorate(
+		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+
+	client := rest.NewClient(
+		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
 	mjl, err := client.Monitors.List()
 	if err != nil {
@@ -30,16 +43,16 @@ func main() {
 		fmt.Println(string(b))
 	}
 
-	mj, err := client.Monitors.Get("52a99e559faa7fa6e546b9ca")
+	mj, err := client.Monitors.Get("52a90e559faa7fa6e546b9ca")
 	if err != nil {
 		log.Fatal(err)
 	}
 	b, _ := json.MarshalIndent(mj, "", "  ")
 	fmt.Println(string(b))
 
-	new_mj := &ns1.MonitoringJob{Config: map[string]interface{}{"host": "1.1.1.1"},
-		Rules: []*ns1.MonitoringJobRule{
-			&ns1.MonitoringJobRule{Key: "loss", Value: "5.0", Comparison: "<="},
+	new_mj := &monitoring.Job{Config: map[string]interface{}{"host": "1.1.1.1"},
+		Rules: []*monitoring.JobRule{
+			&monitoring.JobRule{Key: "loss", Value: "5.0", Comparison: "<="},
 		},
 		JobType:      "ping",
 		Regions:      []string{"master"},

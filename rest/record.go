@@ -3,7 +3,7 @@ package rest
 import (
 	"fmt"
 
-	ns1 "github.com/ns1/ns1-go"
+	"github.com/ns1/ns1-go/dns"
 )
 
 const (
@@ -16,7 +16,7 @@ type RecordsService service
 // Get takes a zone, domain and record type t and returns full configuration for a DNS record.
 //
 // NS1 API docs: https://ns1.com/api/#record-get
-func (s *RecordsService) Get(zone string, domain string, t string) (*ns1.Record, error) {
+func (s *RecordsService) Get(zone string, domain string, t string) (*dns.Record, error) {
 	path := fmt.Sprintf("%s/%s/%s/%s", recordPath, zone, domain, t)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -24,7 +24,7 @@ func (s *RecordsService) Get(zone string, domain string, t string) (*ns1.Record,
 		return nil, err
 	}
 
-	var r ns1.Record
+	var r dns.Record
 	_, err = s.client.Do(req, &r)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (s *RecordsService) Get(zone string, domain string, t string) (*ns1.Record,
 // Create takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type.
 //
 // NS1 API docs: https://ns1.com/api/#record-put
-func (s *RecordsService) Create(r *ns1.Record) error {
+func (s *RecordsService) Create(r *dns.Record) error {
 	path := fmt.Sprintf("%s/%s/%s/%s", recordPath, r.Zone, r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("PUT", path, &r)
@@ -56,7 +56,7 @@ func (s *RecordsService) Create(r *ns1.Record) error {
 // UpdateRecord takes a *Record and modifies configuration details for an existing DNS record.
 //
 // NS1 API docs: https://ns1.com/api/#record-post
-func (s *RecordsService) UpdateRecord(r *ns1.Record) error {
+func (s *RecordsService) UpdateRecord(r *dns.Record) error {
 	path := fmt.Sprintf("%s/%s/%s/%s", recordPath, r.Zone, r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("POST", path, &r)

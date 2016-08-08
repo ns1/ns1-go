@@ -28,8 +28,8 @@ type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// APIClient manages communication with the NS1 Rest API.
-type APIClient struct {
+// Client manages communication with the NS1 Rest API.
+type Client struct {
 	// httpClient handles all rest api communication,
 	// and expects an *http.Client.
 	httpClient Doer
@@ -60,15 +60,15 @@ type APIClient struct {
 	Zones       *ZonesService
 }
 
-// NewAPIClient constructs and returns a reference to an instantiated APIClient.
-func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
+// NewClient constructs and returns a reference to an instantiated Client.
+func NewClient(httpClient Doer, options ...ClientOption) *Client {
 	endpoint, _ := url.Parse(defaultEndpoint)
 
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 
-	c := &APIClient{
+	c := &Client{
 		httpClient:    httpClient,
 		Endpoint:      endpoint,
 		RateLimitFunc: defaultRateLimitFunc,
@@ -92,39 +92,39 @@ func NewAPIClient(httpClient Doer, options ...APIClientOption) *APIClient {
 }
 
 type service struct {
-	client *APIClient
+	client *Client
 }
 
-// APIClientOption specifies a function for setting APIClient fields.
-type APIClientOption func(*APIClient)
+// ClientOption specifies a function for setting Client fields.
+type ClientOption func(*Client)
 
-// SetHTTPClient sets an APIClient instances' httpClient.
-func SetHTTPClient(httpClient Doer) APIClientOption {
-	return func(c *APIClient) { c.httpClient = httpClient }
+// SetHTTPClient sets a Client instances' httpClient.
+func SetHTTPClient(httpClient Doer) ClientOption {
+	return func(c *Client) { c.httpClient = httpClient }
 }
 
-// SetAPIKey sets an APIClient instances' APIKey.
-func SetAPIKey(key string) APIClientOption {
-	return func(c *APIClient) { c.APIKey = key }
+// SetAPIKey sets a Client instances' APIKey.
+func SetAPIKey(key string) ClientOption {
+	return func(c *Client) { c.APIKey = key }
 }
 
-// SetEndpoint sets an APIClient instances' Endpoint.
-func SetEndpoint(endpoint string) APIClientOption {
-	return func(c *APIClient) { c.Endpoint, _ = url.Parse(endpoint) }
+// SetEndpoint sets a Client instances' Endpoint.
+func SetEndpoint(endpoint string) ClientOption {
+	return func(c *Client) { c.Endpoint, _ = url.Parse(endpoint) }
 }
 
-// SetUserAgent sets an APIClient instances' user agent.
-func SetUserAgent(ua string) APIClientOption {
-	return func(c *APIClient) { c.UserAgent = ua }
+// SetUserAgent sets a Client instances' user agent.
+func SetUserAgent(ua string) ClientOption {
+	return func(c *Client) { c.UserAgent = ua }
 }
 
-// SetRateLimitFunc sets an APIClient instances' RateLimitFunc.
-func SetRateLimitFunc(ratefunc func(rl RateLimit)) APIClientOption {
-	return func(c *APIClient) { c.RateLimitFunc = ratefunc }
+// SetRateLimitFunc sets a Client instances' RateLimitFunc.
+func SetRateLimitFunc(ratefunc func(rl RateLimit)) ClientOption {
+	return func(c *Client) { c.RateLimitFunc = ratefunc }
 }
 
 // Do satisfies the Doer interface.
-func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func (c APIClient) Do(req *http.Request, v interface{}) (*http.Response, error) 
 }
 
 // NewRequest constructs and returns a http.Request.
-func (c *APIClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(path)
 	if err != nil {
 		return nil, err
@@ -240,7 +240,7 @@ func (rl RateLimit) WaitTimeRemaining() time.Duration {
 }
 
 // RateLimitStrategySleep sets RateLimitFunc to sleep by WaitTimeRemaining
-func (c *APIClient) RateLimitStrategySleep() {
+func (c *Client) RateLimitStrategySleep() {
 	c.RateLimitFunc = func(rl RateLimit) {
 		remaining := rl.WaitTimeRemaining()
 		time.Sleep(remaining)
