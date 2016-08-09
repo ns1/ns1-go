@@ -1,4 +1,4 @@
-package nsone
+package rest
 
 import (
 	"testing"

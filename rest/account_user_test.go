@@ -1,9 +1,11 @@
-package nsone
+package rest
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+
+	"github.com/ns1/ns1-go/model/account"
 )
 
 func TestUnmarshalUsers(t *testing.T) {
@@ -11,7 +13,7 @@ func TestUnmarshalUsers(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var users []User
+	var users []account.User
 	if err = json.Unmarshal(data, &users); err != nil {
 		t.Error(err)
 	}
@@ -81,7 +83,7 @@ func TestUnmarshalUsers(t *testing.T) {
 	if !pdata.ManageDatafeeds {
 		t.Error("manage data feeds")
 	}
-	pdns := p.Dns
+	pdns := p.DNS
 	if !pdns.ManageZones {
 		t.Error("manage zones")
 	}
