@@ -34,7 +34,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	mjl, err := client.Jobs.List()
+	mjl, _, err := client.Jobs.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func main() {
 		fmt.Println(string(b))
 	}
 
-	mj, err := client.Jobs.Get("52a90e559faa7fa6e546b9ca")
+	mj, _, err := client.Jobs.Get("52a90e559faa7fa6e546b9ca")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,7 +65,7 @@ func main() {
 		NotifyDelay:  0,
 	}
 
-	err = client.Jobs.Create(new_mj)
+	_, err = client.Jobs.Create(new_mj)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,14 +73,14 @@ func main() {
 	fmt.Println(string(b))
 
 	new_mj.Frequency = 5
-	err = client.Jobs.Update(new_mj)
+	_, err = client.Jobs.Update(new_mj)
 	if err != nil {
 		log.Fatal(err)
 	}
 	b, _ = json.MarshalIndent(new_mj, "", "  ")
 	fmt.Println(string(b))
 
-	err = client.Jobs.Delete(new_mj.ID)
+	_, err = client.Jobs.Delete(new_mj.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

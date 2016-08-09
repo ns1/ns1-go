@@ -33,7 +33,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	teams, err := client.Teams.List()
+	teams, _, err := client.Teams.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func main() {
 		fmt.Println(string(b))
 	}
 
-	users, err := client.Users.List()
+	users, _, err := client.Users.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func main() {
 		fmt.Println(string(b))
 	}
 
-	keys, err := client.APIKeys.List()
+	keys, _, err := client.APIKeys.List()
 	if err != nil {
 		log.Fatal(err)
 	}

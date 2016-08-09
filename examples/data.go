@@ -34,7 +34,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	dataSources, err := client.DataSources.List()
+	dataSources, _, err := client.DataSources.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,19 +45,19 @@ func main() {
 
 	// Create a zone to play in
 	zone_name := "testdata.com"
-	err = client.Zones.Delete(zone_name)
+	_, err = client.Zones.Delete(zone_name)
 	if err != nil {
 		log.Fatal(err)
 	}
 	z := dns.NewZone(zone_name)
-	err = client.Zones.Create(z)
+	_, err = client.Zones.Create(z)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Construct/Create an NSONE API data source
 	ds := data.NewSource("my api source", "nsone_v1")
-	err = client.DataSources.Create(ds)
+	_, err = client.DataSources.Create(ds)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,12 +78,12 @@ func main() {
 	}
 
 	// Create the feeds through the rest api.
-	err = client.DataFeeds.Create(feed1)
+	_, err = client.DataFeeds.Create(feed1)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.DataFeeds.Create(feed2)
+	_, err = client.DataFeeds.Create(feed2)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func main() {
 			Config: map[string]interface{}{},
 		},
 	}
-	err = client.Records.Create(r)
+	_, err = client.Records.Create(r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -119,7 +119,7 @@ func main() {
 	update := make(map[string]interface{})
 	update["server1"] = map[string]bool{"up": true}
 	update["server2"] = map[string]bool{"up": false}
-	err = client.DataSources.PublishToFeed(ds.ID, update)
+	_, err = client.DataSources.PublishToFeed(ds.ID, update)
 	if err != nil {
 		log.Fatal(err)
 	}

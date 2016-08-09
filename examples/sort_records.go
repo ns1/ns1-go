@@ -61,7 +61,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	zones, err := client.Zones.List()
+	zones, _, err := client.Zones.List()
 	if err != nil {
 		log.Fatal(err)
 	}
