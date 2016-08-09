@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ns1/ns1-go/dns"
+	"github.com/ns1/ns1-go/model/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 
@@ -34,7 +34,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	zones, err := client.Zones.List()
+	zones, _, err := client.Zones.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,21 +46,21 @@ func main() {
 
 	// Construct/Create a zone.
 	zone_name := "test.com"
-	err = client.Zones.Delete(zone_name)
+	_, err = client.Zones.Delete(zone_name)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	z := dns.NewZone(zone_name)
 	z.NxTTL = 3600
-	err = client.Zones.Create(z)
+	_, err = client.Zones.Create(z)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Update the zone.
 	z.Retry = 5401
-	err = client.Zones.Update(z)
+	_, err = client.Zones.Update(z)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func main() {
 	// Add an A record with a single static answer.
 	orchidRec := dns.NewRecord("test.com", "orchid", "A")
 	orchidRec.Answers = []*dns.Answer{&dns.Answer{Answer: []string{"2.2.2.2"}}}
-	err = client.Records.Create(orchidRec)
+	_, err = client.Records.Create(orchidRec)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func main() {
 		&dns.Answer{Answer: []string{"1.2.3.4"}},
 		&dns.Answer{Answer: []string{"5.6.7.8"}},
 	}
-	err = client.Records.Create(honeyRec)
+	_, err = client.Records.Create(honeyRec)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func main() {
 	// Add a cname
 	potRec := dns.NewRecord("test.com", "pot", "CNAME")
 	potRec.Answers = []*dns.Answer{&dns.Answer{Answer: []string{"honey.test.com"}}}
-	err = client.Records.Create(potRec)
+	_, err = client.Records.Create(potRec)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func main() {
 		&dns.Answer{Answer: []string{"5", "mail1.test.com"}},
 		&dns.Answer{Answer: []string{"10", "mail2.test.com"}},
 	}
-	err = client.Records.Create(mailRec)
+	_, err = client.Records.Create(mailRec)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func main() {
 	aaaaRec := dns.NewRecord("test.com", "honey6", "AAAA")
 	aaaaRec.TTL = 300
 	aaaaRec.Answers = []*dns.Answer{&dns.Answer{Answer: []string{"2607:f8b0:4006:806::1010"}}}
-	err = client.Records.Create(aaaaRec)
+	_, err = client.Records.Create(aaaaRec)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,7 +142,7 @@ func main() {
 			Config: map[string]interface{}{"N": 1},
 		},
 	}
-	err = client.Records.Create(bumbleRec)
+	_, err = client.Records.Create(bumbleRec)
 	if err != nil {
 		log.Fatal(err)
 	}

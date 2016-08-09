@@ -20,7 +20,7 @@ type Record struct {
 	Regions         map[string]Region `json:"regions,omitempty"`
 }
 
-// Implementation of Stringer interface.
+// Implementation of Stringer interface. Concatenates domain and record type.
 func (r Record) String() string {
 	return fmt.Sprintf("%s %s", r.Domain, r.Type)
 }

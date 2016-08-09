@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ns1/ns1-go/monitoring"
+	"github.com/ns1/ns1-go/model/monitoring"
 	"github.com/ns1/ns1-go/rest"
 )
 
@@ -34,7 +34,7 @@ func main() {
 	client := rest.NewClient(
 		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
 
-	mjl, err := client.Monitors.List()
+	mjl, err := client.Jobs.List()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func main() {
 		fmt.Println(string(b))
 	}
 
-	mj, err := client.Monitors.Get("52a90e559faa7fa6e546b9ca")
+	mj, err := client.Jobs.Get("52a90e559faa7fa6e546b9ca")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,7 +65,7 @@ func main() {
 		NotifyDelay:  0,
 	}
 
-	err = client.Monitors.Create(new_mj)
+	err = client.Jobs.Create(new_mj)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,14 +73,14 @@ func main() {
 	fmt.Println(string(b))
 
 	new_mj.Frequency = 5
-	err = client.Monitors.Update(new_mj)
+	err = client.Jobs.Update(new_mj)
 	if err != nil {
 		log.Fatal(err)
 	}
 	b, _ = json.MarshalIndent(new_mj, "", "  ")
 	fmt.Println(string(b))
 
-	err = client.Monitors.Delete(new_mj.ID)
+	err = client.Jobs.Delete(new_mj.ID)
 	if err != nil {
 		log.Fatal(err)
 	}

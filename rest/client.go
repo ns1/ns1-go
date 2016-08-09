@@ -53,7 +53,7 @@ type Client struct {
 	APIKeys     *APIKeysService
 	DataFeeds   *DataFeedsService
 	DataSources *DataSourcesService
-	Monitors    *MonitorsService
+	Jobs        *JobsService
 	Records     *RecordsService
 	Teams       *TeamsService
 	Users       *UsersService
@@ -79,7 +79,7 @@ func NewClient(httpClient Doer, options ...ClientOption) *Client {
 	c.APIKeys = (*APIKeysService)(&c.common)
 	c.DataFeeds = (*DataFeedsService)(&c.common)
 	c.DataSources = (*DataSourcesService)(&c.common)
-	c.Monitors = (*MonitorsService)(&c.common)
+	c.Jobs = (*JobsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
 	c.Users = (*UsersService)(&c.common)
@@ -175,6 +175,17 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	req.Header.Add(headerAuth, c.APIKey)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
+}
+
+// Response wraps the standard http.Response returned from the NS1 rest api.
+type Response struct {
+	*http.Response
+}
+
+func newResponse(resp *http.Response) *Response {
+	response := Response{Response: resp}
+
+	return &response
 }
 
 // Error contains all http responses outside the 2xx range.

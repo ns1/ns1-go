@@ -10,7 +10,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ns1/ns1-go/dns"
+	"github.com/ns1/ns1-go/model/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 

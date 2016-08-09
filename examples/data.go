@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ns1/ns1-go/data"
-	"github.com/ns1/ns1-go/dns"
+	"github.com/ns1/ns1-go/model/data"
+	"github.com/ns1/ns1-go/model/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 
