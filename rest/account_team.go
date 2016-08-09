@@ -19,7 +19,7 @@ func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
 	}
 
 	tl := []*account.Team{}
-	resp, err = s.client.Do(req, &tl)
+	resp, err := s.client.Do(req, &tl)
 	if err != nil {
 		return nil, resp, err
 	}

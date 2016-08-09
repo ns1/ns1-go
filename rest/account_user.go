@@ -19,7 +19,7 @@ func (s *UsersService) List() ([]*account.User, *http.Response, error) {
 	}
 
 	ul := []*account.User{}
-	resp, err = s.client.Do(req, &ul)
+	resp, err := s.client.Do(req, &ul)
 	if err != nil {
 		return nil, resp, err
 	}

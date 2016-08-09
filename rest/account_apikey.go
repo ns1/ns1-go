@@ -19,7 +19,7 @@ func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 	}
 
 	kl := []*account.APIKey{}
-	resp, err = s.client.Do(req, &kl)
+	resp, err := s.client.Do(req, &kl)
 	if err != nil {
 		return nil, resp, err
 	}

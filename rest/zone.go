@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/ns1/ns1-go/model/dns"
 )
@@ -12,14 +13,14 @@ type ZonesService service
 // List returns all active zones and basic zone configuration details for each.
 //
 // NS1 API docs: https://ns1.com/api/#zones-get
-func (s *ZonesService) List() ([]*dns.Zone, *Response, error) {
+func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "zones", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	zl := []*dns.Zone{}
-	resp, err = s.client.Do(req, &zl)
+	resp, err := s.client.Do(req, &zl)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -30,7 +31,7 @@ func (s *ZonesService) List() ([]*dns.Zone, *Response, error) {
 // Get takes a zone name and returns a single active zone and its basic configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#zones-zone-get
-func (s *ZonesService) Get(zone string) (*dns.Zone, *Response, error) {
+func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -39,7 +40,7 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *Response, error) {
 	}
 
 	var z dns.Zone
-	resp, err = s.client.Do(req, &z)
+	resp, err := s.client.Do(req, &z)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -50,7 +51,7 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *Response, error) {
 // Create takes a *Zone and creates a new DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
-func (s *ZonesService) Create(z *dns.Zone) (*Response, error) {
+func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("PUT", path, &z)
@@ -59,7 +60,7 @@ func (s *ZonesService) Create(z *dns.Zone) (*Response, error) {
 	}
 
 	// Update zones fields with data from api(ensure consistent)
-	resp, err = s.client.Do(req, &z)
+	resp, err := s.client.Do(req, &z)
 	if err != nil {
 		return resp, err
 	}
@@ -70,7 +71,7 @@ func (s *ZonesService) Create(z *dns.Zone) (*Response, error) {
 // Update takes a *Zone and modifies basic details of a DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
-func (s *ZonesService) Update(z *dns.Zone) (*Response, error) {
+func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("POST", path, &z)
@@ -79,7 +80,7 @@ func (s *ZonesService) Update(z *dns.Zone) (*Response, error) {
 	}
 
 	// Update zones fields with data from api(ensure consistent)
-	resp, err = s.client.Do(req, &z)
+	resp, err := s.client.Do(req, &z)
 	if err != nil {
 		return resp, err
 	}
@@ -90,7 +91,7 @@ func (s *ZonesService) Update(z *dns.Zone) (*Response, error) {
 // Delete takes a zone and destroys an existing DNS zone and all records in the zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-delete
-func (s *ZonesService) Delete(zone string) (*Response, error) {
+func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
@@ -98,7 +99,7 @@ func (s *ZonesService) Delete(zone string) (*Response, error) {
 		return nil, err
 	}
 
-	resp, err = s.client.Do(req, nil)
+	resp, err := s.client.Do(req, nil)
 	if err != nil {
 		return resp, err
 	}

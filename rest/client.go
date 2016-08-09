@@ -177,17 +177,6 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
-// Response wraps the standard http.Response returned from the NS1 rest api.
-type Response struct {
-	*http.Response
-}
-
-func newResponse(resp *http.Response) *Response {
-	response := Response{Response: resp}
-
-	return &response
-}
-
 // Error contains all http responses outside the 2xx range.
 type Error struct {
 	Resp    *http.Response
