@@ -61,7 +61,7 @@ type Client struct {
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
-func NewClient(httpClient Doer, options ...ClientOption) *Client {
+func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	endpoint, _ := url.Parse(defaultEndpoint)
 
 	if httpClient == nil {
@@ -95,31 +95,28 @@ type service struct {
 	client *Client
 }
 
-// ClientOption specifies a function for setting Client fields.
-type ClientOption func(*Client)
-
 // SetHTTPClient sets a Client instances' httpClient.
-func SetHTTPClient(httpClient Doer) ClientOption {
+func SetHTTPClient(httpClient Doer) func(*Client) {
 	return func(c *Client) { c.httpClient = httpClient }
 }
 
 // SetAPIKey sets a Client instances' APIKey.
-func SetAPIKey(key string) ClientOption {
+func SetAPIKey(key string) func(*Client) {
 	return func(c *Client) { c.APIKey = key }
 }
 
 // SetEndpoint sets a Client instances' Endpoint.
-func SetEndpoint(endpoint string) ClientOption {
+func SetEndpoint(endpoint string) func(*Client) {
 	return func(c *Client) { c.Endpoint, _ = url.Parse(endpoint) }
 }
 
 // SetUserAgent sets a Client instances' user agent.
-func SetUserAgent(ua string) ClientOption {
+func SetUserAgent(ua string) func(*Client) {
 	return func(c *Client) { c.UserAgent = ua }
 }
 
 // SetRateLimitFunc sets a Client instances' RateLimitFunc.
-func SetRateLimitFunc(ratefunc func(rl RateLimit)) ClientOption {
+func SetRateLimitFunc(ratefunc func(rl RateLimit)) func(*Client) {
 	return func(c *Client) { c.RateLimitFunc = ratefunc }
 }
 
@@ -175,6 +172,10 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	req.Header.Add(headerAuth, c.APIKey)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
+}
+
+type Response struct {
+	*http.Response
 }
 
 // Error contains all http responses outside the 2xx range.
