@@ -1,10 +1,18 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/ns1/ns1-go/model/dns"
+)
+
+var (
+	// ErrZoneMissing is returned when a zone should not yet exist for a request to succeed.
+	ErrZoneExists = errors.New("Zone already exists.")
+	// ErrZoneMissing is returned when a zone is expected to exist for a request to succeed.
+	ErrZoneMissing = errors.New("Zone does not exist.")
 )
 
 // ZonesService handles 'zones' endpoint.
@@ -42,6 +50,9 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 	var z dns.Zone
 	resp, err := s.client.Do(req, &z)
 	if err != nil {
+		if err.(*Error).Message == "zone not found" {
+			return nil, resp, ErrZoneMissing
+		}
 		return nil, resp, err
 	}
 
@@ -62,6 +73,9 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
 	if err != nil {
+		if err.(*Error).Message == "zone already exists" {
+			return resp, ErrZoneExists
+		}
 		return resp, err
 	}
 
@@ -82,6 +96,9 @@ func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
 	if err != nil {
+		if err.(*Error).Message == "zone not found" {
+			return resp, ErrZoneMissing
+		}
 		return resp, err
 	}
 
@@ -101,6 +118,9 @@ func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
+		if err.(*Error).Message == "zone not found" {
+			return resp, ErrZoneMissing
+		}
 		return resp, err
 	}
 
