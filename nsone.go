@@ -154,12 +154,7 @@ func (c APIClient) GetZones() ([]Zone, error) {
 // GetZone takes a zone and returns a single active zone and its basic configuration details
 func (c APIClient) GetZone(zone string) (*Zone, error) {
 	z := NewZone(zone)
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
-	if status == 404 {
-		z.Id = ""
-		z.Zone = ""
-		return z, nil
-	}
+	_, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/zones/%s", z.Zone), nil, z)
 	return z, err
 }
 
@@ -274,12 +269,7 @@ func (c APIClient) GetMonitoringJobs() (MonitoringJobs, error) {
 // GetMonitoringJob takes an ID and returns details for a specific monitoring job
 func (c APIClient) GetMonitoringJob(id string) (MonitoringJob, error) {
 	var mj MonitoringJob
-	status, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id), nil, &mj)
-	if status == 404 {
-		mj.Id = ""
-		mj.Name = ""
-		return mj, nil
-	}
+	_, err := c.doHTTPUnmarshal("GET", fmt.Sprintf("https://api.nsone.net/v1/monitoring/jobs/%s", id), nil, &mj)
 	return mj, err
 }
 
