@@ -99,3 +99,8 @@ func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 		target,
 	}}
 }
+
+// Region wraps the values of a Record's "regions" attribute
+type Region struct {
+	Meta map[string]interface{} `json:"meta"`
+}
