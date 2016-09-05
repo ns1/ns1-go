@@ -1,10 +1,18 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/ns1/ns1-go/model/dns"
+)
+
+var (
+	// ErrRecordMissing is returned when a record should not yet exist for a request to succeed.
+	ErrRecordExists = errors.New("Record already exists.")
+	// ErrRecordMissing is returned when a record is expected to exist for a request to succeed.
+	ErrRecordMissing = errors.New("Record does not exist.")
 )
 
 // RecordsService handles 'zones/ZONE/DOMAIN/TYPE' endpoint.
@@ -24,6 +32,9 @@ func (s *RecordsService) Get(zone string, domain string, t string) (*dns.Record,
 	var r dns.Record
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
+		if err.(*Error).Message == "record not found" {
+			return nil, resp, ErrRecordMissing
+		}
 		return nil, resp, err
 	}
 
@@ -32,6 +43,7 @@ func (s *RecordsService) Get(zone string, domain string, t string) (*dns.Record,
 
 // Create takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type.
 //
+// The given record must have at least one answer.
 // NS1 API docs: https://ns1.com/api/#record-put
 func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
@@ -44,7 +56,14 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 	// Update record fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
-		return resp, err
+		switch err.(*Error).Message {
+		case "zone not found":
+			return resp, ErrZoneMissing
+		case "record already exists":
+			return resp, ErrRecordExists
+		default:
+			return resp, err
+		}
 	}
 
 	return resp, nil
@@ -52,8 +71,9 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 
 // UpdateRecord takes a *Record and modifies configuration details for an existing DNS record.
 //
+// Only the fields to be updated are required in the given record.
 // NS1 API docs: https://ns1.com/api/#record-post
-func (s *RecordsService) UpdateRecord(r *dns.Record) (*http.Response, error) {
+func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("POST", path, &r)
@@ -64,7 +84,14 @@ func (s *RecordsService) UpdateRecord(r *dns.Record) (*http.Response, error) {
 	// Update records fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
-		return resp, err
+		switch err.(*Error).Message {
+		case "zone not found":
+			return resp, ErrZoneMissing
+		case "record already exists":
+			return resp, ErrRecordExists
+		default:
+			return resp, err
+		}
 	}
 
 	return resp, nil
@@ -83,6 +110,9 @@ func (s *RecordsService) DeleteRecord(zone string, domain string, t string) (*ht
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
+		if err.(*Error).Message == "record not found" {
+			return resp, ErrRecordMissing
+		}
 		return resp, err
 	}
 
