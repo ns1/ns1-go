@@ -71,7 +71,7 @@ func TestUnmarshalMonitoringJobs(t *testing.T) {
 		t.Error("Do not have any jobs")
 	}
 	j := m[0]
-	if j.Id != "52a27d4397d5f07003fdbe7b" {
+	if j.ID != "52a27d4397d5f07003fdbe7b" {
 		t.Error("Wrong ID")
 	}
 	conf := j.Config

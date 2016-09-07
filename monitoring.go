@@ -32,7 +32,7 @@ type MonitoringJobs []MonitoringJob
 
 // MonitoringJob wraps an NS1 /monitoring/jobs resource
 type MonitoringJob struct {
-	Id             string                         `json:"id,omitempty"`
+	ID             string                         `json:"id,omitempty"`
 	Config         map[string]interface{}         `json:"config"`
 	Status         map[string]MonitoringJobStatus `json:"status,omitempty"`
 	Rules          []MonitoringJobRule            `json:"rules"`

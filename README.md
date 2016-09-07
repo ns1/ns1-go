@@ -24,7 +24,7 @@ An *experimental* golang client for the NSOne API: https://api.nsone.net/
         err = api.CreateDataFeed(df_dc1)
         if err != nil {
             panic(err)
-        }    
+        }
 
         dc2_feed_config := make(map[string]string)
         dc2_feed_config["label"] = "exampledc2"
@@ -100,7 +100,7 @@ See [the godoc](http://www.godoc.org/github.com/bobtfish/go-nsone-api)
   * Filter chains are currently unsupported (Terraform will ignore them if present however - so you can set these up manually)
 
 ## NSOne monitoring
-  * 
+  *
 
 ## Users / Account management / API keys
   * No support
@@ -137,4 +137,3 @@ Copyright (c) Tomas Doran 2015
 # LICENSE
 
 Apache2 - see the included LICENSE file for more information
-
