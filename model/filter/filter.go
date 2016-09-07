@@ -16,14 +16,9 @@ func (f *Filter) Disable() {
 }
 
 // NewSelFirstN returns a filter that eliminates all but the
-// first N answers from the list (defaults to 1).
+// first N answers from the list.
 func NewSelFirstN(n int) *Filter {
-	if n == 0 {
-		n = 1
-	}
-	config := map[string]interface{}{
-		"N": n,
-	}
+	config := map[string]interface{}{"N": n}
 	return &Filter{
 		Filter: "select_first_n",
 		Config: config,

@@ -8,13 +8,6 @@ import (
 	"github.com/ns1/ns1-go/model/dns"
 )
 
-var (
-	// ErrZoneMissing is returned when a zone should not yet exist for a request to succeed.
-	ErrZoneExists = errors.New("Zone already exists.")
-	// ErrZoneMissing is returned when a zone is expected to exist for a request to succeed.
-	ErrZoneMissing = errors.New("Zone does not exist.")
-)
-
 // ZonesService handles 'zones' endpoint.
 type ZonesService service
 
@@ -126,3 +119,8 @@ func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 
 	return resp, nil
 }
+
+var (
+	ErrZoneExists  = errors.New("Zone already exists.")
+	ErrZoneMissing = errors.New("Zone does not exist.")
+)

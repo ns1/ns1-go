@@ -29,15 +29,9 @@ func NewWeightedSticky(byNetwork bool) *Filter {
 
 // NewIPv4PrefixShuffle returns a filter that randomly selects
 // IPv4 addresses from prefix list. This filter can only be used
-// A records. n is the number of IPs to randomly select per answer
-// (defaults to 1).
+// A records. n is the number of IPs to randomly select per answer.
 func NewIPv4PrefixShuffle(n int) *Filter {
-	if n == 0 {
-		n = 1
-	}
-	config := map[string]interface{}{
-		"N": n,
-	}
+	config := map[string]interface{}{"N": n}
 	return &Filter{
 		Filter: "ipv4_prefix_shuffle",
 		Config: config,

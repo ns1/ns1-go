@@ -8,13 +8,6 @@ import (
 	"github.com/ns1/ns1-go/model/dns"
 )
 
-var (
-	// ErrRecordMissing is returned when a record should not yet exist for a request to succeed.
-	ErrRecordExists = errors.New("Record already exists.")
-	// ErrRecordMissing is returned when a record is expected to exist for a request to succeed.
-	ErrRecordMissing = errors.New("Record does not exist.")
-)
-
 // RecordsService handles 'zones/ZONE/DOMAIN/TYPE' endpoint.
 type RecordsService service
 
@@ -118,3 +111,8 @@ func (s *RecordsService) DeleteRecord(zone string, domain string, t string) (*ht
 
 	return resp, nil
 }
+
+var (
+	ErrRecordExists  = errors.New("Record already exists.")
+	ErrRecordMissing = errors.New("Record does not exist.")
+)

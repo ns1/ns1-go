@@ -24,9 +24,7 @@ func NewPriority() *Filter {
 // load metric, for each answer you intend to subject to load
 // shedding.
 func NewShedLoad(metric string) *Filter {
-	config := map[string]interface{}{
-		"metric": metric,
-	}
+	config := map[string]interface{}{"metric": metric}
 	return &Filter{
 		Filter: "shed_load",
 		Config: config,
