@@ -1,3 +1,4 @@
+// Example referencing https://ns1.com/articles/automated-failover
 package main
 
 import (
@@ -25,6 +26,9 @@ func initClient() *api.Client {
 	// Adds logging to each http request.
 	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
 	client := api.NewClient(doer, api.SetAPIKey(k))
+
+	// Could also have done this(no logging or timeout)
+	// client := api.NewClient(api.SetAPIKey(k))
 
 	return client
 }
@@ -123,17 +127,6 @@ func main() {
 
 	// Create the record
 	_, err = client.Records.Create(record)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Create a linked record
-	linkedRecord := dns.NewRecord(domain, "l", "A")
-	linkedRecord.LinkTo(record.Domain)
-	prettyPrint("linked record :", linkedRecord)
-
-	// Create the linked record
-	_, err = client.Records.Create(linkedRecord)
 	if err != nil {
 		log.Fatal(err)
 	}
