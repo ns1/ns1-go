@@ -1,4 +1,4 @@
-package stat
+package model
 
 // // GetQPSStats returns current queries per second (QPS) for the account
 // func (c APIClient) GetQPSStats() (v float64, err error) {

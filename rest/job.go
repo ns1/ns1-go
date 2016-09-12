@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/model/monitoring"
+	"github.com/ns1/ns1-go/model/monitor"
 )
 
 // JobsService handles 'monitoring/jobs' endpoint.
@@ -13,13 +13,13 @@ type JobsService service
 // List returns all monitoring jobs for the account.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-get
-func (s *JobsService) List() ([]*monitoring.Job, *http.Response, error) {
+func (s *JobsService) List() ([]*monitor.Job, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "monitoring/jobs", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	mjl := []*monitoring.Job{}
+	mjl := []*monitor.Job{}
 	resp, err := s.client.Do(req, &mjl)
 	if err != nil {
 		return nil, resp, err
@@ -31,7 +31,7 @@ func (s *JobsService) List() ([]*monitoring.Job, *http.Response, error) {
 // Get takes an ID and returns details for a specific monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-get
-func (s *JobsService) Get(id string) (*monitoring.Job, *http.Response, error) {
+func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", id)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -39,7 +39,7 @@ func (s *JobsService) Get(id string) (*monitoring.Job, *http.Response, error) {
 		return nil, nil, err
 	}
 
-	var mj monitoring.Job
+	var mj monitor.Job
 	resp, err := s.client.Do(req, &mj)
 	if err != nil {
 		return nil, resp, err
@@ -51,7 +51,7 @@ func (s *JobsService) Get(id string) (*monitoring.Job, *http.Response, error) {
 // Create takes a *MonitoringJob and creates a new monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-put
-func (s *JobsService) Create(mj *monitoring.Job) (*http.Response, error) {
+func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
 
 	req, err := s.client.NewRequest("PUT", path, &mj)
@@ -71,7 +71,7 @@ func (s *JobsService) Create(mj *monitoring.Job) (*http.Response, error) {
 // Update takes a *MonitoringJob and change the configuration details of an existing monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-post
-func (s *JobsService) Update(mj *monitoring.Job) (*http.Response, error) {
+func (s *JobsService) Update(mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
 
 	req, err := s.client.NewRequest("POST", path, &mj)

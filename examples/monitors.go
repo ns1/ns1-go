@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,79 +8,92 @@ import (
 	"os"
 	"time"
 
-	"github.com/ns1/ns1-go/model/monitoring"
-	"github.com/ns1/ns1-go/rest"
+	"github.com/ns1/ns1-go/model/monitor"
+	api "github.com/ns1/ns1-go/rest"
 )
 
-func main() {
+// Helper that initializes rest api client from environment variable.
+func initClient() *api.Client {
 	k := os.Getenv("NS1_APIKEY")
 	if k == "" {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	httpClient := &http.Client{
-		Transport: tr,
-		Timeout:   time.Second * 10,
-	}
-
+	httpClient := &http.Client{Timeout: time.Second * 10}
 	// Adds logging to each http request.
-	doer := rest.Decorate(
-		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+	client := api.NewClient(doer, api.SetAPIKey(k))
 
-	client := rest.NewClient(
-		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
+	return client
+}
+
+func prettyPrint(header string, v interface{}) {
+	fmt.Println(header)
+	fmt.Printf("%#v \n", v)
+	b, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(b))
+}
+
+func main() {
+	// Initialize the rest api client.
+	client := initClient()
 
 	mjl, _, err := client.Jobs.List()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, mj := range mjl {
-		b, _ := json.MarshalIndent(mj, "", "  ")
-		fmt.Println(string(b))
+		prettyPrint("monitor:", mj)
 	}
 
-	mj, _, err := client.Jobs.Get("52a90e559faa7fa6e546b9ca")
-	if err != nil {
-		log.Fatal(err)
-	}
-	b, _ := json.MarshalIndent(mj, "", "  ")
-	fmt.Println(string(b))
-
-	new_mj := &monitoring.Job{Config: map[string]interface{}{"host": "1.1.1.1"},
-		Rules: []*monitoring.JobRule{
-			&monitoring.JobRule{Key: "loss", Value: "5.0", Comparison: "<="},
+	tcpJob := &monitor.Job{
+		Type: "tcp",
+		Name: "myhost.com:443 Monitor",
+		Config: monitor.Config{
+			"host": "1.2.3.4",
+			"port": 443,
+			"send": "HEAD / HTTP/1.0\r\n\r\n",
+			"ssl":  true,
 		},
-		JobType:      "ping",
-		Regions:      []string{"master"},
-		Active:       true,
-		Frequency:    1,
-		Policy:       "quorum",
-		RegionScope:  "fixed",
-		Name:         "Test monitor",
-		NotifyRepeat: 0,
-		NotifyDelay:  0,
+		Rules: []*monitor.Rule{
+			&monitor.Rule{
+				Key:        "output",
+				Value:      "200 OK",
+				Comparison: "contains",
+			},
+			&monitor.Rule{
+				Key:        "connect",
+				Value:      200,
+				Comparison: "<=",
+			},
+		},
+		Regions:        []string{"lga", "sjc"},
+		Frequency:      10,
+		Active:         true,
+		Policy:         "quorum",
+		RegionScope:    "fixed",
+		NotifyRegional: false,
+		NotifyFailback: true,
+		NotifyRepeat:   0,
+		NotifyDelay:    65,
 	}
 
-	_, err = client.Jobs.Create(new_mj)
+	_, err = client.Jobs.Create(tcpJob)
 	if err != nil {
 		log.Fatal(err)
 	}
-	b, _ = json.MarshalIndent(new_mj, "", "  ")
-	fmt.Println(string(b))
+	prettyPrint("tcp job:", tcpJob)
 
-	new_mj.Frequency = 5
-	_, err = client.Jobs.Update(new_mj)
+	// Deactivate the job
+	tcpJob.Deactivate()
+	_, err = client.Jobs.Update(tcpJob)
 	if err != nil {
 		log.Fatal(err)
 	}
-	b, _ = json.MarshalIndent(new_mj, "", "  ")
-	fmt.Println(string(b))
+	prettyPrint("tcp job deactivated:", tcpJob)
 
-	_, err = client.Jobs.Delete(new_mj.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// _, err = client.Jobs.Delete(tcpJob.ID)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 }

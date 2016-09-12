@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/model/data"
+	"github.com/ns1/ns1-go/model/dns/data"
 )
 
 // DataSourcesService handles 'data/sources' endpoint.
@@ -67,7 +67,7 @@ func (s *DataSourcesService) Create(ds *data.Source) (*http.Response, error) {
 }
 
 // Update takes a *DataSource modifies basic details of a data source.
-// NOTE: This does not 'publish' data. See PublishToFeed
+// NOTE: This does not 'publish' data. See the Publish method.
 //
 // NS1 API docs: https://ns1.com/api/#sources-post
 func (s *DataSourcesService) Update(ds *data.Source) (*http.Response, error) {
@@ -106,10 +106,10 @@ func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
 	return resp, nil
 }
 
-// PublishToFeed takes a datasources' id and data to publish to the feed.
+// Publish takes a datasources' id and data to publish.
 //
 // NS1 API docs: https://ns1.com/api/#feed-post
-func (s *DataSourcesService) PublishToFeed(dataSourceId string, data interface{}) (*http.Response, error) {
+func (s *DataSourcesService) Publish(dataSourceId string, data interface{}) (*http.Response, error) {
 	path := fmt.Sprintf("feed/%s", dataSourceId)
 
 	req, err := s.client.NewRequest("POST", path, &data)
