@@ -4,11 +4,11 @@ package account
 type User struct {
 	Name        string               `json:"name"`
 	Username    string               `json:"username"`
-	Notify      NotificationSettings `json:"notify"`
-	LastAccess  int                  `json:"last_access,omitempty"`
 	Email       string               `json:"email"`
-	Teams       []string             `json:"teams"`
+	Notify      NotificationSettings `json:"notify"`
+	TeamIDs     []string             `json:"teams"`
 	Permissions PermissionsMap       `json:"permissions"`
+	LastAccess  float64              `json:"last_access"`
 }
 
 // NotificationSettings wraps a User's "notify" attribute

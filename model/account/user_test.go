@@ -2,102 +2,116 @@ package account
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnmarshalUsers(t *testing.T) {
-	data, err := ioutil.ReadFile("test/data/account_users.json")
-	if err != nil {
+	d := []byte(`[
+  {
+    "permissions": {},
+    "teams": [],
+    "email": "support@nsone.net",
+    "last_access": 1376325771.0,
+    "notify": {
+      "billing": true
+    },
+    "name": "API Example",
+    "username": "apiexample"
+  },
+  {
+    "permissions": {
+      "dns": {
+        "view_zones": true,
+        "manage_zones": true,
+        "zones_allow_by_default": false,
+        "zones_deny": [],
+        "zones_allow": ["example.com"]
+      },
+      "data": {
+        "push_to_datafeeds": false,
+        "manage_datasources": false,
+        "manage_datafeeds": false
+      },
+      "account": {
+        "manage_payment_methods": false,
+        "manage_plan": false,
+        "manage_teams": false,
+        "manage_apikeys": false,
+        "manage_account_settings": false,
+        "view_activity_log": false,
+        "view_invoices": false,
+        "manage_users": false
+      },
+      "monitoring": {
+        "manage_lists": false,
+        "manage_jobs": false,
+        "view_jobs": false
+      }
+    },
+    "teams": ["520422919f782d37dffb588a"],
+    "email": "newuser@example.com",
+    "last_access": null,
+    "notify": {
+      "billing": true
+    },
+    "name": "New User",
+    "username": "newuser"
+  }
+]
+`)
+	ul := []*User{}
+	if err := json.Unmarshal(d, &ul); err != nil {
 		t.Error(err)
 	}
-	var users []User
-	if err = json.Unmarshal(data, &users); err != nil {
-		t.Error(err)
+	assert.Equal(t, len(ul), 2, "Userlist should have 2 users")
+
+	u := ul[0]
+	assert.Equal(t, u.TeamIDs, []string{}, "User should have empty teams")
+	assert.Equal(t, u.Email, "support@nsone.net", "User wrong email")
+	assert.Equal(t, u.LastAccess, 1376325771.0, "User wrong last access")
+	assert.Equal(t, u.Name, "API Example", "User wrong name")
+	assert.Equal(t, u.Username, "apiexample", "User wrong username")
+	assert.Equal(t, u.Notify, NotificationSettings{true}, "User wrong notify")
+	assert.Equal(t, u.Permissions, PermissionsMap{}, "User should have empty permissions")
+
+	u2 := ul[1]
+	assert.Equal(t, u2.TeamIDs, []string{"520422919f782d37dffb588a"}, "User should have empty teams")
+	assert.Equal(t, u2.Email, "newuser@example.com", "User wrong email")
+	assert.Equal(t, u2.LastAccess, 0.0, "User wrong last access")
+	assert.Equal(t, u2.Name, "New User", "User wrong name")
+	assert.Equal(t, u2.Username, "newuser", "User wrong username")
+	assert.Equal(t, u.Notify, NotificationSettings{true}, "User wrong notify")
+
+	permMap := PermissionsMap{
+		DNS: PermissionsDNS{
+			ViewZones:           true,
+			ManageZones:         true,
+			ZonesAllowByDefault: false,
+			ZonesDeny:           []string{},
+			ZonesAllow:          []string{"example.com"},
+		},
+		Data: PermissionsData{
+			PushToDatafeeds:   false,
+			ManageDatasources: false,
+			ManageDatafeeds:   false,
+		},
+		Account: PermissionsAccount{
+			ManagePaymentMethods:  false,
+			ManagePlan:            false,
+			ManageTeams:           false,
+			ManageApikeys:         false,
+			ManageAccountSettings: false,
+			ViewActivityLog:       false,
+			ViewInvoices:          false,
+			ManageUsers:           false,
+		},
+		Monitoring: PermissionsMonitoring{
+			ManageLists: false,
+			ManageJobs:  false,
+			ViewJobs:    false,
+		},
 	}
-	if len(users) != 1 {
-		t.Error("user not found")
-	}
-	user := users[0]
-	if user.Username != "test" {
-		t.Error("username")
-	}
-	if user.Name != "Test User" {
-		t.Error("name")
-	}
-	if len(user.Teams) != 0 {
-		t.Error("teams")
-	}
-	// FIXME user.Notify
-	if user.LastAccess != 1428457118 {
-		t.Error("last access")
-	}
-	if user.Email != "test@test.com" {
-		t.Error("email")
-	}
-	p := user.Permissions
-	pm := p.Monitoring
-	if !pm.ManageJobs {
-		t.Error("manage jobs")
-	}
-	if !pm.ViewJobs {
-		t.Error("view jobs")
-	}
-	if !pm.ManageLists {
-		t.Error("manage lists")
-	}
-	pa := p.Account
-	if !pa.ManagePlan {
-		t.Error("manage plan")
-	}
-	if !pa.ManageUsers {
-		t.Error("manage users")
-	}
-	if !pa.ViewInvoices {
-		t.Error("view invoices")
-	}
-	if !pa.ManageTeams {
-		t.Error("manage teams")
-	}
-	if !pa.ManagePaymentMethods {
-		t.Error("manage payment methods")
-	}
-	if !pa.ManageAccountSettings {
-		t.Error("manage account settings")
-	}
-	if !pa.ManageApikeys {
-		t.Error("manage api keys")
-	}
-	if !pa.ViewActivityLog {
-		t.Error("view activity log")
-	}
-	pdata := p.Data
-	if !pdata.PushToDatafeeds {
-		t.Error("push to data feeds")
-	}
-	if !pdata.ManageDatasources {
-		t.Error("manage data sources")
-	}
-	if !pdata.ManageDatafeeds {
-		t.Error("manage data feeds")
-	}
-	pdns := p.DNS
-	if !pdns.ManageZones {
-		t.Error("manage zones")
-	}
-	if !pdns.ViewZones {
-		t.Error("view zones")
-	}
-	if len(pdns.ZonesAllow) != 1 {
-		t.Error("zones allow size")
-	}
-	if pdns.ZonesAllow[0] != "foo.com" {
-		t.Error("zones allow")
-	}
-	if len(pdns.ZonesDeny) != 1 {
-		t.Error("zone deny size")
-	}
-	if pdns.ZonesDeny[0] != "bar.com" {
-		t.Error("zone deny")
-	}
+	assert.Equal(t, u2.Permissions, permMap, "User wrong permissions")
 }

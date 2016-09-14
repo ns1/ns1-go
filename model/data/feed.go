@@ -1,6 +1,6 @@
 package data
 
-// Destination is the target record the receives data from a feed/source.
+// Destination is the target resource the receives data from a feed/source.
 type Destination struct {
 	ID string `json:"destid"`
 

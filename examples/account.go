@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	api "github.com/ns1/ns1-go/rest"
 )
 
 // Helper that initializes rest api client from environment variable.
