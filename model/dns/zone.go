@@ -7,23 +7,35 @@ type Zone struct {
 	// Zones have metadata tables, but no filters act on 'zone-level' meta.
 	Meta *data.Meta `json:"meta,omitempty"`
 
-	ID           string         `json:"id,omitempty"`
-	TTL          int            `json:"ttl,omitempty"`
-	NxTTL        int            `json:"nx_ttl,omitempty"`
-	Retry        int            `json:"retry,omitempty"`
-	Zone         string         `json:"zone,omitempty"`
-	Refresh      int            `json:"refresh,omitempty"`
-	Expiry       int            `json:"expiry,omitempty"`
-	Primary      *ZonePrimary   `json:"primary,omitempty"`
-	DNSServers   []string       `json:"dns_servers,omitempty"`
-	Networks     []int          `json:"networks,omitempty"`
-	NetworkPools []string       `json:"network_pools,omitempty"`
-	Hostmaster   string         `json:"hostmaster,omitempty"`
-	Pool         string         `json:"pool,omitempty"`
-	Secondary    *ZoneSecondary `json:"secondary,omitempty"`
-	Link         string         `json:"link,omitempty"`
-	Records      []*ZoneRecord  `json:"records,omitempty"`
-	Serial       int            `json:"serial,omitempty"`
+	// Read-only fields
+	DNSServers   []string `json:"dns_servers,omitempty"`
+	NetworkPools []string `json:"network_pools,omitempty"`
+	Pool         string   `json:"pool,omitempty"` // Deprecated
+
+	ID   string `json:"id,omitempty"`
+	Zone string `json:"zone,omitempty"`
+
+	TTL        int    `json:"ttl,omitempty"`
+	NxTTL      int    `json:"nx_ttl,omitempty"`
+	Retry      int    `json:"retry,omitempty"`
+	Serial     int    `json:"serial,omitempty"`
+	Refresh    int    `json:"refresh,omitempty"`
+	Expiry     int    `json:"expiry,omitempty"`
+	Hostmaster string `json:"hostmaster,omitempty"`
+
+	// If this is a linked zone, Link points to an existing standard zone,
+	// reusing its configuration and records. Link is a zones' domain name.
+	Link *string `json:"link,omitempty"`
+
+	// Networks contains the network ids the zone is available. Most zones
+	// will be in the NSONE Global Network(which is id 0).
+	NetworkIDs []int         `json:"networks,omitempty"`
+	Records    []*ZoneRecord `json:"records,omitempty"`
+
+	// Primary contains info to enable slaving of the zone by third party dns servers.
+	Primary *ZonePrimary `json:"primary,omitempty"`
+	// Secondary
+	Secondary *ZoneSecondary `json:"secondary,omitempty"`
 }
 
 // Implementation of Stringer interface.
@@ -44,33 +56,47 @@ type ZoneRecord struct {
 
 // ZonePrimary wraps a Zone's "primary" attribute
 type ZonePrimary struct {
+	// Enabled determines whether AXFR queries (and optionally NOTIFY messages)
+	// will be enabled for the zone.
 	Enabled     bool                  `json:"enabled"`
 	Secondaries []ZoneSecondaryServer `json:"secondaries"`
 }
 
+// ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
+type ZoneSecondaryServer struct {
+	IP         string `json:"ip"`
+	Port       int    `json:"port,omitempty"`
+	Notify     bool   `json:"notify"`
+	NetworkIDs []int  `json:"networks,omitempty"`
+}
+
 // ZoneSecondary wraps a Zone's "secondary" attribute
 type ZoneSecondary struct {
-	Status      string `json:"status,omitempty"`
-	LastXfr     int    `json:"last_xfr,omitempty"`
+	// Read-Only fields
+	Expired bool    `json:"expired,omitempty"`
+	LastXfr int     `json:"last_xfr,omitempty"`
+	Status  string  `json:"status,omitempty"`
+	Error   *string `json:"error"`
+
 	PrimaryIP   string `json:"primary_ip,omitempty"`
 	PrimaryPort int    `json:"primary_port,omitempty"`
 	Enabled     bool   `json:"enabled"`
-	Expired     bool   `json:"expired,omitempty"`
+
+	TSIG *TSIG `json:"tsig"`
 }
 
-// ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
-type ZoneSecondaryServer struct {
-	IP     string `json:"ip"`
-	Port   int    `json:"port,omitempty"`
-	Notify bool   `json:"notify"`
+type TSIG struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Hash    string `json:"hash,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Key     string `json:"key,omitempty"`
 }
 
-// NewZone takes a zone domain name and creates a new primary *Zone
+// NewZone takes a zone domain name and creates a new zone.
 func NewZone(zone string) *Zone {
 	z := Zone{
 		Zone: zone,
 	}
-	z.MakePrimary()
 	return &z
 }
 
@@ -99,7 +125,11 @@ func (z *Zone) MakeSecondary(ip string) {
 	}
 }
 
-// LinkTo sets Link to a target zone domain name and unsets all other configuration properties
+// LinkTo sets Link to a target zone domain name and unsets all other configuration properties.
+// No other zone configuration properties (such as refresh, retry, etc) may be specified,
+// since they are all pulled from the target zone. Linked zones, once created, cannot be
+// configured at all and cannot have records added to them. They may only be deleted, which
+// does not affect the target zone at all.
 func (z *Zone) LinkTo(to string) {
 	z.Meta = nil
 	z.TTL = 0
@@ -109,10 +139,10 @@ func (z *Zone) LinkTo(to string) {
 	z.Expiry = 0
 	z.Primary = nil
 	z.DNSServers = nil
-	z.Networks = nil
+	z.NetworkIDs = nil
 	z.NetworkPools = nil
 	z.Hostmaster = ""
 	z.Pool = ""
 	z.Secondary = nil
-	z.Link = to
+	z.Link = &to
 }
