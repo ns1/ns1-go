@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/ns1/ns1-go/model/dns"
-	"github.com/ns1/ns1-go/model/dns/filter"
+	"github.com/ns1/ns1-go/model/filter"
 	api "github.com/ns1/ns1-go/rest"
 )
 

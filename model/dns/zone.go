@@ -1,25 +1,29 @@
 package dns
 
+import "github.com/ns1/ns1-go/model/data"
+
 // Zone wraps an NS1 /zone resource
 type Zone struct {
-	ID           string            `json:"id,omitempty"`
-	TTL          int               `json:"ttl,omitempty"`
-	NxTTL        int               `json:"nx_ttl,omitempty"`
-	Retry        int               `json:"retry,omitempty"`
-	Zone         string            `json:"zone,omitempty"`
-	Refresh      int               `json:"refresh,omitempty"`
-	Expiry       int               `json:"expiry,omitempty"`
-	Primary      *ZonePrimary      `json:"primary,omitempty"`
-	DNSServers   []string          `json:"dns_servers,omitempty"`
-	Networks     []int             `json:"networks,omitempty"`
-	NetworkPools []string          `json:"network_pools,omitempty"`
-	Hostmaster   string            `json:"hostmaster,omitempty"`
-	Pool         string            `json:"pool,omitempty"`
-	Meta         map[string]string `json:"meta,omitempty"`
-	Secondary    *ZoneSecondary    `json:"secondary,omitempty"`
-	Link         string            `json:"link,omitempty"`
-	Records      []*ZoneRecord     `json:"records,omitempty"`
-	Serial       int               `json:"serial,omitempty"`
+	// Zones have metadata tables, but no filters act on 'zone-level' meta.
+	Meta *data.Meta `json:"meta,omitempty"`
+
+	ID           string         `json:"id,omitempty"`
+	TTL          int            `json:"ttl,omitempty"`
+	NxTTL        int            `json:"nx_ttl,omitempty"`
+	Retry        int            `json:"retry,omitempty"`
+	Zone         string         `json:"zone,omitempty"`
+	Refresh      int            `json:"refresh,omitempty"`
+	Expiry       int            `json:"expiry,omitempty"`
+	Primary      *ZonePrimary   `json:"primary,omitempty"`
+	DNSServers   []string       `json:"dns_servers,omitempty"`
+	Networks     []int          `json:"networks,omitempty"`
+	NetworkPools []string       `json:"network_pools,omitempty"`
+	Hostmaster   string         `json:"hostmaster,omitempty"`
+	Pool         string         `json:"pool,omitempty"`
+	Secondary    *ZoneSecondary `json:"secondary,omitempty"`
+	Link         string         `json:"link,omitempty"`
+	Records      []*ZoneRecord  `json:"records,omitempty"`
+	Serial       int            `json:"serial,omitempty"`
 }
 
 // Implementation of Stringer interface.

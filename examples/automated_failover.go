@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/ns1/ns1-go/model/data"
 	"github.com/ns1/ns1-go/model/dns"
-	"github.com/ns1/ns1-go/model/dns/data"
-	"github.com/ns1/ns1-go/model/dns/filter"
+	"github.com/ns1/ns1-go/model/filter"
 	api "github.com/ns1/ns1-go/rest"
 )
 
@@ -57,7 +57,7 @@ func prettyPrint(header string, v interface{}) {
 }
 
 // Define the type of update data we will send to the datasource.
-// This isnt required, but meant for clarity.
+// update maps feed labels to metadata.
 type update map[string]data.Meta
 
 func main() {

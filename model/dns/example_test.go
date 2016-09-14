@@ -3,10 +3,18 @@ package dns_test
 import (
 	"fmt"
 
+	"github.com/ns1/ns1-go/model/data"
 	"github.com/ns1/ns1-go/model/dns"
-	"github.com/ns1/ns1-go/model/dns/data"
-	"github.com/ns1/ns1-go/model/dns/filter"
+	"github.com/ns1/ns1-go/model/filter"
 )
+
+func ExampleZone() {
+	z := dns.NewZone("example.com")
+
+	fmt.Println(z)
+	// Output:
+	// example.com
+}
 
 func ExampleRecord() {
 	// Construct the A record
