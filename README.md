@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/ns1/ns1-go.svg?branch=v2)](https://travis-ci.org/ns1/ns1-go)
-
-[![GoDoc](https://godoc.org/gopkg.in/ns1/ns1-go.v2?status.svg)](https://godoc.org/gopkg.in/ns1/ns1-go.v2)
+[![Build Status](https://travis-ci.org/ns1/ns1-go.svg?branch=v2)](https://travis-ci.org/ns1/ns1-go) [![GoDoc](https://godoc.org/gopkg.in/ns1/ns1-go.v2?status.svg)](https://godoc.org/gopkg.in/ns1/ns1-go.v2)
 
 # NS1 Golang SDK
 
