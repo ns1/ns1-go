@@ -88,10 +88,15 @@ type ZoneSecondary struct {
 
 // TSIG is a zones transaction signature.
 type TSIG struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Hash    string `json:"hash,omitempty"`
-	Name    string `json:"name,omitempty"`
-	Key     string `json:"key,omitempty"`
+	// Key is the encrypted TSIG key(read-only)
+	Key string `json:"key,omitempty"`
+
+	// Whether TSIG is enabled for a secondary zone.
+	Enabled bool `json:"enabled,omitempty"`
+	// Which hashing algorithm
+	Hash string `json:"hash,omitempty"`
+	// Name of the TSIG key
+	Name string `json:"name,omitempty"`
 }
 
 // NewZone takes a zone domain name and creates a new zone.
