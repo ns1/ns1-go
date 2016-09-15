@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ns1/ns1-go/model/data"
+	"github.com/ns1/ns1-go/rest/model/data"
 	"github.com/stretchr/testify/assert"
 )
 
