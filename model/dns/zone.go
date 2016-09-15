@@ -34,7 +34,7 @@ type Zone struct {
 
 	// Primary contains info to enable slaving of the zone by third party dns servers.
 	Primary *ZonePrimary `json:"primary,omitempty"`
-	// Secondary
+	// Secondary contains info for slaving the zone to a primary dns server.
 	Secondary *ZoneSecondary `json:"secondary,omitempty"`
 }
 
@@ -64,10 +64,12 @@ type ZonePrimary struct {
 
 // ZoneSecondaryServer wraps elements of a Zone's "primary.secondary" attribute
 type ZoneSecondaryServer struct {
-	IP         string `json:"ip"`
-	Port       int    `json:"port,omitempty"`
-	Notify     bool   `json:"notify"`
-	NetworkIDs []int  `json:"networks,omitempty"`
+	// Read-Only
+	NetworkIDs []int `json:"networks,omitempty"`
+
+	IP     string `json:"ip"`
+	Port   int    `json:"port,omitempty"`
+	Notify bool   `json:"notify"`
 }
 
 // ZoneSecondary wraps a Zone's "secondary" attribute
@@ -100,7 +102,8 @@ func NewZone(zone string) *Zone {
 	return &z
 }
 
-// MakePrimary enables Primary, disables Secondary, and sets primary's Secondaries to all provided ZoneSecondaryServers
+// MakePrimary enables Primary, disables Secondary, and sets primary's
+// Secondaries to all provided ZoneSecondaryServers
 func (z *Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
 	z.Secondary = nil
 	z.Primary = &ZonePrimary{
@@ -112,7 +115,8 @@ func (z *Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
 	}
 }
 
-// MakeSecondary enables Secondary, disables Primary, and sets secondary's Primary_ip to provided ip
+// MakeSecondary enables Secondary, disables Primary, and sets secondary's
+// Primary_ip to provided ip.
 func (z *Zone) MakeSecondary(ip string) {
 	z.Secondary = &ZoneSecondary{
 		Enabled:     true,

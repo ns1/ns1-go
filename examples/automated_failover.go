@@ -33,27 +33,11 @@ func initClient() *api.Client {
 	return client
 }
 
-// Helper that creates zone from given domain, and ignores error if zone already exists.
-func setupZone(client *api.Client, domain string) error {
-	z := dns.NewZone(domain)
-	_, err := client.Zones.Create(z)
-	if err != nil {
-		// Ignore if zone already exists
-		if err == api.ErrZoneExists {
-			log.Printf("[Zone Create]Zone Exists %s: %s \n", z, err)
-		} else {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func prettyPrint(header string, v interface{}) {
-	fmt.Println(header)
-	fmt.Printf("%#v \n", v)
+	log.Println(header)
+	log.Printf("%#v \n", v)
 	b, _ := json.MarshalIndent(v, "", "  ")
-	fmt.Println(string(b))
+	log.Println(string(b))
 }
 
 // Define the type of update data we will send to the datasource.
@@ -65,18 +49,21 @@ func main() {
 	client := initClient()
 
 	// Create the zone(if it doesnt already exist).
+	// all we need to create zone is the domain name.
 	domain := "myfailover.com"
-	err := setupZone(client, domain)
+	z := dns.NewZone(domain)
+	_, err := client.Zones.Create(z)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Construct an NSONE API data source.
-	source := data.NewSource("my api source", "nsone_v1")
+	s := data.NewSource("my api source", "nsone_v1")
+	prettyPrint("Data Source:", s)
 
 	// Create the nsone_v1 api data source.
 	// Note: this does not create the associated feeds.
-	_, err = client.DataSources.Create(source)
+	_, err = client.DataSources.Create(s)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,36 +84,37 @@ func main() {
 		data.Config{"label": "London-UK"})
 
 	// Create the buf/lon feeds through the rest api.
-	for _, feed := range feeds {
-		_, err = client.DataFeeds.Create(source.ID, feed)
+	for _, f := range feeds {
+		prettyPrint("Data Feed:", f)
+		_, err = client.DataFeeds.Create(s.ID, f)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	record := dns.NewRecord(domain, "a", "A")                  // Construct the A record
-	record.Regions["test"] = data.Region{data.Meta{Up: false}} // Add a region for examples sake.
+	// Construct the A record with two answers(US, UK).
+	r := dns.NewRecord(domain, "a", "A")
 
 	pAns := dns.NewAv4Answer("1.1.1.1")          // Construct the PRIMARY answer(with BUFFALO feed).
-	pAns.Meta.Priority = 1                       // primary has higher priority
-	pAns.Meta.Up = data.FeedPtr{feeds["buf"].ID} // Connect the primary answer to the Buffalo feed.
+	pAns.Meta.Priority = 1                       // (static) primary has higher priority
+	pAns.Meta.Up = data.FeedPtr{feeds["buf"].ID} // (dynamic) connect the primary answer to the Buffalo feed.
 
 	sAns := dns.NewAv4Answer("2.2.2.2")          // Construct the SECONDARY answer(with LONDON feed).
-	sAns.Meta.Priority = 2                       // secondary has lower priority.
-	sAns.Meta.Up = data.FeedPtr{feeds["lon"].ID} // Connect the secondary answer to the London feed.
+	sAns.Meta.Priority = 2                       // (static) secondary has lower priority.
+	sAns.Meta.Up = data.FeedPtr{feeds["lon"].ID} // (dynamic) connect the secondary answer to the London feed.
 
-	record.AddAnswer(pAns) // Add primary answer to record
-	record.AddAnswer(sAns) // Add secondary answer to record
+	r.AddAnswer(pAns) // Add primary answer to record
+	r.AddAnswer(sAns) // Add secondary answer to record
 
-	// Construct and add both filters to the record(ORDER MATTERS)
-	record.AddFilter(filter.NewUp())
-	record.AddFilter(filter.NewSelFirstN(1))
+	// Construct and add both filters to the record(order matters).
+	r.AddFilter(filter.NewUp())
+	r.AddFilter(filter.NewSelFirstN(1))
 
 	// Helper to show record in json before sending PUT
-	prettyPrint("record :", record)
+	prettyPrint("Record:", r)
 
-	// Create the record
-	_, err = client.Records.Create(record)
+	// Create the record with REST API
+	_, err = client.Records.Create(r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -144,28 +132,31 @@ func main() {
 	fmt.Println("Flipping answer every 5 sec. Press return to abort.")
 	tick := time.Tick(5 * time.Second)
 	var buffaloUp bool
+	pool := z.NetworkPools[0]
 	for countdown := 5; countdown > 0; countdown-- {
-		fmt.Println(countdown)
+		log.Println(countdown)
 		select {
 		case <-tick:
 			// Update the buffalo feed
 			d := update{"Buffalo-US": data.Meta{Up: buffaloUp}}
-			_, err = client.DataSources.Publish(source.ID, d)
+			prettyPrint("Publishing:", d)
+			_, err = client.DataSources.Publish(s.ID, d)
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			if buffaloUp {
-				fmt.Printf("'dig %s' will respond with answer %s \n", record.Domain, pAns)
+				log.Printf("'dig %s @dns1.%s.nsone.net' will respond with answer %s \n",
+					r.Domain, pool, pAns)
 			} else {
-				fmt.Printf("'dig %s' will respond with answer %s \n", record.Domain, sAns)
+				log.Printf("'dig %s @dns1.%s.nsone.net' will respond with answer %s \n",
+					r.Domain, pool, sAns)
 			}
 			// Toggle status for next update.
 			buffaloUp = !buffaloUp
 
 		case <-abort:
-			fmt.Println("Aborted")
-			return
+			log.Fatal("Aborted")
 		}
 	}
 }

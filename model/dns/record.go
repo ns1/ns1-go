@@ -33,9 +33,8 @@ func (r Record) String() string {
 	return fmt.Sprintf("%s %s", r.Domain, r.Type)
 }
 
-// NewRecord takes a zone, domain and record type t and creates a *Record with UseClientSubnet: true & empty Answers
-//
-// Answers are required on PUT, but not POST.
+// NewRecord takes a zone, domain and record type t and creates a *Record with
+// UseClientSubnet: true & empty Answers.
 func NewRecord(zone string, domain string, t string) *Record {
 	if !strings.HasSuffix(domain, zone) {
 		domain = fmt.Sprintf("%s.%s", domain, zone)

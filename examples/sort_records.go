@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ns1/ns1-go/model/dns"
+	"github.com/ns1/ns1-go/dns"
 	"github.com/ns1/ns1-go/rest"
 )
 
@@ -46,20 +45,15 @@ func main() {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
 	httpClient := &http.Client{
 		Transport: tr,
 		Timeout:   time.Second * 10,
 	}
 
 	// Adds logging to each http request.
-	doer := rest.Decorate(
-		httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
+	doer := rest.Decorate(httpClient, rest.Logging(log.New(os.Stdout, "", log.LstdFlags)))
 
-	client := rest.NewClient(
-		doer, rest.SetAPIKey(k), rest.SetEndpoint("https://api.dev.nsone.co/v1/"))
+	client := rest.NewClient(doer, rest.SetAPIKey(k))
 
 	zones, _, err := client.Zones.List()
 	if err != nil {

@@ -1,6 +1,7 @@
 package dns_test
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/ns1/ns1-go/model/data"
@@ -14,6 +15,41 @@ func ExampleZone() {
 	fmt.Println(z)
 	// Output:
 	// example.com
+}
+
+// Example references https://ns1.com/articles/primary-dns-with-ns1
+func ExamplePrimaryZone() {
+	// Secondary/slave dns server info.
+	secondary := dns.ZoneSecondaryServer{
+		IP:     "1.2.3.4",
+		Port:   53,
+		Notify: true,
+	}
+
+	// Construct the primary/master zone.
+	domain := "masterzone.example"
+
+	masterZone := dns.NewZone(domain)
+	masterZone.MakePrimary(secondary)
+
+	b, _ := json.MarshalIndent(masterZone, "", "  ")
+
+	fmt.Println(string(b))
+	// Output:
+	// {
+	//   "zone": "masterzone.example",
+	//   "primary": {
+	//     "enabled": true,
+	//     "secondaries": [
+	//       {
+	//         "ip": "1.2.3.4",
+	//         "port": 53,
+	//         "notify": true
+	//       }
+	//     ]
+	//   }
+	// }
+
 }
 
 func ExampleRecord() {
