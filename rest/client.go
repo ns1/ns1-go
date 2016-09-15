@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	clientVersion    = "0.9.0"
+	clientVersion    = "2.0.0"
 	defaultEndpoint  = "https://api.nsone.net/v1/"
 	defaultUserAgent = "go-ns1/" + clientVersion
 
