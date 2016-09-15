@@ -38,7 +38,6 @@ type Zone struct {
 	Secondary *ZoneSecondary `json:"secondary,omitempty"`
 }
 
-// Implementation of Stringer interface.
 func (z Zone) String() string {
 	return z.Zone
 }
@@ -87,6 +86,7 @@ type ZoneSecondary struct {
 	TSIG *TSIG `json:"tsig"`
 }
 
+// TSIG is a zones transaction signature.
 type TSIG struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Hash    string `json:"hash,omitempty"`

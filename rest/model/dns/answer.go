@@ -22,11 +22,11 @@ type Answer struct {
 	RegionName string `json:"region,omitempty"`
 }
 
-// Implementation of Stringer interface. Simply displays response data.
 func (a Answer) String() string {
 	return strings.Trim(fmt.Sprint(a.Rdata), "[]")
 }
 
+// SetRegion associates a region with this answer.
 func (a *Answer) SetRegion(name string) {
 	a.RegionName = name
 }
@@ -39,6 +39,7 @@ func NewAnswer(rdata []string) *Answer {
 	}
 }
 
+// NewAv4Answer creates an Answer for A record.
 func NewAv4Answer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -46,6 +47,7 @@ func NewAv4Answer(host string) *Answer {
 	}
 }
 
+// NewAv6Answer creates an Answer for AAAA record.
 func NewAv6Answer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -53,6 +55,7 @@ func NewAv6Answer(host string) *Answer {
 	}
 }
 
+// NewALIASAnswer creates an Answer for ALIAS record.
 func NewALIASAnswer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -60,6 +63,7 @@ func NewALIASAnswer(host string) *Answer {
 	}
 }
 
+// NewCNAMEAnswer creates an Answer for CNAME record.
 func NewCNAMEAnswer(name string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -67,6 +71,7 @@ func NewCNAMEAnswer(name string) *Answer {
 	}
 }
 
+// NewTXTAnswer creates an Answer for TXT record.
 func NewTXTAnswer(text string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -74,6 +79,7 @@ func NewTXTAnswer(text string) *Answer {
 	}
 }
 
+// NewMXAnswer creates an Answer for MX record.
 func NewMXAnswer(pri int, host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
@@ -81,6 +87,7 @@ func NewMXAnswer(pri int, host string) *Answer {
 	}
 }
 
+// NewSRVAnswer creates an Answer for SRV record.
 func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 	return &Answer{
 		Meta: &data.Meta{},

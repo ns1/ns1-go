@@ -17,11 +17,12 @@ type Destination struct {
 	SourceID string `json:"-"`
 }
 
+// NewDestination returns an empty feed destination.
 func NewDestination() *Destination {
 	return &Destination{}
 }
 
-// DataFeed wraps an NS1 /data/feeds resource
+// Feed wraps an NS1 /data/feeds resource
 type Feed struct {
 	ID     string `json:"id,omitempty"`
 	Name   string `json:"name"`
@@ -31,6 +32,7 @@ type Feed struct {
 	SourceID string
 }
 
+// NewFeed returns a data feed with given name and config.
 func NewFeed(name string, cfg Config) *Feed {
 	return &Feed{Name: name, Config: cfg}
 }

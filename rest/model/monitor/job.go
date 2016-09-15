@@ -72,11 +72,13 @@ type Job struct {
 	NotifyFailback bool `json:"notify_failback"`
 }
 
+// Activate a monitoring job.
 func (j *Job) Activate() {
 	j.Active = true
 
 }
 
+// Deactivate a monitoring job.
 func (j *Job) Deactivate() {
 	j.Active = false
 }

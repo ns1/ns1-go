@@ -174,6 +174,7 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
+// Response wraps stdlib http response.
 type Response struct {
 	*http.Response
 }

@@ -1,7 +1,6 @@
 package data
 
-// Represents dynamic metadata value in which a feed
-// is providing the value.
+// FeedPtr represents the dynamic metadata value in which a feed is providing the value.
 type FeedPtr struct {
 	FeedID string `json:"feed,omitempty"`
 }

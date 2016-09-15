@@ -62,7 +62,7 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 	return resp, nil
 }
 
-// UpdateRecord takes a *Record and modifies configuration details for an existing DNS record.
+// Update takes a *Record and modifies configuration details for an existing DNS record.
 //
 // Only the fields to be updated are required in the given record.
 // NS1 API docs: https://ns1.com/api/#record-post
@@ -113,6 +113,8 @@ func (s *RecordsService) DeleteRecord(zone string, domain string, t string) (*ht
 }
 
 var (
-	ErrRecordExists  = errors.New("Record already exists.")
+	// ErrRecordExists bundles PUT create error.
+	ErrRecordExists = errors.New("Record already exists.")
+	// ErrRecordMissing bundles GET/POST/DELETE error.
 	ErrRecordMissing = errors.New("Record does not exist.")
 )

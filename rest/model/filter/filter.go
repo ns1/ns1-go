@@ -7,10 +7,12 @@ type Filter struct {
 	Config   Config `json:"config"`
 }
 
+// Enable a filter.
 func (f *Filter) Enable() {
 	f.Disabled = false
 }
 
+// Disable a filter.
 func (f *Filter) Disable() {
 	f.Disabled = true
 }
@@ -57,7 +59,7 @@ func NewStickyRegion(byNetwork bool) *Filter {
 // answers in the same country/state/province as the user (or
 // answers with no specified location) are returned. rmNoLoc determines
 // whether to remove answers without location on any match.
-func NewGeofenceCounty(rmNoLoc bool) *Filter {
+func NewGeofenceCountry(rmNoLoc bool) *Filter {
 	return &Filter{
 		Type:   "geofence_country",
 		Config: Config{"remove_no_location": rmNoLoc},

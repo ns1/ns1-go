@@ -109,8 +109,8 @@ func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
 // Publish takes a datasources' id and data to publish.
 //
 // NS1 API docs: https://ns1.com/api/#feed-post
-func (s *DataSourcesService) Publish(dataSourceId string, data interface{}) (*http.Response, error) {
-	path := fmt.Sprintf("feed/%s", dataSourceId)
+func (s *DataSourcesService) Publish(dsID string, data interface{}) (*http.Response, error) {
+	path := fmt.Sprintf("feed/%s", dsID)
 
 	req, err := s.client.NewRequest("POST", path, &data)
 	if err != nil {
