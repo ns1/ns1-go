@@ -56,7 +56,7 @@ func ExampleRegions() {
 	}
 	// Set a regions' 'connections' metavalue to receive from a feed.
 	regions["other_region"] = data.Region{
-		data.Meta{Connections: data.FeedPtr{feedID}},
+		data.Meta{Connections: data.FeedPtr{FeedID: feedID}},
 	}
 	fmt.Println(regions["some_region"].Meta.Up)
 	fmt.Println(regions["some_region"].Meta.Priority)
