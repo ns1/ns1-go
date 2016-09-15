@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ns1/ns1-go.svg?branch=v2)](https://travis-ci.org/ns1/ns1-go)
+
 # NS1 Golang SDK
 
 The golang client for the NS1 API: https://api.nsone.net/
