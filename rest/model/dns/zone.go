@@ -1,6 +1,6 @@
 package dns
 
-import "github.com/ns1/ns1-go/model/data"
+import "github.com/ns1/ns1-go/rest/model/data"
 
 // Zone wraps an NS1 /zone resource
 type Zone struct {

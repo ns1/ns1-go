@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/model/dns"
+	"github.com/ns1/ns1-go/rest/model/dns"
 )
 
 // RecordsService handles 'zones/ZONE/DOMAIN/TYPE' endpoint.

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ns1/ns1-go/model/data"
+	"github.com/ns1/ns1-go/rest/model/data"
 )
 
 // Answer wraps the values of a Record's "filters" attribute

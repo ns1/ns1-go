@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/ns1/ns1-go/model/account"
+	"github.com/ns1/ns1-go/rest/model/account"
 )
 
 func TestUnmarshalUsers(t *testing.T) {

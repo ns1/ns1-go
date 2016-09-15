@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/model/monitor"
+	"github.com/ns1/ns1-go/rest/model/monitor"
 )
 
 // JobsService handles 'monitoring/jobs' endpoint.

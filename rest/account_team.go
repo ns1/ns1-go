@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/ns1/ns1-go/model/account"
+	"github.com/ns1/ns1-go/rest/model/account"
 )
 
 // TeamsService handles 'account/teams' endpoint.
