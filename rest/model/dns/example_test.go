@@ -60,12 +60,12 @@ func ExampleRecord() {
 	// Construct primary answer(higher priority)
 	pAns := dns.NewAv4Answer("1.1.1.1")
 	pAns.Meta.Priority = 1
-	pAns.Meta.Up = data.FeedPtr{"feed1_id"}
+	pAns.Meta.Up = data.FeedPtr{FeedID: "feed1_id"}
 
 	// Construct secondary answer(lower priority)
 	sAns := dns.NewAv4Answer("2.2.2.2")
 	sAns.Meta.Priority = 2
-	sAns.Meta.Up = data.FeedPtr{"feed2_id"}
+	sAns.Meta.Up = data.FeedPtr{FeedID: "feed2_id"}
 
 	// Add both answers to record
 	record.AddAnswer(pAns)
@@ -76,7 +76,7 @@ func ExampleRecord() {
 	record.AddFilter(filter.NewSelFirstN(1))
 
 	// Add region 'test' to record(set as down)
-	record.Regions["test"] = data.Region{data.Meta{Up: false}}
+	record.Regions["test"] = data.Region{Meta: data.Meta{Up: false}}
 
 	fmt.Println(record)
 	fmt.Println(record.TTL)

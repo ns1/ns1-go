@@ -36,7 +36,7 @@ func ExampleMeta() {
 
 	meta := data.Meta{}
 	meta.Priority = 1
-	meta.Up = data.FeedPtr{feedID}
+	meta.Up = data.FeedPtr{FeedID: feedID}
 	fmt.Println(meta.Connections) // will be nil
 	fmt.Println(meta.Priority)
 	fmt.Println(meta.Up)
@@ -47,16 +47,16 @@ func ExampleMeta() {
 }
 
 func ExampleRegions() {
-	feedID := "feed_id"
+	feedPtr := data.FeedPtr{FeedID: "feed_id"}
 
 	regions := data.Regions{}
 	// Set a regions' 'up' metavalue to false('down').
 	regions["some_region"] = data.Region{
-		data.Meta{Up: false},
+		Meta: data.Meta{Up: false},
 	}
 	// Set a regions' 'connections' metavalue to receive from a feed.
 	regions["other_region"] = data.Region{
-		data.Meta{Connections: data.FeedPtr{FeedID: feedID}},
+		Meta: data.Meta{Connections: feedPtr},
 	}
 	fmt.Println(regions["some_region"].Meta.Up)
 	fmt.Println(regions["some_region"].Meta.Priority)
