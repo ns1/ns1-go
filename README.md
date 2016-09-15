@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/ns1/ns1-go.svg?branch=v2)](https://travis-ci.org/ns1/ns1-go)
 
+[![GoDoc](https://godoc.org/gopkg.in/ns1/ns1-go.v2?status.svg)](https://godoc.org/gopkg.in/ns1/ns1-go.v2)
+
 # NS1 Golang SDK
 
 The golang client for the NS1 API: https://api.nsone.net/
@@ -9,10 +11,6 @@ The golang client for the NS1 API: https://api.nsone.net/
 ```
 $ go get gopkg.in/ns1/ns1-go.v2
 ```
-
-# Reference documentation
-
-See [the godoc](http://gopkg.in/ns1/ns1-go.v2)
 
 Examples
 ========
