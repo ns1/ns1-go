@@ -15,7 +15,7 @@ See [the godoc](http://gopkg.in/ns1/ns1-go.v2)
 Examples
 ========
 
-See [more rest example dir](https://github.com/ns1/ns1-go/tree/v2/rest/_examples)
+[See more](https://github.com/ns1/ns1-go/tree/v2/rest/_examples)
 
 
 ```go
