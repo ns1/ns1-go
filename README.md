@@ -43,7 +43,7 @@ See [the godoc](http://www.godoc.org/github.com/ns1/ns1-go)
 Examples
 ========
 
-See [rest example dir]()
+See [rest example dir](https://github.com/ns1/ns1-go/tree/master/rest/_examples)
 
 Contributing
 ============
