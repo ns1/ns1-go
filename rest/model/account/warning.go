@@ -6,7 +6,7 @@ type UsageWarning struct {
 	Queries Warning `json:"queries"`
 }
 
-// Alerting toggles and thresholds for overage warning alert messages.
+// Warning contains alerting toggles and thresholds for overage warning alert messages.
 // First thresholds must be smaller than Second ones and all thresholds
 // must be percentages between 0 and 100.
 type Warning struct {
