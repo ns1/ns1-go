@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	api "github.com/ns1/ns1-go/rest"
+	api "gopkg.in/ns1/ns1-go.v2/rest"
 )
 
 // Helper that initializes rest api client from environment variable.

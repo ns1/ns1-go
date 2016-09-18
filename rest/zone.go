@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/rest/model/dns"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
 )
 
 // ZonesService handles 'zones' endpoint.

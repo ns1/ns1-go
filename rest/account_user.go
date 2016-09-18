@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/ns1/ns1-go/rest/model/account"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
 // UsersService handles 'account/users' endpoint.
