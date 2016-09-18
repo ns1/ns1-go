@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	api "github.com/ns1/ns1-go/rest"
-	"github.com/ns1/ns1-go/rest/model/dns"
-	"github.com/ns1/ns1-go/rest/model/filter"
+	api "gopkg.in/ns1/ns1-go.v2/rest"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/filter"
 )
 
 // Helper that initializes rest api client from environment variable.

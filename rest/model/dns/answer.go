@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ns1/ns1-go/rest/model/data"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
 )
 
 // Answer wraps the values of a Record's "filters" attribute

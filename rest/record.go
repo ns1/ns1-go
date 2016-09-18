@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ns1/ns1-go/rest/model/dns"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
 )
 
 // RecordsService handles 'zones/ZONE/DOMAIN/TYPE' endpoint.
@@ -90,10 +90,10 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 	return resp, nil
 }
 
-// DeleteRecord takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details.
+// Delete takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#record-delete
-func (s *RecordsService) DeleteRecord(zone string, domain string, t string) (*http.Response, error) {
+func (s *RecordsService) Delete(zone string, domain string, t string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)

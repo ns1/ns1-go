@@ -9,8 +9,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ns1/ns1-go/rest"
-	"github.com/ns1/ns1-go/rest/dns"
+	"gopkg.in/ns1/ns1-go.v2/rest"
+	"gopkg.in/ns1/ns1-go.v2/rest/dns"
 )
 
 type byTTL []*dns.Zone
