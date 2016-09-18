@@ -57,6 +57,7 @@ type Client struct {
 	Records     *RecordsService
 	Teams       *TeamsService
 	Users       *UsersService
+	Warnings    *WarningsService
 	Zones       *ZonesService
 }
 
@@ -83,6 +84,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Records = (*RecordsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
 	c.Users = (*UsersService)(&c.common)
+	c.Warnings = (*WarningsService)(&c.common)
 	c.Zones = (*ZonesService)(&c.common)
 
 	for _, option := range options {
