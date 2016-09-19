@@ -1,11 +1,13 @@
 package monitor
 
+// NotifyList wraps notifications.
 type NotifyList struct {
 	ID            string          `json:"id,omitempty"`
 	Name          string          `json:"name,omitempty"`
 	Notifications []*Notification `json:"notify_list,omitempty"`
 }
 
+// Notification represents endpoint to alert to.
 type Notification struct {
 	Type   string `json:"type,omitempty"`
 	Config Config `json:"config,omitempty"`
