@@ -43,10 +43,14 @@ func (s *UsersService) Get(username string) (*account.User, *http.Response, erro
 	var u account.User
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		if err.(*Error).Message == "Unknown user" {
-			return nil, resp, ErrUserMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "Unknown user" {
+				return nil, resp, ErrUserMissing
+			}
+		default:
+			return nil, resp, err
 		}
-		return nil, resp, err
 	}
 
 	return &u, resp, nil
@@ -64,10 +68,14 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 	// Update user fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		if err.(*Error).Message == "request failed:Login Name is already in use." {
-			return resp, ErrUserExists
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "request failed:Login Name is already in use." {
+				return resp, ErrUserExists
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -87,10 +95,14 @@ func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 	// Update user fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		if err.(*Error).Message == "Unknown user" {
-			return resp, ErrUserMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "Unknown user" {
+				return resp, ErrUserMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -109,10 +121,14 @@ func (s *UsersService) Delete(username string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		if err.(*Error).Message == "Unknown user" {
-			return resp, ErrUserMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "Unknown user" {
+				return resp, ErrUserMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil

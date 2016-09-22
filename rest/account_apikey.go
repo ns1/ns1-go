@@ -44,10 +44,14 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 	var a account.APIKey
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		if err.(*Error).Message == "unknown api key" {
-			return nil, resp, ErrKeyMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "unknown api key" {
+				return nil, resp, ErrKeyMissing
+			}
+		default:
+			return nil, resp, err
 		}
-		return nil, resp, err
 	}
 
 	return &a, resp, nil
@@ -65,10 +69,14 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 	// Update account fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		if err.(*Error).Message == fmt.Sprintf("api key with name \"%s\" exists", a.Name) {
-			return resp, ErrKeyExists
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == fmt.Sprintf("api key with name \"%s\" exists", a.Name) {
+				return resp, ErrKeyExists
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -88,10 +96,14 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 	// Update apikey fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		if err.(*Error).Message == "unknown api key" {
-			return resp, ErrKeyMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "unknown api key" {
+				return resp, ErrKeyMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -110,10 +122,14 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		if err.(*Error).Message == "unknown api key" {
-			return resp, ErrKeyMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "unknown api key" {
+				return resp, ErrKeyMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil

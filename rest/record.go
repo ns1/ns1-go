@@ -25,10 +25,14 @@ func (s *RecordsService) Get(zone string, domain string, t string) (*dns.Record,
 	var r dns.Record
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
-		if err.(*Error).Message == "record not found" {
-			return nil, resp, ErrRecordMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "record not found" {
+				return nil, resp, ErrRecordMissing
+			}
+		default:
+			return nil, resp, err
 		}
-		return nil, resp, err
 	}
 
 	return &r, resp, nil
@@ -49,11 +53,14 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 	// Update record fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
-		switch err.(*Error).Message {
-		case "zone not found":
-			return resp, ErrZoneMissing
-		case "record already exists":
-			return resp, ErrRecordExists
+		switch err.(type) {
+		case *Error:
+			switch err.(*Error).Message {
+			case "zone not found":
+				return resp, ErrZoneMissing
+			case "record already exists":
+				return resp, ErrRecordExists
+			}
 		default:
 			return resp, err
 		}
@@ -77,11 +84,14 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 	// Update records fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
 	if err != nil {
-		switch err.(*Error).Message {
-		case "zone not found":
-			return resp, ErrZoneMissing
-		case "record already exists":
-			return resp, ErrRecordExists
+		switch err.(type) {
+		case *Error:
+			switch err.(*Error).Message {
+			case "zone not found":
+				return resp, ErrZoneMissing
+			case "record already exists":
+				return resp, ErrRecordExists
+			}
 		default:
 			return resp, err
 		}
@@ -103,10 +113,14 @@ func (s *RecordsService) Delete(zone string, domain string, t string) (*http.Res
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		if err.(*Error).Message == "record not found" {
-			return resp, ErrRecordMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "record not found" {
+				return resp, ErrRecordMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
