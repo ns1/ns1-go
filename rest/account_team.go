@@ -43,10 +43,14 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 	var t account.Team
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		if err.(*Error).Message == "Unknown team id" {
-			return nil, resp, ErrTeamMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "Unknown team id" {
+				return nil, resp, ErrTeamMissing
+			}
+		default:
+			return nil, resp, err
 		}
-		return nil, resp, err
 	}
 
 	return &t, resp, nil
@@ -64,10 +68,14 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		if err.(*Error).Message == fmt.Sprintf("team with name \"%s\" exists", t.Name) {
-			return resp, ErrTeamExists
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == fmt.Sprintf("team with name \"%s\" exists", t.Name) {
+				return resp, ErrTeamExists
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -87,10 +95,14 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		if err.(*Error).Message == "unknown team id" {
-			return resp, ErrTeamMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "unknown team id" {
+				return resp, ErrTeamMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
@@ -109,10 +121,14 @@ func (s *TeamsService) Delete(id string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		if err.(*Error).Message == "unknown team id" {
-			return resp, ErrTeamMissing
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "unknown team id" {
+				return resp, ErrTeamMissing
+			}
+		default:
+			return resp, err
 		}
-		return resp, err
 	}
 
 	return resp, nil
