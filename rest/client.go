@@ -134,13 +134,13 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 	defer resp.Body.Close()
 
-	rl := parseRate(resp)
-	c.RateLimitFunc(rl)
-
 	err = CheckResponse(resp)
 	if err != nil {
 		return resp, err
 	}
+
+	rl := parseRate(resp)
+	c.RateLimitFunc(rl)
 
 	if v != nil {
 		// Try to unmarshal body into given type using streaming decoder.
@@ -220,7 +220,7 @@ func CheckResponse(resp *http.Response) error {
 	return restErr
 }
 
-// RateLimitFunc is rate limiting strategy for the APIClient instance.
+// RateLimitFunc is rate limiting strategy for the Client instance.
 type RateLimitFunc func(RateLimit)
 
 // RateLimit stores X-Ratelimit-* headers
