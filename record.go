@@ -40,6 +40,7 @@ type RegionMeta struct {
 	Country   []string `json:"country,omitempty"`
 	USState   []string `json:"us_state,omitempty"`
 	Up        bool     `json:"up,omitempty"`
+	Weight    *float64 `json:"weight,omitempty"`
 }
 
 // MetaFeed wraps an Answer.Metadata element which points to a feed
