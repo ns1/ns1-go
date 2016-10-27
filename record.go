@@ -16,17 +16,17 @@ type Filter struct {
 
 // Record wraps an NS1 /zone/{zone}/{domain}/{type} resource
 type Record struct {
-	Id              string            `json:"id,omitempty"`
-	Zone            string            `json:"zone,omitempty"`
-	Domain          string            `json:"domain,omitempty"`
-	Type            string            `json:"type,omitempty"`
-	Link            string            `json:"link,omitempty"`
-	Meta            map[string]string `json:"meta,omitempty"`
-	Answers         []Answer          `json:"answers"`
-	Filters         []Filter          `json:"filters,omitempty"`
-	Ttl             int               `json:"ttl,omitempty"`
-	UseClientSubnet bool              `json:"use_client_subnet"`
-	Regions         map[string]Region `json:"regions,omitempty"`
+	Id              string                 `json:"id,omitempty"`
+	Zone            string                 `json:"zone,omitempty"`
+	Domain          string                 `json:"domain,omitempty"`
+	Type            string                 `json:"type,omitempty"`
+	Link            string                 `json:"link,omitempty"`
+	Meta            map[string]interface{} `json:"meta,omitempty"`
+	Answers         []Answer               `json:"answers"`
+	Filters         []Filter               `json:"filters,omitempty"`
+	Ttl             int                    `json:"ttl,omitempty"`
+	UseClientSubnet bool                   `json:"use_client_subnet"`
+	Regions         map[string]Region      `json:"regions,omitempty"`
 }
 
 // Region wraps the values of a Record's "regions" attribute
