@@ -14,7 +14,7 @@ type RecordsService service
 // Get takes a zone, domain and record type t and returns full configuration for a DNS record.
 //
 // NS1 API docs: https://ns1.com/api/#record-get
-func (s *RecordsService) Get(zone string, domain string, t string) (*dns.Record, *http.Response, error) {
+func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
 	req, err := s.client.NewRequest("GET", path, nil)
