@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/bobtfish/go-nsone-api"
 	"os"
+
+	nsone "gopkg.in/ns1/ns1-go.v1"
 )
 
 func main() {
