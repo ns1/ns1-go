@@ -12,8 +12,10 @@ import (
 	"gopkg.in/ns1/ns1-go.v2/rest/model/monitor"
 )
 
+var client *api.Client
+
 // Helper that initializes rest api client from environment variable.
-func initClient() *api.Client {
+func init() {
 	k := os.Getenv("NS1_APIKEY")
 	if k == "" {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
@@ -22,9 +24,7 @@ func initClient() *api.Client {
 	httpClient := &http.Client{Timeout: time.Second * 10}
 	// Adds logging to each http request.
 	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
-	client := api.NewClient(doer, api.SetAPIKey(k))
-
-	return client
+	client = api.NewClient(doer, api.SetAPIKey(k))
 }
 
 func prettyPrint(header string, v interface{}) {
@@ -35,9 +35,6 @@ func prettyPrint(header string, v interface{}) {
 }
 
 func main() {
-	// Initialize the rest api client.
-	client := initClient()
-
 	nl, _, err := client.Notifications.List()
 	if err != nil {
 		log.Fatal(err)
