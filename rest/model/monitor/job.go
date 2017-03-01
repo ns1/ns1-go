@@ -19,7 +19,7 @@ type Job struct {
 	Config Config `json:"config"`
 
 	// The current status of the monitor.
-	Status map[string]Status `json:"status,omitempty"`
+	Status map[string]*Status `json:"status"`
 
 	// Rules for determining failure conditions.
 	Rules []*Rule `json:"rules"`
@@ -66,7 +66,7 @@ type Job struct {
 
 	// If true, notifications are sent for any regional failure (and failback if desired),
 	// in addition to global state notifications.
-	NotifyRegional bool `json:"notidy_regional"`
+	NotifyRegional bool `json:"notify_regional"`
 
 	// If true, a notification is sent when a job returns to an "up" state.
 	NotifyFailback bool `json:"notify_failback"`

@@ -63,13 +63,21 @@ func TestUnmarshalJobs(t *testing.T) {
 	if conf["host"] != "1.2.3.4" {
 		t.Error("Wrong host")
 	}
-	status := j.Status["global"]
-	if status.Since != 1389407609 {
+
+	if j.Status["global"].Since != 1389407609 {
 		t.Error("since has unexpected value")
 	}
-	if status.Status != "up" {
+	if j.Status["global"].Status != "up" {
 		t.Error("Status is not up")
 	}
+
+	if j.Status["sjc"].Since != 1389404014 {
+		t.Error("sjc since has unexpected value")
+	}
+	if j.Status["sjc"].Status != "up" {
+		t.Error("sjc Status is not up")
+	}
+
 	r := j.Rules[0]
 	assert.Equal(t, r.Key, "rtt", "RTT rule key is wrong")
 	assert.Equal(t, r.Value.(float64), float64(100), "RTT rule value is wrong")
