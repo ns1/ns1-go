@@ -44,19 +44,6 @@ func main() {
 			"send": "HEAD / HTTP/1.0\r\n\r\n",
 			"ssl":  true,
 		},
-		Status: map[string]*monitor.Status{},
-		Rules: []*monitor.Rule{
-			&monitor.Rule{
-				Key:        "output",
-				Value:      "200 OK",
-				Comparison: "contains",
-			},
-			&monitor.Rule{
-				Key:        "connect",
-				Value:      200,
-				Comparison: "<=",
-			},
-		},
 		Regions:        []string{"lga", "sjc"},
 		Frequency:      10,
 		Active:         true,

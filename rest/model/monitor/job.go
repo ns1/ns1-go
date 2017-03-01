@@ -19,10 +19,10 @@ type Job struct {
 	Config Config `json:"config"`
 
 	// The current status of the monitor.
-	Status map[string]*Status `json:"status"`
+	Status map[string]*Status `json:"status,omitempty"`
 
 	// Rules for determining failure conditions.
-	Rules []*Rule `json:"rules"`
+	Rules []*Rule `json:"rules,omitempty"`
 
 	// List of regions in which to run the monitor.
 	// eg, ["dal", "sin", "sjc", "lga", "ams"]
