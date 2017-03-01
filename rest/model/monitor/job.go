@@ -99,6 +99,15 @@ type Status struct {
 	Status string `json:"status"`
 }
 
+// StatusLog wraps an NS1 /monitoring/history resource
+type StatusLog struct {
+	Job    string `json:"job"`
+	Region string `json:"region"`
+	Status string `json:"status"`
+	Since  int    `json:"since"`
+	Until  int    `json:"until"`
+}
+
 // Rule wraps an element of a Job's "rules" attribute
 type Rule struct {
 	Key        string      `json:"key"`
