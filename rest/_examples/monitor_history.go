@@ -22,9 +22,7 @@ func init() {
 	}
 
 	httpClient := &http.Client{Timeout: time.Second * 10}
-	// Adds logging to each http request.
-	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
-	client = api.NewClient(doer, api.SetAPIKey(k))
+	client = api.NewClient(httpClient, api.SetAPIKey(k))
 }
 
 func prettyPrint(header string, v interface{}) {
@@ -35,14 +33,7 @@ func prettyPrint(header string, v interface{}) {
 }
 
 func main() {
-	mjl, _, err := client.Jobs.List()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, mj := range mjl {
-		prettyPrint("monitor:", mj)
-	}
-
+	// Create a monitoring job
 	tcpJob := &monitor.Job{
 		Type: "tcp",
 		Name: "myhost.com:443 Monitor",
@@ -51,18 +42,6 @@ func main() {
 			"port": 443,
 			"send": "HEAD / HTTP/1.0\r\n\r\n",
 			"ssl":  true,
-		},
-		Rules: []*monitor.Rule{
-			&monitor.Rule{
-				Key:        "output",
-				Value:      "200 OK",
-				Comparison: "contains",
-			},
-			&monitor.Rule{
-				Key:        "connect",
-				Value:      200,
-				Comparison: "<=",
-			},
 		},
 		Regions:        []string{"lga", "sjc"},
 		Frequency:      10,
@@ -75,22 +54,21 @@ func main() {
 		NotifyDelay:    65,
 	}
 
-	_, err = client.Jobs.Create(tcpJob)
+	_, err := client.Jobs.Create(tcpJob)
 	if err != nil {
 		log.Fatal(err)
 	}
-	prettyPrint("tcp job:", tcpJob)
 
-	// Deactivate the job
-	tcpJob.Deactivate()
-	_, err = client.Jobs.Update(tcpJob)
+	// Check a monitoring jobs history
+	slgs, _, err := client.Jobs.History(tcpJob.ID,
+		api.SetTimeParam("start", time.Now().Add(-24*time.Hour)),
+		api.SetTimeParam("end", time.Now()),
+		api.SetBoolParam("exact", true),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	prettyPrint("tcp job deactivated:", tcpJob)
 
-	// _, err = client.Jobs.Delete(tcpJob.ID)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	b, _ := json.MarshalIndent(slgs, "", "  ")
+	fmt.Printf("Status Logs: %s\n", string(b))
 }

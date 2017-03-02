@@ -9,6 +9,7 @@ import (
 	"time"
 
 	api "gopkg.in/ns1/ns1-go.v2/rest"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/monitor"
 )
 
 var client *api.Client
@@ -26,34 +27,27 @@ func init() {
 	client = api.NewClient(doer, api.SetAPIKey(k))
 }
 
+func prettyPrint(header string, v interface{}) {
+	fmt.Println(header)
+	fmt.Printf("%#v \n", v)
+	b, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(b))
+}
+
 func main() {
-	teams, _, err := client.Teams.List()
+	nl, _, err := client.Notifications.List()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for _, t := range teams {
-		b, _ := json.MarshalIndent(t, "", "  ")
-		fmt.Println(string(b))
+	for _, n := range nl {
+		prettyPrint("notification:", n)
 	}
 
-	users, _, err := client.Users.List()
+	webhook := monitor.NewWebNotification("test.com/test")
+	nList := monitor.NewNotifyList("my list", webhook)
+	_, err = client.Notifications.Create(nList)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for _, u := range users {
-		b, _ := json.MarshalIndent(u, "", "  ")
-		fmt.Println(string(b))
-	}
-
-	keys, _, err := client.APIKeys.List()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, k := range keys {
-		b, _ := json.MarshalIndent(k, "", "  ")
-		fmt.Println(string(b))
-	}
+	prettyPrint("NotifyList:", nList)
 }

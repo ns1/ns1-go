@@ -63,13 +63,21 @@ func TestUnmarshalJobs(t *testing.T) {
 	if conf["host"] != "1.2.3.4" {
 		t.Error("Wrong host")
 	}
-	status := j.Status["global"]
-	if status.Since != 1389407609 {
+
+	if j.Status["global"].Since != 1389407609 {
 		t.Error("since has unexpected value")
 	}
-	if status.Status != "up" {
+	if j.Status["global"].Status != "up" {
 		t.Error("Status is not up")
 	}
+
+	if j.Status["sjc"].Since != 1389404014 {
+		t.Error("sjc since has unexpected value")
+	}
+	if j.Status["sjc"].Status != "up" {
+		t.Error("sjc Status is not up")
+	}
+
 	r := j.Rules[0]
 	assert.Equal(t, r.Key, "rtt", "RTT rule key is wrong")
 	assert.Equal(t, r.Value.(float64), float64(100), "RTT rule value is wrong")
@@ -93,5 +101,139 @@ func TestUnmarshalJobs(t *testing.T) {
 	}
 	if j.RegionScope != "fixed" {
 		t.Error("Job region scope is not fixed")
+	}
+}
+
+func TestUnmarshalStatusLog(t *testing.T) {
+	data := []byte(`{
+    "status": "down",
+    "region": "lga",
+    "since": 1488297041,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297042
+  }`)
+	log := &StatusLog{}
+	if err := json.Unmarshal(data, &log); err != nil {
+		t.Error(err)
+	}
+	if log.Job != "58b364c09825e00001e2af80" {
+		t.Error("Wrong job")
+	}
+	if log.Status != "down" {
+		t.Error("Wrong status")
+	}
+	if log.Region != "lga" {
+		t.Error("Wrong region")
+	}
+	if log.Since != 1488297041 {
+		t.Error("Wrong since")
+	}
+	if log.Until != 1488297042 {
+		t.Error("Wrong until")
+	}
+}
+
+func TestUnmarshalStatusLogMostRecent(t *testing.T) {
+	data := []byte(`{
+    "status": "down",
+    "region": "lga",
+    "since": 1488297041,
+    "job": "58b364c09825e00001e2af80",
+    "until": null
+  }`)
+	log := &StatusLog{}
+	if err := json.Unmarshal(data, &log); err != nil {
+		t.Error(err)
+	}
+	if log.Job != "58b364c09825e00001e2af80" {
+		t.Error("Wrong job")
+	}
+	if log.Status != "down" {
+		t.Error("Wrong status")
+	}
+	if log.Region != "lga" {
+		t.Error("Wrong region")
+	}
+	if log.Since != 1488297041 {
+		t.Error("Wrong since")
+	}
+	if log.Until != 0 {
+		t.Error("Wrong until")
+	}
+}
+
+func TestUnmarshalStatusLogs(t *testing.T) {
+	data := []byte(`[
+  {
+    "status": "up",
+    "region": "satellite",
+    "since": 1488297044,
+    "job": "58b364c09825e00001e2af80",
+    "until": null
+  },
+  {
+    "status": "up",
+    "region": "master",
+    "since": 1488297044,
+    "job": "58b364c09825e00001e2af80",
+    "until": null
+  },
+  {
+    "status": "up",
+    "region": "global",
+    "since": 1488297044,
+    "job": "58b364c09825e00001e2af80",
+    "until": null
+  },
+  {
+    "status": "down",
+    "region": "satellite",
+    "since": 1488297043,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297044
+  },
+  {
+    "status": "down",
+    "region": "master",
+    "since": 1488297043,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297044
+  },
+  {
+    "status": "down",
+    "region": "global",
+    "since": 1488297043,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297044
+  },
+  {
+    "status": "up",
+    "region": "satellite",
+    "since": 1488297042,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297043
+  },
+  {
+    "status": "up",
+    "region": "master",
+    "since": 1488297042,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297043
+  },
+  {
+    "status": "up",
+    "region": "global",
+    "since": 1488297042,
+    "job": "58b364c09825e00001e2af80",
+    "until": 1488297043
+  }
+]`)
+
+	logs := []*StatusLog{}
+	if err := json.Unmarshal(data, &logs); err != nil {
+		t.Error(err)
+	}
+	if len(logs) != 9 {
+		t.Errorf("Do not have correct number of status logs in job history. Expected: %d, Actual: %d", 9, len(logs))
 	}
 }
