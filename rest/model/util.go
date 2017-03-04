@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -12,22 +11,17 @@ type Timestamp struct {
 	time.Time
 }
 
-func (t *Timestamp) MarshalJSON() ([]byte, error) {
-	ts := t.Time.Unix()
-	stamp := fmt.Sprint(ts)
-
-	return []byte(stamp), nil
-}
-
-func (t *Timestamp) UnmarshalJSON(b []byte) error {
-	ts, err := strconv.Atoi(string(b))
-	if err != nil {
-		return err
+// UnmarshalJSON implements the json.Unmarshaler interface.
+// Time is expected in RFC3339 or Unix format.
+func (t *Timestamp) UnmarshalJSON(data []byte) error {
+	str := string(data)
+	i, err := strconv.ParseInt(str, 10, 64)
+	if err == nil {
+		t.Time = time.Unix(i, 0)
+	} else {
+		t.Time, err = time.Parse(`"`+time.RFC3339+`"`, str)
 	}
-
-	t.Time = time.Unix(int64(ts), 0)
-
-	return nil
+	return err
 }
 
 func (t Timestamp) String() string {
