@@ -1,5 +1,7 @@
 package monitor
 
+import "gopkg.in/ns1/ns1-go.v2/rest/model"
+
 // Job wraps an NS1 /monitoring/jobs resource
 type Job struct {
 	ID string `json:"id,omitempty"`
@@ -95,17 +97,17 @@ type Result struct {
 
 // Status wraps an value of a Job's "status" attribute
 type Status struct {
-	Since  int    `json:"since"`
-	Status string `json:"status"`
+	Since  model.Timestamp `json:"since"`
+	Status string          `json:"status"`
 }
 
 // StatusLog wraps an NS1 /monitoring/history resource
 type StatusLog struct {
-	Job    string `json:"job"`
-	Region string `json:"region"`
-	Status string `json:"status"`
-	Since  int    `json:"since"`
-	Until  int    `json:"until"`
+	Job    string           `json:"job"`
+	Region string           `json:"region"`
+	Status string           `json:"status"`
+	Since  model.Timestamp  `json:"since"`
+	Until  *model.Timestamp `json:"until"`
 }
 
 // Rule wraps an element of a Job's "rules" attribute
