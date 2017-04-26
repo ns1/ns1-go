@@ -95,17 +95,19 @@ type Result struct {
 
 // Status wraps an value of a Job's "status" attribute
 type Status struct {
-	Since  int    `json:"since"`
-	Status string `json:"status"`
+	Since   int      `json:"since"`
+	Status  string   `json:"status"`
+	FailSet []string `json:"fail_set"`
 }
 
 // StatusLog wraps an NS1 /monitoring/history resource
 type StatusLog struct {
-	Job    string `json:"job"`
-	Region string `json:"region"`
-	Status string `json:"status"`
-	Since  int    `json:"since"`
-	Until  int    `json:"until"`
+	Job     string   `json:"job"`
+	Region  string   `json:"region"`
+	Status  string   `json:"status"`
+	Since   int      `json:"since"`
+	Until   int      `json:"until"`
+	FailSet []string `json:"fail_set"`
 }
 
 // Rule wraps an element of a Job's "rules" attribute
