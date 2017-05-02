@@ -33,6 +33,7 @@ func main() {
 	k := os.Getenv("NS1_APIKEY")
 	if k == "" {
 		fmt.Println("NS1_APIKEY environment variable is not set, giving up")
+		os.Exit(1)
 	}
 
 	httpClient := &http.Client{Timeout: time.Second * 10}
