@@ -1,14 +1,12 @@
-package data_test
+package data
 
 import (
 	"fmt"
-
-	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
 )
 
 func ExampleSource() {
 	// Construct an NSONE API data source.
-	source := data.NewSource("my api source", "nsone_v1")
+	source := NewSource("my api source", "nsone_v1")
 	fmt.Println(source.ID) // will be empty string
 	fmt.Println(source.Name)
 	fmt.Println(source.Type)
@@ -20,9 +18,9 @@ func ExampleSource() {
 func ExampleFeed() {
 
 	// Construct the london data feed.
-	feed := data.NewFeed(
+	feed := NewFeed(
 		"London Feed",
-		data.Config{"label": "London-UK"})
+		Config{"label": "London-UK"})
 	fmt.Println(feed.ID) // will be empty string
 	fmt.Println(feed.Name)
 	fmt.Println(feed.Config)
@@ -34,9 +32,9 @@ func ExampleFeed() {
 func ExampleMeta() {
 	feedID := "feed_id"
 
-	meta := data.Meta{}
+	meta := Meta{}
 	meta.Priority = 1
-	meta.Up = data.FeedPtr{FeedID: feedID}
+	meta.Up = FeedPtr{FeedID: feedID}
 	fmt.Println(meta.Connections) // will be nil
 	fmt.Println(meta.Priority)
 	fmt.Println(meta.Up)
@@ -47,16 +45,16 @@ func ExampleMeta() {
 }
 
 func ExampleRegions() {
-	feedPtr := data.FeedPtr{FeedID: "feed_id"}
+	feedPtr := FeedPtr{FeedID: "feed_id"}
 
-	regions := data.Regions{}
+	regions := Regions{}
 	// Set a regions' 'up' metavalue to false('down').
-	regions["some_region"] = data.Region{
-		Meta: data.Meta{Up: false},
+	regions["some_region"] = Region{
+		Meta: Meta{Up: false},
 	}
 	// Set a regions' 'connections' metavalue to receive from a feed.
-	regions["other_region"] = data.Region{
-		Meta: data.Meta{Connections: feedPtr},
+	regions["other_region"] = Region{
+		Meta: Meta{Connections: feedPtr},
 	}
 	fmt.Println(regions["some_region"].Meta.Up)
 	fmt.Println(regions["some_region"].Meta.Priority)
