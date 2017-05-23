@@ -102,12 +102,14 @@ type Status struct {
 
 // StatusLog wraps an NS1 /monitoring/history resource
 type StatusLog struct {
-	Job     string   `json:"job"`
-	Region  string   `json:"region"`
-	Status  string   `json:"status"`
-	Since   int      `json:"since"`
-	Until   int      `json:"until"`
-	FailSet []string `json:"fail_set"`
+	Job       string   `json:"job"`
+	Region    string   `json:"region"`
+	Status    string   `json:"status"`
+	Since     int      `json:"since"`
+	Until     int      `json:"until"`
+	FailSet   []string `json:"fail_set"`
+	Callout   string   `json:"callout,omitempty"`
+	Published int      `json:"published,omitempty"`
 }
 
 // Rule wraps an element of a Job's "rules" attribute
