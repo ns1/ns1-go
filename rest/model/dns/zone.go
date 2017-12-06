@@ -48,7 +48,7 @@ type ZoneRecord struct {
 	ID       string   `json:"id,omitempty"`
 	Link     string   `json:"link,omitempty"`
 	ShortAns []string `json:"short_answers,omitempty"`
-	Tier     int      `json:"tier,omitempty"`
+	Tier     float64  `json:"tier,omitempty"`
 	TTL      int      `json:"ttl,omitempty"`
 	Type     string   `json:"type,omitempty"`
 }

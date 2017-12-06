@@ -9,6 +9,44 @@ import (
 	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
 )
 
+func TestUnmarshalZoneRecords(t *testing.T) {
+  d := []byte(`[
+    {
+      "domain": "foo.test.zone",
+      "short_answers": [
+        "1.2.3.4"
+      ],
+      "link": null,
+      "ttl": 180,
+      "tier": 1.0,
+      "type": "A",
+      "id": "835d91f01c56932156905bf7"
+    },
+    {
+      "domain": "bar.test.zone",
+      "short_answers": [
+        "5.6.7.8"
+      ],
+      "link": null,
+      "ttl": 180,
+      "tier": 1,
+      "type": "A",
+      "id": "367d91f01c56932156905v98"
+    }
+]
+`)
+  zrl := []*ZoneRecord{}
+  if err := json.Unmarshal(d, &zrl); err != nil {
+    t.Error(err)
+  }
+
+  if len(zrl) != 2 {
+    fmt.Println(zrl)
+    t.Error("Do not have 2 records in list")
+  }
+
+}
+
 func TestUnmarshalZones(t *testing.T) {
 	d := []byte(`[
    {  
