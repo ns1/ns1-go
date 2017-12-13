@@ -1,12 +1,20 @@
 package data
 
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
+)
+
 // FeedPtr represents the dynamic metadata value in which a feed is providing the value.
 type FeedPtr struct {
 	FeedID string `json:"feed,omitempty"`
 }
 
-// Meta contains information on an entities metadata table. Metadata key/value
-// pairs are used by a records' filter pipeline during a dns query.
+// Meta contains information on an entity's metadata table. Metadata key/value
+// pairs are used by a record's filter pipeline during a dns query.
 // All values can be a feed id as well, indicating real-time updates of these values.
 // Structure/Precendence of metadata tables:
 //  - Record
@@ -124,4 +132,101 @@ type Meta struct {
 	// load (e.g., loadavg, connections, etc).
 	// int or FeedPtr.
 	HighWatermark interface{} `json:"high_watermark,omitempty"`
+}
+
+// StringMap returns a map[string]interface{} representation of metadata (for use with terraform in nested structures)
+func (meta *Meta) StringMap() map[string]interface{} {
+	m := make(map[string]interface{})
+	v := reflect.Indirect(reflect.ValueOf(meta))
+	t := v.Type()
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		fv := v.Field(i)
+		if fv.IsNil() {
+			continue
+		}
+		tag := f.Tag.Get("json")
+
+		tag = strings.Split(tag, ",")[0]
+
+		m[tag] = FormatInterface(fv.Interface())
+	}
+	return m
+}
+
+// FormatInterface takes an interface of types: string, bool, int, float64, []string, and FeedPtr, and returns a string representation of said interface
+func FormatInterface(i interface{}) string {
+	switch v := i.(type) {
+	case string:
+		return v
+	case bool:
+		return strconv.FormatBool(v)
+	case int:
+		return strconv.FormatInt(int64(v), 10)
+	case float64:
+		return strconv.FormatFloat(v, 'f', 2, 64)
+	case []string:
+		return strings.Join(v, ",")
+	case FeedPtr:
+		data, err := json.Marshal(v)
+		if err != nil {
+			panic(err)
+		}
+		return string(data)
+	default:
+		panic(fmt.Sprintf("expected v to be convertible to a string, got: %+v, %T", v, v))
+	}
+}
+
+// ParseType returns an interface containing a string, bool, int, float64, []string, or FeedPtr
+// float64 values with no decimal may be returned as integers, but that should be ok because the api won't know the difference
+// when it's json encoded
+func ParseType(s string) interface{} {
+	slc := strings.Split(s, ",")
+	if len(slc) > 1 {
+		return slc
+	}
+
+	feedptr := FeedPtr{}
+	err := json.Unmarshal([]byte(s), &feedptr)
+	if err == nil {
+		return feedptr
+	}
+
+	b, err := strconv.ParseBool(s)
+	if err == nil {
+		return b
+	}
+
+	f, err := strconv.ParseFloat(s, 64)
+	if err == nil {
+		if isIntegral(f) {
+			return int(f)
+		} else {
+			return f
+		}
+	}
+
+	return s
+}
+
+// isIntegral returns whether or not a float64 has a decimal place
+func isIntegral(f float64) bool {
+	return f == float64(int(f))
+}
+
+// MetaFromMap creates a *Meta and uses reflection to set fields from a map. This will panic if a value for a key is not a string.
+// This it to ensure compatibility with terraform
+func MetaFromMap(m map[string]interface{}) *Meta {
+	meta := &Meta{}
+	mv := reflect.Indirect(reflect.ValueOf(meta))
+	mt := mv.Type()
+	for k, v := range m {
+		name := ToCamel(k)
+		if _, ok := mt.FieldByName(name); ok {
+			fv := mv.FieldByName(name)
+			fv.Set(reflect.ValueOf(ParseType(v.(string))))
+		}
+	}
+	return meta
 }
