@@ -173,6 +173,12 @@ func FormatInterface(i interface{}) string {
 		return strconv.FormatFloat(v, 'f', -1, 64)
 	case []string:
 		return strings.Join(v, ",")
+	case []interface{}:
+		slc := make([]string, 0)
+		for _, s := range v {
+			slc = append(slc, s.(string))
+		}
+		return strings.Join(slc, ",")
 	case FeedPtr:
 		data, err := json.Marshal(v)
 		if err != nil {

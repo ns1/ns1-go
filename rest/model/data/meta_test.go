@@ -8,6 +8,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta.Latitude = 0.50
 
 	meta.Longitude = FeedPtr{FeedID: "12345678"}
+	meta.Georegion = []interface{}{"US-EAST"}
 
 	m := meta.StringMap()
 
@@ -17,6 +18,10 @@ func TestMeta_StringMap(t *testing.T) {
 
 	if m["latitude"].(string) != "0.5" {
 		t.Fatal("latitude should be '0.5'")
+	}
+
+	if m["georegion"].(string) != "US-EAST" {
+		t.Fatal("georegion should be 'US-EAST")
 	}
 
 	expected := `{"feed":"12345678"}`
