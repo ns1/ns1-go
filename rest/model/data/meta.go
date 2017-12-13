@@ -162,9 +162,8 @@ func FormatInterface(i interface{}) string {
 	case bool:
 		if v {
 			return "1"
-		} else {
-			return "0"
 		}
+		return "0"
 	case int:
 		return strconv.FormatInt(int64(v), 10)
 	case float64:
