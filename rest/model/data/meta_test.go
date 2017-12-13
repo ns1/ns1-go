@@ -11,12 +11,12 @@ func TestMeta_StringMap(t *testing.T) {
 
 	m := meta.StringMap()
 
-	if m["up"].(string) != "true" {
-		t.Fatal("up should be true")
+	if m["up"].(string) != "1" {
+		t.Fatal("up should be 1")
 	}
 
-	if m["latitude"].(string) != "0.50" {
-		t.Fatal("latitude should be '0.50'")
+	if m["latitude"].(string) != "0.5" {
+		t.Fatal("latitude should be '0.5'")
 	}
 
 	expected := `{"feed":"12345678"}`
@@ -63,7 +63,7 @@ func TestMetaFromMap(t *testing.T) {
 	m := make(map[string]interface{})
 
 	m["latitude"] = "0.50"
-	m["up"] = "true"
+	m["up"] = "1"
 	m["connections"] = "5"
 	m["longitude"] = `{"feed":"12345678"}`
 	meta := MetaFromMap(m)

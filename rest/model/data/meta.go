@@ -160,11 +160,17 @@ func FormatInterface(i interface{}) string {
 	case string:
 		return v
 	case bool:
-		return strconv.FormatBool(v)
+		if v {
+			return "1"
+		}
+		return "0"
 	case int:
 		return strconv.FormatInt(int64(v), 10)
 	case float64:
-		return strconv.FormatFloat(v, 'f', 2, 64)
+		if isIntegral(v) {
+			return strconv.FormatInt(int64(v), 10)
+		}
+		return strconv.FormatFloat(v, 'f', -1, 64)
 	case []string:
 		return strings.Join(v, ",")
 	case FeedPtr:
@@ -191,11 +197,6 @@ func ParseType(s string) interface{} {
 	err := json.Unmarshal([]byte(s), &feedptr)
 	if err == nil {
 		return feedptr
-	}
-
-	b, err := strconv.ParseBool(s)
-	if err == nil {
-		return b
 	}
 
 	f, err := strconv.ParseFloat(s, 64)
@@ -225,7 +226,15 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 		name := ToCamel(k)
 		if _, ok := mt.FieldByName(name); ok {
 			fv := mv.FieldByName(name)
-			fv.Set(reflect.ValueOf(ParseType(v.(string))))
+			if name == "Up" {
+				if v.(string) == "1" {
+					fv.Set(reflect.ValueOf(true))
+				} else {
+					fv.Set(reflect.ValueOf(false))
+				}
+			} else {
+				fv.Set(reflect.ValueOf(ParseType(v.(string))))
+			}
 		}
 	}
 	return meta
