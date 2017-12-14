@@ -34,8 +34,8 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("priority should be 10")
 	}
 
-	if m["weight"].(string) != "10" {
-		t.Fatal("weight should be 10")
+	if m["weight"].(string) != "10f" {
+		t.Fatal("weight should be 10f")
 	}
 
 	if m["country"].(string) != "US,UK" {
