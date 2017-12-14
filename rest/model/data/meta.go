@@ -1,9 +1,12 @@
 package data
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"net"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -180,10 +183,7 @@ func FormatInterface(i interface{}) string {
 		}
 		return strings.Join(slc, ",")
 	case FeedPtr:
-		data, err := json.Marshal(v)
-		if err != nil {
-			panic(err)
-		}
+		data, _ := json.Marshal(v)
 		return string(data)
 	default:
 		panic(fmt.Sprintf("expected v to be convertible to a string, got: %+v, %T", v, v))
@@ -244,4 +244,237 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 		}
 	}
 	return meta
+}
+
+// metaValidation is a validation struct for a metadata field.
+// It contains the kinds of types that the field can be, and a list of check functions that will run on the field
+type metaValidation struct {
+	kinds      []reflect.Kind
+	checkFuncs []func(v reflect.Value) error
+}
+
+// validateLatLong makes sure that the given lat/long is within the range 180.0 to -180.0
+func validateLatLong(v reflect.Value) error {
+	if v.Kind() == reflect.Float64 {
+		f := v.Interface().(float64)
+		if f < -180.0 || f > 180.0 {
+			return fmt.Errorf("latitude/longitude values must be between -180.0 and 180.0, got %f", f)
+		}
+	}
+	return nil
+}
+
+// validateCidr makes sure that the given string is a valid cidr
+func validateCidr(v reflect.Value) error {
+	if v.Kind() == reflect.String {
+		s := v.Interface().(string)
+		_, _, err := net.ParseCIDR(s)
+		if err != nil {
+			return err
+		}
+	}
+	var last error
+	if v.Kind() == reflect.Slice {
+		slc := v.Interface().([]interface{})
+		for _, s := range slc {
+			_, _, err := net.ParseCIDR(s.(string))
+			last = err
+		}
+	}
+	return last
+}
+
+// validatePositiveNumber makes sure that the given number (float or int) is positive
+func validatePositiveNumber(fieldName string, v reflect.Value) error {
+	i := 0
+	if v.Kind() == reflect.Int {
+		i = v.Interface().(int)
+
+	}
+
+	if v.Kind() == reflect.Float64 {
+		i = int(v.Interface().(float64))
+	}
+
+	if i < 0 {
+		return fmt.Errorf("%s must be a positive number, was %+v", fieldName, v.Interface())
+	}
+
+	return nil
+}
+
+// geoMap is a map of all of the georegions
+var geoMap = map[string]struct{}{
+	"US-EAST": {}, "US-CENTRAL": {}, "US-WEST": {},
+	"EUROPE": {}, "ASIAPAC": {}, "SOUTH-AMERICA": {}, "AFRICA": {},
+}
+
+// geoKeyString returns a string representation of all of the georegions
+func geoKeyString() string {
+	length := 0
+	slc := make([]string, 0)
+	for k := range geoMap {
+		slc = append(slc, k)
+		length += len(k) + 1
+	}
+	sort.Strings(slc)
+
+	b := bytes.NewBuffer(make([]byte, 0, length-1))
+
+	for _, k := range slc {
+		b.WriteString(k + ",")
+	}
+
+	return strings.TrimRight(b.String(), ",")
+}
+
+// validateGeoregion makes sure that the given georegion is correct
+func validateGeoregion(v reflect.Value) error {
+	if v.Kind() == reflect.String {
+		s := v.String()
+		if _, ok := geoMap[s]; !ok {
+			return fmt.Errorf("georegion must be one or more of %s, found %s", geoKeyString(), s)
+		}
+	}
+
+	if v.Kind() == reflect.Slice {
+		slc := v.Interface().([]interface{})
+		for _, s := range slc {
+			if _, ok := geoMap[s.(string)]; !ok {
+				return fmt.Errorf("georegion must be one or more of %s, found %s", geoKeyString(), s)
+			}
+		}
+	}
+	return nil
+}
+
+// validateCountryStateProvince makes sure that the given field only has two characters
+func validateCountryStateProvince(v reflect.Value) error {
+	if v.Kind() == reflect.String {
+		s := v.String()
+		if len(s) != 2 {
+			return fmt.Errorf("country/state/province codes must be 2 digits as specified in ISO3166/ISO3166-2, got: %s", s)
+		}
+	}
+
+	if v.Kind() == reflect.Slice {
+		slc := v.Interface().([]interface{})
+		for _, s := range slc {
+			if len(s.(string)) != 2 {
+				return fmt.Errorf("country/state/province codes must be 2 digits as specified in ISO3166/ISO3166-2, got: %s", s)
+			}
+		}
+	}
+	return nil
+}
+
+// validateNoteLength validates that a note's length is less than 256 characters
+func validateNoteLength(v reflect.Value) error {
+	if v.Kind() == reflect.String {
+		s := v.String()
+		if len(s) > 256 {
+			return fmt.Errorf("note length must be less than 256 characters, was %d", len(s))
+		}
+	}
+	return nil
+}
+
+// checkFuncs is shorthand for returning a slice of functions that take a reflect.Value and return an error
+func checkFuncs(f ...func(v reflect.Value) error) []func(v reflect.Value) error {
+	return f
+}
+
+// kinds is shorthand for returning a slice of reflect.Kind
+func kinds(k ...reflect.Kind) []reflect.Kind {
+	return k
+}
+
+// validationMap is a map of meta fields to validation types and functions
+var validationMap = map[string]metaValidation{
+	"Up": {kinds(reflect.Bool), nil},
+	"Connections": {kinds(reflect.Int), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Connections", v)
+		})},
+	"Requests": {kinds(reflect.Int), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Requests", v)
+		})},
+	"LoadAvg": {kinds(reflect.Float64), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("LoadAvg", v)
+		})},
+	"Pulsar":     {kinds(reflect.String), nil},
+	"Latitude":   {kinds(reflect.Float64), checkFuncs(validateLatLong)},
+	"Longitude":  {kinds(reflect.Float64), checkFuncs(validateLatLong)},
+	"Georegion":  {kinds(reflect.String, reflect.Slice), checkFuncs(validateGeoregion)},
+	"Country":    {kinds(reflect.String, reflect.Slice), checkFuncs(validateCountryStateProvince)},
+	"USState":    {kinds(reflect.String, reflect.Slice), checkFuncs(validateCountryStateProvince)},
+	"CAProvince": {kinds(reflect.String, reflect.Slice), checkFuncs(validateCountryStateProvince)},
+	"Note":       {kinds(reflect.String), checkFuncs(validateNoteLength)},
+	"IPPrefixes": {kinds(reflect.String, reflect.Slice), checkFuncs(validateCidr)},
+	"ASN":        {kinds(reflect.String, reflect.Slice), nil},
+	"Priority": {kinds(reflect.Int), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Priority", v)
+		})},
+	"Weight": {kinds(reflect.Float64), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Weight", v)
+		})},
+	"LowWatermark":  {kinds(reflect.Int), nil},
+	"HighWatermark": {kinds(reflect.Int), nil},
+}
+
+// validate takes a field name, a reflect value, and metaValidation and validates the given field
+func validate(name string, v reflect.Value, m metaValidation) (errs []error) {
+
+	check := true
+	// if this is a FeedPtr or a *FeedPtr then we're ok, skip checking the rest of the types
+	if v.Kind() == reflect.Struct || v.Kind() == reflect.Invalid {
+		check = false
+	}
+
+	if check {
+		match := false
+		for _, k := range m.kinds {
+			if k == v.Kind() {
+				match = true
+			}
+		}
+
+		if !match {
+			errs = append(errs, fmt.Errorf("found type mismatch for meta field '%s'. expected %+v, got: %+v", name, m.kinds, v.Kind()))
+		}
+
+		for _, f := range m.checkFuncs {
+			err := f(v)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	if v.Kind() == reflect.Struct {
+		if _, ok := v.Interface().(FeedPtr); !ok {
+			errs = append(errs, fmt.Errorf("if a meta field is a struct, it must be a FeedPtr, got: %s", v.Type()))
+		}
+	}
+
+	return
+}
+
+// Validate validates metadata fields and returns a list of errors if any are found
+func (m *Meta) Validate() (errs []error) {
+	mv := reflect.Indirect(reflect.ValueOf(m))
+	mt := mv.Type()
+	for i := 0; i < mt.NumField(); i++ {
+		fv := mt.Field(i)
+		err := validate(fv.Name, mv.Field(i).Elem(), validationMap[fv.Name])
+		if err != nil {
+			errs = append(errs, err...)
+		}
+	}
+
+	return errs
 }
