@@ -173,7 +173,7 @@ func FormatInterface(i interface{}) string {
 		if isIntegral(v) {
 			return strconv.FormatInt(int64(v), 10)
 		}
-		return strconv.FormatFloat(v, 'f', -1, 64)
+		return strconv.FormatFloat(v, 'f', -1, 64) + "f"
 	case []string:
 		return strings.Join(v, ",")
 	case []interface{}:
@@ -205,13 +205,16 @@ func ParseType(s string) interface{} {
 		return feedptr
 	}
 
-	f, err := strconv.ParseFloat(s, 64)
-	if err == nil {
-		if isIntegral(f) {
-			return int(f)
-		} else {
+	if strings.HasSuffix(s, "f") {
+		f, err := strconv.ParseFloat(strings.TrimRight(s, "f"), 64)
+		if err == nil {
 			return f
 		}
+	}
+
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err == nil {
+		return int(i)
 	}
 
 	return s
