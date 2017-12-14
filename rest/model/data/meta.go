@@ -170,9 +170,6 @@ func FormatInterface(i interface{}) string {
 	case int:
 		return strconv.FormatInt(int64(v), 10)
 	case float64:
-		if isIntegral(v) {
-			return strconv.FormatInt(int64(v), 10)
-		}
 		return strconv.FormatFloat(v, 'f', -1, 64) + "f"
 	case []string:
 		return strings.Join(v, ",")
@@ -218,11 +215,6 @@ func ParseType(s string) interface{} {
 	}
 
 	return s
-}
-
-// isIntegral returns whether or not a float64 has a decimal place
-func isIntegral(f float64) bool {
-	return f == float64(int(f))
 }
 
 // MetaFromMap creates a *Meta and uses reflection to set fields from a map. This will panic if a value for a key is not a string.
