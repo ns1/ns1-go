@@ -202,6 +202,7 @@ func ParseType(s string) interface{} {
 		return feedptr
 	}
 
+	// we know this is definitely a float in this case
 	if strings.HasSuffix(s, "f") {
 		f, err := strconv.ParseFloat(strings.TrimRight(s, "f"), 64)
 		if err == nil {
@@ -209,12 +210,19 @@ func ParseType(s string) interface{} {
 		}
 	}
 
-	i, err := strconv.ParseInt(s, 10, 64)
+	f, err := strconv.ParseFloat(s, 64)
 	if err == nil {
-		return int(i)
+		if !isIntegral(f) {
+			return f
+		}
+		return int(f)
 	}
 
 	return s
+}
+
+func isIntegral(f float64) bool {
+	return f == float64(int(f))
 }
 
 // MetaFromMap creates a *Meta and uses reflection to set fields from a map. This will panic if a value for a key is not a string.
@@ -395,13 +403,13 @@ var validationMap = map[string]metaValidation{
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Requests", v)
 		})},
-	"LoadAvg": {kinds(reflect.Float64), checkFuncs(
+	"LoadAvg": {kinds(reflect.Float64, reflect.Int), checkFuncs(
 		func(v reflect.Value) error {
 			return validatePositiveNumber("LoadAvg", v)
 		})},
 	"Pulsar":     {kinds(reflect.String), nil},
-	"Latitude":   {kinds(reflect.Float64), checkFuncs(validateLatLong)},
-	"Longitude":  {kinds(reflect.Float64), checkFuncs(validateLatLong)},
+	"Latitude":   {kinds(reflect.Float64, reflect.Int), checkFuncs(validateLatLong)},
+	"Longitude":  {kinds(reflect.Float64, reflect.Int), checkFuncs(validateLatLong)},
 	"Georegion":  {kinds(reflect.String, reflect.Slice), checkFuncs(validateGeoregion)},
 	"Country":    {kinds(reflect.String, reflect.Slice), checkFuncs(validateCountryStateProvince)},
 	"USState":    {kinds(reflect.String, reflect.Slice), checkFuncs(validateCountryStateProvince)},
@@ -413,7 +421,7 @@ var validationMap = map[string]metaValidation{
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Priority", v)
 		})},
-	"Weight": {kinds(reflect.Float64), checkFuncs(
+	"Weight": {kinds(reflect.Float64, reflect.Int), checkFuncs(
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Weight", v)
 		})},
