@@ -18,8 +18,8 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("up should be 1")
 	}
 
-	if m["latitude"].(string) != "0.5f" {
-		t.Fatal("latitude should be '0.5f'")
+	if m["latitude"].(string) != "0.5" {
+		t.Fatal("latitude should be '0.5'")
 	}
 
 	if m["georegion"].(string) != "US-EAST" {
@@ -34,8 +34,8 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("priority should be 10")
 	}
 
-	if m["weight"].(string) != "10f" {
-		t.Fatal("weight should be 10f")
+	if m["weight"].(string) != "10" {
+		t.Fatal("weight should be 10")
 	}
 
 	if m["country"].(string) != "US,UK" {
@@ -65,7 +65,7 @@ func TestMeta_StringMap(t *testing.T) {
 }
 
 func TestParseType(t *testing.T) {
-	fs := "3.14f"
+	fs := "3.14"
 
 	v := ParseType(fs)
 
@@ -100,7 +100,7 @@ func TestParseType(t *testing.T) {
 func TestMetaFromMap(t *testing.T) {
 	m := make(map[string]interface{})
 
-	m["latitude"] = "0.50f"
+	m["latitude"] = "0.50"
 	m["up"] = "1"
 	m["connections"] = "5"
 	m["longitude"] = `{"feed":"12345678"}`
