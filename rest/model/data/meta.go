@@ -170,7 +170,7 @@ func FormatInterface(i interface{}) string {
 	case int:
 		return strconv.FormatInt(int64(v), 10)
 	case float64:
-		return strconv.FormatFloat(v, 'f', -1, 64) + "f"
+		return strconv.FormatFloat(v, 'f', -1, 64)
 	case []string:
 		return strings.Join(v, ",")
 	case []interface{}:
@@ -200,14 +200,6 @@ func ParseType(s string) interface{} {
 	err := json.Unmarshal([]byte(s), &feedptr)
 	if err == nil {
 		return feedptr
-	}
-
-	// we know this is definitely a float in this case
-	if strings.HasSuffix(s, "f") {
-		f, err := strconv.ParseFloat(strings.TrimRight(s, "f"), 64)
-		if err == nil {
-			return f
-		}
 	}
 
 	f, err := strconv.ParseFloat(s, 64)
