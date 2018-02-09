@@ -333,6 +333,14 @@ func validateGeoregion(v reflect.Value) error {
 	}
 
 	if v.Kind() == reflect.Slice {
+		if slc, ok := v.Interface().([]string); ok {
+			for _, s := range slc {
+				if _, ok := geoMap[s]; !ok {
+					return fmt.Errorf("georegion must be one or more of %s, found %s", geoKeyString(), s)
+				}
+			}
+			return nil
+		}
 		slc := v.Interface().([]interface{})
 		for _, s := range slc {
 			if _, ok := geoMap[s.(string)]; !ok {
@@ -353,6 +361,14 @@ func validateCountryStateProvince(v reflect.Value) error {
 	}
 
 	if v.Kind() == reflect.Slice {
+		if slc, ok := v.Interface().([]string); ok {
+			for _, s := range slc {
+				if len(s) != 2 {
+					return fmt.Errorf("country/state/province codes must be 2 digits as specified in ISO3166/ISO3166-2, got: %s", s)
+				}
+			}
+			return nil
+		}
 		slc := v.Interface().([]interface{})
 		for _, s := range slc {
 			if len(s.(string)) != 2 {
@@ -460,8 +476,8 @@ func validate(name string, v reflect.Value, m metaValidation) (errs []error) {
 }
 
 // Validate validates metadata fields and returns a list of errors if any are found
-func (m *Meta) Validate() (errs []error) {
-	mv := reflect.Indirect(reflect.ValueOf(m))
+func (meta *Meta) Validate() (errs []error) {
+	mv := reflect.Indirect(reflect.ValueOf(meta))
 	mt := mv.Type()
 	for i := 0; i < mt.NumField(); i++ {
 		fv := mt.Field(i)
