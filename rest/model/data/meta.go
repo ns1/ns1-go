@@ -476,8 +476,8 @@ func validate(name string, v reflect.Value, m metaValidation) (errs []error) {
 }
 
 // Validate validates metadata fields and returns a list of errors if any are found
-func (m *Meta) Validate() (errs []error) {
-	mv := reflect.Indirect(reflect.ValueOf(m))
+func (meta *Meta) Validate() (errs []error) {
+	mv := reflect.Indirect(reflect.ValueOf(meta))
 	mt := mv.Type()
 	for i := 0; i < mt.NumField(); i++ {
 		fv := mt.Field(i)
