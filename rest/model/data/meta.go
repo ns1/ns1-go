@@ -193,6 +193,7 @@ func FormatInterface(i interface{}) string {
 func ParseType(s string) interface{} {
 	slc := strings.Split(s, ",")
 	if len(slc) > 1 {
+		sort.Strings(slc)
 		return slc
 	}
 
