@@ -18,7 +18,7 @@ func ExampleZone() {
 }
 
 // Example references https://ns1.com/articles/primary-dns-with-ns1
-func ExamplePrimaryZone() {
+func ExampleZone_MakePrimary() {
 	// Secondary/slave dns server info.
 	secondary := dns.ZoneSecondaryServer{
 		IP:     "1.2.3.4",
@@ -123,7 +123,7 @@ func ExampleRecord() {
 	// false
 }
 
-func ExampleRecordLink() {
+func ExampleRecord_LinkTo() {
 	// Construct the src record
 	srcRecord := dns.NewRecord("test.com", "a", "A")
 	srcRecord.TTL = 300
