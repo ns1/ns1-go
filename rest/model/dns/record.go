@@ -44,6 +44,7 @@ func NewRecord(zone string, domain string, t string) *Record {
 		Domain:  domain,
 		Type:    t,
 		Answers: []*Answer{},
+		Filters: []*filter.Filter{},
 		Regions: data.Regions{},
 	}
 }
