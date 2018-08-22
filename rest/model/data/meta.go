@@ -179,6 +179,9 @@ func FormatInterface(i interface{}) string {
 			slc = append(slc, s.(string))
 		}
 		return strings.Join(slc, ",")
+	case map[string]interface{}:
+		data, _ := json.Marshal(v)
+		return string(data)
 	case FeedPtr:
 		data, _ := json.Marshal(v)
 		return string(data)
@@ -242,8 +245,10 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 			if name == "Up" {
 				if v.(string) == "1" {
 					fv.Set(reflect.ValueOf(true))
-				} else {
+				} else if v.(string) == "0" {
 					fv.Set(reflect.ValueOf(false))
+				} else {
+					fv.Set(reflect.ValueOf(ParseType(v.(string))))
 				}
 			} else {
 				fv.Set(reflect.ValueOf(ParseType(v.(string))))
