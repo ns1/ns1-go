@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -259,13 +260,13 @@ func (c *Client) RateLimitStrategySleep() {
 func parseRate(resp *http.Response) RateLimit {
 	var rl RateLimit
 
-	if limit := resp.Header.Get(headerRateLimit); limit != "" {
+	if limit := resp.Header.Get(strings.ToLower(headerRateLimit)); limit != "" {
 		rl.Limit, _ = strconv.Atoi(limit)
 	}
-	if remaining := resp.Header.Get(headerRateRemaining); remaining != "" {
+	if remaining := resp.Header.Get(strings.ToLower(headerRateRemaining)); remaining != "" {
 		rl.Remaining, _ = strconv.Atoi(remaining)
 	}
-	if period := resp.Header.Get(headerRatePeriod); period != "" {
+	if period := resp.Header.Get(strings.ToLower(headerRatePeriod)); period != "" {
 		rl.Period, _ = strconv.Atoi(period)
 	}
 
