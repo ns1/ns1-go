@@ -3,6 +3,7 @@ package dns
 import (
 	"fmt"
 	"strconv"
+	"encoding/json"
 	"strings"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
@@ -22,6 +23,37 @@ type Answer struct {
 
 	// Region(grouping) that answer belongs to.
 	RegionName string `json:"region,omitempty"`
+}
+
+func (a *Answer) MarshalJSON() ([]byte, error) {
+	type Alias Answer
+	return json.Marshal(&struct {
+		*Alias
+	}{
+		Alias: (*Alias)(a),
+	})
+}
+
+func (a *Answer) UnmarshalJSON(data []byte) error {
+	type Alias Answer
+	aux := &struct {
+		Rdata []interface{} `json:"answer"`
+		*Alias
+	}{
+		Alias: (*Alias)(a),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	// Cast every value to a string
+	rdata := []string{}
+	for _, val := range aux.Rdata {
+		rdata = append(rdata, fmt.Sprintf("%v", val))
+	}
+
+	a.Rdata = rdata
+	return nil
 }
 
 func (a Answer) String() string {
