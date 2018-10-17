@@ -25,15 +25,13 @@ type Answer struct {
 	RegionName string `json:"region,omitempty"`
 }
 
-func (a *Answer) MarshalJSON() ([]byte, error) {
-	type Alias Answer
-	return json.Marshal(&struct {
-		*Alias
-	}{
-		Alias: (*Alias)(a),
-	})
-}
-
+// UnmarshalJSON is a short-term solution for the fact that we
+// incorrectly model Answer.Rdata as a slice of strings. The
+// NS1 Rest API is not strictly typed, and several record
+// types have non-string rdata values(MX/SRV/etc). Using
+// a custom unmarshaller that casts every value to a string
+// allows for a non-breaking change. But we should properly
+// fix this when we are ready for a version bump.
 func (a *Answer) UnmarshalJSON(data []byte) error {
 	type Alias Answer
 	aux := &struct {
