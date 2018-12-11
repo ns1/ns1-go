@@ -57,8 +57,6 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 			switch err.(*Error).Message {
 			case "zone not found":
 				return resp, ErrZoneMissing
-			case "record not found":
-				return resp, ErrRecordMissing
 			case "record already exists":
 				return resp, ErrRecordExists
 			}
@@ -89,6 +87,8 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 			switch err.(*Error).Message {
 			case "zone not found":
 				return resp, ErrZoneMissing
+			case "record not found":
+				return resp, ErrRecordMissing
 			case "record already exists":
 				return resp, ErrRecordExists
 			}
