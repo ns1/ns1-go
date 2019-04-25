@@ -54,6 +54,13 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("up should be 0")
 	}
 
+	// Test mapping raw json feed ptr, for Terraform workaround
+	meta.Up = `{"feed":"12345678"}`
+	m = meta.StringMap()
+	if m["up"].(string) != expected {
+		t.Fatal("up should be", expected, "was", m["up"].(string))
+	}
+
 	meta.Up = struct{}{}
 	defer func(t *testing.T) {
 		if r := recover(); r == nil {
@@ -95,6 +102,12 @@ func TestParseType(t *testing.T) {
 	if _, ok := v.(string); !ok {
 		t.Fatal("value should be string, was", v)
 	}
+
+	fp := `{"feed":"12345678"}`
+	v = ParseType(fp)
+	if _, ok := v.(FeedPtr); !ok {
+		t.Fatal("value should be FeedPointer, was", v)
+	}
 }
 
 func TestMetaFromMap(t *testing.T) {
@@ -123,6 +136,21 @@ func TestMetaFromMap(t *testing.T) {
 	}
 
 	m["up"] = "0"
+	meta = MetaFromMap(m)
+
+	if meta.Up.(bool) {
+		t.Fatal("meta.Up should be false")
+	}
+
+	// Terraform 0.12 will no longer auto-convert bool values to 0 or 1, must support true and false
+	m["up"] = "true"
+	meta = MetaFromMap(m)
+
+	if !meta.Up.(bool) {
+		t.Fatal("meta.Up should be true")
+	}
+
+	m["up"] = "false"
 	meta = MetaFromMap(m)
 
 	if meta.Up.(bool) {

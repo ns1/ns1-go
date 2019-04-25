@@ -247,9 +247,9 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 		if _, ok := mt.FieldByName(name); ok {
 			fv := mv.FieldByName(name)
 			if name == "Up" {
-				if v.(string) == "1" {
+				if v.(string) == "1" || strings.ToLower(v.(string)) == "true" {
 					fv.Set(reflect.ValueOf(true))
-				} else if v.(string) == "0" {
+				} else if v.(string) == "0" || strings.ToLower(v.(string)) == "false" {
 					fv.Set(reflect.ValueOf(false))
 				} else {
 					fv.Set(reflect.ValueOf(ParseType(v.(string))))
