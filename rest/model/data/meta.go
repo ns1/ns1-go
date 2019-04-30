@@ -182,10 +182,12 @@ func FormatInterface(i interface{}) string {
 	case map[string]interface{}:
 		// Required for Terraform workaround to allow users to submit raw json of feed pointer
 		// as value for metadata.  See https://github.com/terraform-providers/terraform-provider-ns1/issues/35
-		mapVal := i.(map[string]interface{})
-		feedPtr := FeedPtr{FeedID: mapVal["feed"].(string)}
-		data, _ := json.Marshal(feedPtr)
-		return string(data)
+		if val, ok := v["feed"].(string); ok {
+			feedPtr := FeedPtr{FeedID: val}
+			data, _ := json.Marshal(feedPtr)
+			return string(data)
+		}
+		panic(fmt.Sprintf("expected map to contain 'feed' key to marshal as feedPtr, got: %+v", v))
 	case FeedPtr:
 		data, _ := json.Marshal(v)
 		return string(data)
