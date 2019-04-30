@@ -49,19 +49,34 @@ func TestMeta_StringMap(t *testing.T) {
 
 	meta.Up = false
 	m = meta.StringMap()
-
 	if m["up"].(string) != "0" {
 		t.Fatal("up should be 0")
 	}
 
+	// Test mapping deserialized json feed ptr, for Terraform workaround
+	meta.Up = map[string]interface{}{"feed": "12345678"}
+	m = meta.StringMap()
+	if m["up"].(string) != expected {
+		t.Fatal("up should be", expected, "was", m["up"].(string))
+	}
+
+	// Verify panic if passed deserialized json other than feed
+	meta.Up = map[string]interface{}{"badKey": "12345678"}
+	verifyStringMapPanic(t, meta)
+
 	meta.Up = struct{}{}
+	verifyStringMapPanic(t, meta)
+
+}
+
+func verifyStringMapPanic(t *testing.T, meta *Meta) (r interface{}) {
 	defer func(t *testing.T) {
 		if r := recover(); r == nil {
 			t.Fatal("meta should have panicked but did not")
 		}
 	}(t)
 	meta.StringMap()
-
+	return
 }
 
 func TestParseType(t *testing.T) {
@@ -95,6 +110,12 @@ func TestParseType(t *testing.T) {
 	if _, ok := v.(string); !ok {
 		t.Fatal("value should be string, was", v)
 	}
+
+	fp := `{"feed":"12345678"}`
+	v = ParseType(fp)
+	if _, ok := v.(FeedPtr); !ok {
+		t.Fatal("value should be FeedPointer, was", v)
+	}
 }
 
 func TestMetaFromMap(t *testing.T) {
@@ -127,6 +148,28 @@ func TestMetaFromMap(t *testing.T) {
 
 	if meta.Up.(bool) {
 		t.Fatal("meta.Up should be false")
+	}
+
+	// Terraform 0.12 will no longer auto-convert bool values to 0 or 1, must support true and false
+	m["up"] = "false"
+	meta = MetaFromMap(m)
+
+	if meta.Up.(bool) {
+		t.Fatal("meta.Up should be false")
+	}
+
+	m["up"] = "true"
+	meta = MetaFromMap(m)
+
+	if !meta.Up.(bool) {
+		t.Fatal("meta.Up should be true")
+	}
+
+	m["up"] = `{"feed":"12345678"}`
+	meta = MetaFromMap(m)
+
+	if meta.Up.(FeedPtr).FeedID != "12345678" {
+		t.Fatal("meta.Up should be a feed ptr with id 12345678, was", meta.Up)
 	}
 }
 
