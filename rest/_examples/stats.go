@@ -32,19 +32,19 @@ func init() {
 }
 
 func main() {
-	qps, _, err := client.Stats.GetQps()
+	qps, _, err := client.Stats.GetQPS()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("Account qps: %f\n", qps)
 
-	qps, _, err = client.Stats.GetZoneQps(zoneName)
+	qps, _, err = client.Stats.GetZoneQPS(zoneName)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("Zone qps: %f\n", qps)
 
-	qps, _, err = client.Stats.GetRecordQps(zoneName, recordName, recordType)
+	qps, _, err = client.Stats.GetRecordQPS(zoneName, recordName, recordType)
 	if err != nil {
 		log.Fatal(err)
 	}
