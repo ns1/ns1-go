@@ -14,14 +14,14 @@ type StatsService service
 //Returns current queries per second (QPS) for the account.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s StatsService) GetQps() (float32, *http.Response, error) {
+func (s *StatsService) GetQps() (float32, *http.Response, error) {
 	return s.getQps(statsQpsEndpoint)
 }
 
 // Returns current queries per second (QPS) for a specific zone.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s StatsService) GetZoneQps(zone string) (float32, *http.Response, error) {
+func (s *StatsService) GetZoneQps(zone string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", statsQpsEndpoint, zone)
 	return s.getQps(path)
 }
@@ -29,12 +29,12 @@ func (s StatsService) GetZoneQps(zone string) (float32, *http.Response, error) {
 // Returns current queries per second (QPS) for a specific record.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s StatsService) GetRecordQps(zone, record, t string) (float32, *http.Response, error) {
+func (s *StatsService) GetRecordQps(zone, record, t string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s/%s", statsQpsEndpoint, zone, record, t)
 	return s.getQps(path)
 }
 
-func (s StatsService) getQps(path string) (float32, *http.Response, error) {
+func (s *StatsService) getQps(path string) (float32, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return 0, nil, err
