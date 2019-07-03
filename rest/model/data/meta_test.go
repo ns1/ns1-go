@@ -1,6 +1,9 @@
 package data
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestMeta_StringMap(t *testing.T) {
 	meta := &Meta{}
@@ -12,6 +15,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta.Priority = 10
 	meta.Weight = 10.0
 	meta.Country = []string{"US", "UK"}
+	meta.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
 	m := meta.StringMap()
 
 	if m["up"].(string) != "1" {
@@ -40,6 +44,10 @@ func TestMeta_StringMap(t *testing.T) {
 
 	if m["country"].(string) != "US,UK" {
 		t.Fatal("country should be 'US,UK'")
+	}
+
+	if m["ip_prefixes"].(string) != "1.1.1.1/24,2.2.2.2/24" {
+		t.Fatal("IP prefixes should be '1.1.1.1/24,2.2.2.2/24")
 	}
 
 	expected := `{"feed":"12345678"}`
@@ -125,6 +133,7 @@ func TestMetaFromMap(t *testing.T) {
 	m["up"] = "1"
 	m["connections"] = "5"
 	m["longitude"] = `{"feed":"12345678"}`
+	m["ip_prefixes"] = "1.1.1.1/24,2.2.2.2/24"
 	meta := MetaFromMap(m)
 
 	if !meta.Up.(bool) {
@@ -141,6 +150,11 @@ func TestMetaFromMap(t *testing.T) {
 
 	if meta.Longitude.(FeedPtr).FeedID != "12345678" {
 		t.Fatal("meta.Longitude should be a feed ptr with id 12345678, was", meta.Longitude)
+	}
+
+	expected := []string{"1.1.1.1/24", "2.2.2.2/24"}
+	if !reflect.DeepEqual(meta.IPPrefixes.([]string), expected) {
+		t.Fatal("meta.IPPrefixes should be a slice containing elements `1.1.1.1/24` and `2.2.2.2/24`")
 	}
 
 	m["up"] = "0"
@@ -230,7 +244,27 @@ func TestMeta_Validate(t *testing.T) {
 	m = &Meta{}
 	m.Georegion = []interface{}{"US-EAST", "fantasy land"}
 	m.Country = []interface{}{"US", "CANADA"}
+	m.IPPrefixes = []interface{}{"1234567", "1.1.1.1/24"}
 	m.Up = struct{}{}
+	errs = m.Validate()
+	if len(errs) != 4 {
+		t.Fatal("expected 4 errors, but there were", len(errs), ":", errs)
+	}
+
+	// Test validation of []string values passed from Terraform
+	m = &Meta{}
+	m.Georegion = []string{"US-EAST", "US-CENTRAL"}
+	m.Country = []string{"US", "CA"}
+	m.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
+	errs = m.Validate()
+	if len(errs) > 0 {
+		t.Fatal("there should be 0 errors, but there were", len(errs), ":", errs)
+	}
+
+	m = &Meta{}
+	m.Georegion = []string{"US-EAST", "fantasy land"}
+	m.Country = []string{"US", "CANADA"}
+	m.IPPrefixes = []string{"1234567", "1.1.1.1/24"}
 	errs = m.Validate()
 	if len(errs) != 3 {
 		t.Fatal("expected 3 errors, but there were", len(errs), ":", errs)
