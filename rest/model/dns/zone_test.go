@@ -10,7 +10,7 @@ import (
 )
 
 func TestUnmarshalZoneRecords(t *testing.T) {
-  d := []byte(`[
+	d := []byte(`[
     {
       "domain": "foo.test.zone",
       "short_answers": [
@@ -35,15 +35,15 @@ func TestUnmarshalZoneRecords(t *testing.T) {
     }
 ]
 `)
-  zrl := []*ZoneRecord{}
-  if err := json.Unmarshal(d, &zrl); err != nil {
-    t.Error(err)
-  }
+	zrl := []*ZoneRecord{}
+	if err := json.Unmarshal(d, &zrl); err != nil {
+		t.Error(err)
+	}
 
-  if len(zrl) != 2 {
-    fmt.Println(zrl)
-    t.Error("Do not have 2 records in list")
-  }
+	if len(zrl) != 2 {
+		fmt.Println(zrl)
+		t.Error("Do not have 2 records in list")
+	}
 
 }
 
@@ -110,6 +110,14 @@ func TestUnmarshalZones(t *testing.T) {
 	      "last_xfr":0,
 	      "primary_ip":"1.1.1.1",
 	      "primary_port":53,
+		  "other_ips":[
+			"1.1.1.2",
+			"1.1.1.3"
+		  ],
+		  "other_ports":[
+			53,
+			53
+		  ],
 	      "enabled":true,
 	      "tsig":{  
 		 "enabled":false,
@@ -250,10 +258,80 @@ func TestUnmarshalZones(t *testing.T) {
 	assert.Equal(t, secondary.PrimaryIP, "1.1.1.1", "Wrong zone secondary primary ip")
 	assert.Equal(t, secondary.PrimaryPort, 53, "Wrong zone secondary primary port")
 	assert.Equal(t, secondary.Enabled, true, "Wrong zone secondary enabled")
+	assert.ElementsMatch(t, secondary.OtherIPs, []string{"1.1.1.2", "1.1.1.3"}, "Wrong zone secondary list of other IPs")
+	assert.ElementsMatch(t, secondary.OtherPorts, []int{53, 53}, "Wrong zone secondary list of other ports")
 
 	assert.Equal(t, secondary.TSIG, &TSIG{
 		Enabled: false,
 		Hash:    "",
 		Name:    "",
 		Key:     ""}, "Wrong zone secondary tsig")
+}
+
+func TestMakeSecondary(t *testing.T) {
+	d := []byte(`
+	{
+		"nx_ttl":3600,
+		"retry":7200,
+		"zone":"test.zone",
+		"network_pools":[
+		   "p09"
+		],
+		"primary":{
+		   "enabled":true,
+		   "secondaries":[
+			  {
+				 "ip":"1.1.1.1",
+				 "notify":true,
+				 "networks":[
+
+				 ],
+				 "port":53
+			  },
+			  {
+				 "ip":"2.2.2.2",
+				 "notify":true,
+				 "networks":[
+
+				 ],
+				 "port":53
+			  }
+		   ]
+		},
+		"refresh":43200,
+		"expiry":1209600,
+		"dns_servers":[
+		   "dns1.p09.nsone.net",
+		   "dns2.p09.nsone.net",
+		   "dns3.p09.nsone.net",
+		   "dns4.p09.nsone.net"
+		],
+		"meta":{
+
+		},
+		"link":null,
+		"serial":1473863358,
+		"ttl":3600,
+		"id":"57d95da659272400013334de",
+		"hostmaster":"hostmaster@nsone.net",
+		"networks":[
+		   0
+		],
+		"pool":"p09"
+	 }
+	`)
+	z := &Zone{}
+	if err := json.Unmarshal(d, &z); err != nil {
+		t.Error(err)
+	}
+
+	z.MakeSecondary("1.1.1.1")
+
+	primary := &ZonePrimary{
+		Enabled:     false,
+		Secondaries: make([]ZoneSecondaryServer, 0),
+	}
+	assert.Equal(t, z.Primary, primary, "Zone primary should be disabled")
+	assert.Equal(t, z.Secondary.PrimaryIP, "1.1.1.1", "Wrong zone secondary primary IP")
+	assert.Equal(t, z.Secondary.PrimaryPort, 53, "Wrong zone secondary primary port")
 }
