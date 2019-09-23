@@ -56,8 +56,15 @@ Contributing
 
 Contributions, ideas and criticisms are all welcome.
 
+Run tests:
+
+```
+make test
+```
+
+Local dev: use `go mod replace` in client code to point to local checkout of
+this repository.
+
 # LICENSE
 
 Apache2 - see the included LICENSE file for more information
-
-
