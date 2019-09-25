@@ -38,8 +38,9 @@ type Zone struct {
 	// Secondary contains info for slaving the zone to a primary dns server.
 	Secondary *ZoneSecondary `json:"secondary,omitempty"`
 
-	// Whether or not DNSSEC is enabled on the zone
-	DNSSEC bool `json:"dnssec"`
+	// Whether or not DNSSEC is enabled on the zone. Note we use a pointer so
+	// leaving this unset will not change a previous setting.
+	DNSSEC *bool `json:"dnssec,omitempty"`
 }
 
 func (z Zone) String() string {
@@ -161,5 +162,5 @@ func (z *Zone) LinkTo(to string) {
 	z.Pool = ""
 	z.Secondary = nil
 	z.Link = &to
-	z.DNSSEC = false
+	z.DNSSEC = nil
 }

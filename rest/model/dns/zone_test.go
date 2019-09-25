@@ -96,8 +96,7 @@ func TestUnmarshalZones(t *testing.T) {
       "networks":[
          0
       ],
-      "pool":"p09",
-      "dnssec":true
+      "pool":"p09"
    },
    {
      "nx_ttl":3600,
@@ -154,7 +153,8 @@ func TestUnmarshalZones(t *testing.T) {
      "networks":[
         0
      ],
-     "pool":"p09"
+     "pool":"p09",
+     "dnssec":true
   },
    {
       "nx_ttl":3600,
@@ -204,6 +204,7 @@ func TestUnmarshalZones(t *testing.T) {
 	z := zl[0]
 	assert.Nil(t, z.Link)
 	assert.Nil(t, z.Secondary)
+	assert.Nil(t, z.DNSSEC, "Zone DNSSEC should be nil")
 	assert.Equal(t, z.ID, "57d95da659272400013334de", "Wrong zone id")
 	assert.Equal(t, z.Zone, "test.zone", "Wrong zone name")
 	assert.Equal(t, z.TTL, 3600, "Wrong zone ttl")
@@ -217,7 +218,6 @@ func TestUnmarshalZones(t *testing.T) {
 	assert.Equal(t, z.NetworkIDs, []int{0}, "Wrong zone network")
 	assert.Equal(t, z.NetworkPools, []string{"p09"}, "Wrong zone network pools")
 	assert.Equal(t, z.Meta, &data.Meta{}, "Zone meta should be empty")
-	assert.Equal(t, z.DNSSEC, true, "Zone DNSSEC should be true")
 
 	dnsServers := []string{
 		"dns1.p09.nsone.net",
@@ -246,10 +246,10 @@ func TestUnmarshalZones(t *testing.T) {
 	}
 	assert.Equal(t, z.Primary, primary, "Wrong zone primary")
 
-	// Check zone with secondaries
+	// Check zone with secondaries and DNSSEC
 	secZ := zl[1]
 	assert.Nil(t, secZ.Link)
-	assert.Equal(t, secZ.DNSSEC, false, "Zone DNSSEC should be false")
+	assert.Equal(t, *secZ.DNSSEC, true, "Zone DNSSEC should be true")
 	assert.Equal(t, secZ.Zone, "secondary.zone", "Wrong zone name")
 	assert.Equal(t, secZ.Primary, &ZonePrimary{
 		Enabled:     false,
@@ -271,9 +271,9 @@ func TestUnmarshalZones(t *testing.T) {
 		Name:    "",
 		Key:     ""}, "Wrong zone secondary tsig")
 
-	// check last zone
+	// check last zone with DNSSEC explicitly false
 	failoverZ := zl[2]
-	assert.Equal(t, failoverZ.DNSSEC, false, "Zone DNSSEC should be false")
+	assert.Equal(t, *failoverZ.DNSSEC, false, "Zone DNSSEC should be false")
 }
 
 func TestMakeSecondary(t *testing.T) {

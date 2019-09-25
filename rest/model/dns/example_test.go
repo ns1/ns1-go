@@ -47,8 +47,7 @@ func ExampleZone_MakePrimary() {
 	//         "notify": true
 	//       }
 	//     ]
-	//   },
-	//   "dnssec": false
+	//   }
 	// }
 
 }
