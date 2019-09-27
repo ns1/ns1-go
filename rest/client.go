@@ -62,6 +62,7 @@ type Client struct {
 	Users         *UsersService
 	Warnings      *WarningsService
 	Zones         *ZonesService
+	DNSSEC        *DNSSECService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -92,6 +93,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Users = (*UsersService)(&c.common)
 	c.Warnings = (*WarningsService)(&c.common)
 	c.Zones = (*ZonesService)(&c.common)
+	c.DNSSEC = (*DNSSECService)(&c.common)
 
 	for _, option := range options {
 		option(c)
