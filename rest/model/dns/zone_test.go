@@ -49,28 +49,28 @@ func TestUnmarshalZoneRecords(t *testing.T) {
 
 func TestUnmarshalZones(t *testing.T) {
 	d := []byte(`[
-   {  
+   {
       "nx_ttl":3600,
       "retry":7200,
       "zone":"test.zone",
-      "network_pools":[  
+      "network_pools":[
          "p09"
       ],
-      "primary":{  
+      "primary":{
          "enabled":true,
-         "secondaries":[  
-            {  
+         "secondaries":[
+            {
                "ip":"1.1.1.1",
                "notify":true,
-               "networks":[  
+               "networks":[
 
                ],
                "port":53
             },
-            {  
+            {
                "ip":"2.2.2.2",
                "notify":true,
-               "networks":[  
+               "networks":[
 
                ],
                "port":53
@@ -79,13 +79,13 @@ func TestUnmarshalZones(t *testing.T) {
       },
       "refresh":43200,
       "expiry":1209600,
-      "dns_servers":[  
+      "dns_servers":[
          "dns1.p09.nsone.net",
          "dns2.p09.nsone.net",
          "dns3.p09.nsone.net",
          "dns4.p09.nsone.net"
       ],
-      "meta":{  
+      "meta":{
 
       },
       "link":null,
@@ -93,90 +93,91 @@ func TestUnmarshalZones(t *testing.T) {
       "ttl":3600,
       "id":"57d95da659272400013334de",
       "hostmaster":"hostmaster@nsone.net",
-      "networks":[  
+      "networks":[
          0
       ],
       "pool":"p09"
    },
-   {  
-	   "nx_ttl":3600,
-	   "retry":7200,
-	   "zone":"secondary.zone",
-	   "network_pools":[  
-	      "p09"
-	   ],
-	   "secondary":{  
-	      "status":"pending",
-	      "last_xfr":0,
-	      "primary_ip":"1.1.1.1",
-	      "primary_port":53,
-		  "other_ips":[
-			"1.1.1.2",
-			"1.1.1.3"
-		  ],
-		  "other_ports":[
-			53,
-			53
-		  ],
-	      "enabled":true,
-	      "tsig":{  
-		 "enabled":false,
-		 "hash":null,
-		 "name":null,
-		 "key":null
-	      },
-	      "error":null,
-	      "expired":false
-	   },
-	   "primary":{  
-	      "enabled":false,
-	      "secondaries":[  
+   {
+     "nx_ttl":3600,
+     "retry":7200,
+     "zone":"secondary.zone",
+     "network_pools":[
+        "p09"
+     ],
+     "secondary":{
+        "status":"pending",
+        "last_xfr":0,
+        "primary_ip":"1.1.1.1",
+        "primary_port":53,
+      "other_ips":[
+      "1.1.1.2",
+      "1.1.1.3"
+      ],
+      "other_ports":[
+      53,
+      53
+      ],
+        "enabled":true,
+        "tsig":{
+     "enabled":false,
+     "hash":null,
+     "name":null,
+     "key":null
+        },
+        "error":null,
+        "expired":false
+     },
+     "primary":{
+        "enabled":false,
+        "secondaries":[
 
-	      ]
-	   },
-	   "refresh":43200,
-	   "expiry":1209600,
-	   "dns_servers":[  
-	      "dns1.p09.nsone.net",
-	      "dns2.p09.nsone.net",
-	      "dns3.p09.nsone.net",
-	      "dns4.p09.nsone.net"
-	   ],
-	   "meta":{  
+        ]
+     },
+     "refresh":43200,
+     "expiry":1209600,
+     "dns_servers":[
+        "dns1.p09.nsone.net",
+        "dns2.p09.nsone.net",
+        "dns3.p09.nsone.net",
+        "dns4.p09.nsone.net"
+     ],
+     "meta":{
 
-	   },
-	   "link":null,
-	   "serial":1473868413,
-	   "ttl":3600,
-	   "id":"57d9727d1c372700011eff6e",
-	   "hostmaster":"hostmaster@nsone.net",
-	   "networks":[  
-	      0
-	   ],
-	   "pool":"p09"
-	},
-   {  
+     },
+     "link":null,
+     "serial":1473868413,
+     "ttl":3600,
+     "id":"57d9727d1c372700011eff6e",
+     "hostmaster":"hostmaster@nsone.net",
+     "networks":[
+        0
+     ],
+     "pool":"p09",
+     "dnssec":true
+  },
+   {
       "nx_ttl":3600,
       "retry":7200,
       "zone":"myfailover.com",
-      "network_pools":[  
+      "network_pools":[
          "p09"
       ],
-      "primary":{  
+      "primary":{
          "enabled":true,
-         "secondaries":[  
+         "secondaries":[
 
          ]
       },
       "refresh":43200,
       "expiry":1209600,
-      "dns_servers":[  
+      "dns_servers":[
          "dns1.p09.nsone.net",
          "dns2.p09.nsone.net",
          "dns3.p09.nsone.net",
          "dns4.p09.nsone.net"
       ],
-      "meta":{  
+      "meta":{
 
       },
       "link":null,
@@ -184,10 +185,11 @@ func TestUnmarshalZones(t *testing.T) {
       "ttl":3600,
       "id":"57d89c7b1c372700011e0a97",
       "hostmaster":"hostmaster@nsone.net",
-      "networks":[  
+      "networks":[
          0
       ],
-      "pool":"p09"
+      "pool":"p09",
+      "dnssec":false
    }
 ]
 `)
@@ -202,6 +204,7 @@ func TestUnmarshalZones(t *testing.T) {
 	z := zl[0]
 	assert.Nil(t, z.Link)
 	assert.Nil(t, z.Secondary)
+	assert.Nil(t, z.DNSSEC, "Zone DNSSEC should be nil")
 	assert.Equal(t, z.ID, "57d95da659272400013334de", "Wrong zone id")
 	assert.Equal(t, z.Zone, "test.zone", "Wrong zone name")
 	assert.Equal(t, z.TTL, 3600, "Wrong zone ttl")
@@ -243,9 +246,10 @@ func TestUnmarshalZones(t *testing.T) {
 	}
 	assert.Equal(t, z.Primary, primary, "Wrong zone primary")
 
-	// Check zone with secondaries
+	// Check zone with secondaries and DNSSEC
 	secZ := zl[1]
 	assert.Nil(t, secZ.Link)
+	assert.Equal(t, *secZ.DNSSEC, true, "Zone DNSSEC should be true")
 	assert.Equal(t, secZ.Zone, "secondary.zone", "Wrong zone name")
 	assert.Equal(t, secZ.Primary, &ZonePrimary{
 		Enabled:     false,
@@ -266,60 +270,64 @@ func TestUnmarshalZones(t *testing.T) {
 		Hash:    "",
 		Name:    "",
 		Key:     ""}, "Wrong zone secondary tsig")
+
+	// check last zone with DNSSEC explicitly false
+	failoverZ := zl[2]
+	assert.Equal(t, *failoverZ.DNSSEC, false, "Zone DNSSEC should be false")
 }
 
 func TestMakeSecondary(t *testing.T) {
 	d := []byte(`
-	{
-		"nx_ttl":3600,
-		"retry":7200,
-		"zone":"test.zone",
-		"network_pools":[
-		   "p09"
-		],
-		"primary":{
-		   "enabled":true,
-		   "secondaries":[
-			  {
-				 "ip":"1.1.1.1",
-				 "notify":true,
-				 "networks":[
+  {
+    "nx_ttl":3600,
+    "retry":7200,
+    "zone":"test.zone",
+    "network_pools":[
+       "p09"
+    ],
+    "primary":{
+       "enabled":true,
+       "secondaries":[
+        {
+         "ip":"1.1.1.1",
+         "notify":true,
+         "networks":[
 
-				 ],
-				 "port":53
-			  },
-			  {
-				 "ip":"2.2.2.2",
-				 "notify":true,
-				 "networks":[
+         ],
+         "port":53
+        },
+        {
+         "ip":"2.2.2.2",
+         "notify":true,
+         "networks":[
 
-				 ],
-				 "port":53
-			  }
-		   ]
-		},
-		"refresh":43200,
-		"expiry":1209600,
-		"dns_servers":[
-		   "dns1.p09.nsone.net",
-		   "dns2.p09.nsone.net",
-		   "dns3.p09.nsone.net",
-		   "dns4.p09.nsone.net"
-		],
-		"meta":{
+         ],
+         "port":53
+        }
+       ]
+    },
+    "refresh":43200,
+    "expiry":1209600,
+    "dns_servers":[
+       "dns1.p09.nsone.net",
+       "dns2.p09.nsone.net",
+       "dns3.p09.nsone.net",
+       "dns4.p09.nsone.net"
+    ],
+    "meta":{
 
-		},
-		"link":null,
-		"serial":1473863358,
-		"ttl":3600,
-		"id":"57d95da659272400013334de",
-		"hostmaster":"hostmaster@nsone.net",
-		"networks":[
-		   0
-		],
-		"pool":"p09"
-	 }
-	`)
+    },
+    "link":null,
+    "serial":1473863358,
+    "ttl":3600,
+    "id":"57d95da659272400013334de",
+    "hostmaster":"hostmaster@nsone.net",
+    "networks":[
+       0
+    ],
+    "pool":"p09"
+   }
+  `)
 	z := &Zone{}
 	if err := json.Unmarshal(d, &z); err != nil {
 		t.Error(err)
