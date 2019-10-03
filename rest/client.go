@@ -262,6 +262,17 @@ func (c *Client) RateLimitStrategySleep() {
 	}
 }
 
+// RateLimitStrategyConcurrent sleeps for WaitTime * parallelism when
+// remaining is less than or equal to parallelism.
+func (c *Client) RateLimitStrategyConcurrent(parallelism int) {
+	c.RateLimitFunc = func(rl RateLimit) {
+		if rl.Remaining <= parallelism {
+			wait := rl.WaitTime() * time.Duration(parallelism)
+			time.Sleep(wait)
+		}
+	}
+}
+
 // parseRate parses rate related headers from http response.
 func parseRate(resp *http.Response) RateLimit {
 	var rl RateLimit
