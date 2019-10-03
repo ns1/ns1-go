@@ -248,7 +248,13 @@ func (rl RateLimit) WaitTime() time.Duration {
 
 // WaitTimeRemaining returns the time.Duration ratio of Period to Remaining
 func (rl RateLimit) WaitTimeRemaining() time.Duration {
-	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Remaining)
+	var remaining int
+	if rl.Remaining == 0 {
+		remaining = 1
+	} else {
+		remaining = rl.Remaining
+	}
+	return (time.Second * time.Duration(rl.Period)) / time.Duration(remaining)
 }
 
 // RateLimitStrategySleep sets RateLimitFunc to sleep by WaitTimeRemaining
