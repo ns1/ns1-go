@@ -248,6 +248,9 @@ func (rl RateLimit) WaitTime() time.Duration {
 
 // WaitTimeRemaining returns the time.Duration ratio of Period to Remaining
 func (rl RateLimit) WaitTimeRemaining() time.Duration {
+	if rl.Remaining < 2 {
+		return time.Second * time.Duration(rl.Period)
+	}
 	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Remaining)
 }
 
