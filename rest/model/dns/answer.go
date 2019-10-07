@@ -89,6 +89,13 @@ func NewMXAnswer(pri int, host string) *Answer {
 	}
 }
 
+func NewCAAAnswer(pri int, host string, caa string) *Answer {
+	return &Answer{
+		Meta:  &data.Meta{},
+		Rdata: []string{strconv.Itoa(pri), host, caa},
+	}
+}
+
 // NewSRVAnswer creates an Answer for SRV record.
 func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 	return &Answer{

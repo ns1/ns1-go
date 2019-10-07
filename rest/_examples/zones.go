@@ -142,6 +142,23 @@ func main() {
 		}
 	}
 
+	caaRec := dns.NewRecord(domain, "", "CAA")
+
+	caaRec.Answers = []*dns.Answer{
+		dns.NewCAAAnswer(0, "issue", "digicert.com"),
+		dns.NewCAAAnswer(0, "issue", "sectigo.com"),
+		dns.NewCAAAnswer(0, "iodef", "sectigo.com"),
+	}
+	_, err = client.Records.Create(caaRec)
+	if err != nil {
+		// Ignore if record already exists
+		if err != api.ErrRecordExists {
+			log.Fatal(err)
+		} else {
+			log.Printf("Create %s: %s \n", caaRec, err)
+		}
+	}
+
 	// Add a AAAA, specify ttl of 300 seconds
 	aaaaRec := dns.NewRecord(domain, "honey6", "AAAA")
 	aaaaRec.TTL = 300
