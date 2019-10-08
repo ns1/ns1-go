@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // Answer wraps the values of a Record's "filters" attribute
 type Answer struct {
 	ID string `json:"id,omitempty"`
-	
+
 	Meta *data.Meta `json:"meta,omitempty"`
 
 	// Answer response data. eg:
@@ -22,6 +23,40 @@ type Answer struct {
 
 	// Region(grouping) that answer belongs to.
 	RegionName string `json:"region,omitempty"`
+}
+
+// UnmarshalJSON parses responses to Answer and attempts to convert Rdata elements to string
+func (a *Answer) UnmarshalJSON(b []byte) error {
+	type TempAnswer struct {
+		ID         string        `json:"id,omitempty"`
+		Meta       *data.Meta    `json:"meta,omitempty"`
+		Rdata      []interface{} `json:"answer"`
+		RegionName string        `json:"region,omitempty"`
+	}
+	var temp TempAnswer
+
+	if err := json.Unmarshal(b, &temp); err != nil {
+		return err
+	}
+
+	a.ID = temp.ID
+	a.Meta = temp.Meta
+	a.RegionName = temp.RegionName
+
+	var rd []string
+	for _, record := range temp.Rdata {
+		switch v := record.(type) {
+		case string:
+			rd = append(rd, v)
+		case float64:
+			rd = append(rd, strconv.Itoa(int(v)))
+		default:
+			return fmt.Errorf("Could not unmarshal Rdata value %v (type %T) as type string", v, v)
+		}
+	}
+	a.Rdata = rd
+
+	return nil
 }
 
 func (a Answer) String() string {
@@ -99,5 +134,13 @@ func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 			strconv.Itoa(port),
 			target,
 		},
+	}
+}
+
+// NewCAAAnswer creates an Answer for a CAA record.
+func NewCAAAnswer(flag int, tag, value string) *Answer {
+	return &Answer{
+		Meta:  &data.Meta{},
+		Rdata: []string{strconv.Itoa(flag), tag, value},
 	}
 }
