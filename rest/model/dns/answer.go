@@ -89,10 +89,11 @@ func NewMXAnswer(pri int, host string) *Answer {
 	}
 }
 
-func NewCAAAnswer(pri int, issuance string, ca string) *Answer {
+// NewCAAAnswer creates an Answer for a CAA record as per https://tools.ietf.org/html/rfc6844
+func NewCAAAnswer(flag int, tag string, value string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []interface{}{strconv.Itoa(pri), issuance, ca},
+		Rdata: []interface{}{strconv.Itoa(flag), tag, value},
 	}
 }
 
