@@ -18,7 +18,7 @@ type Answer struct {
 	// Av4: ["1.1.1.1"]
 	// Av6: ["2001:db8:85a3::8a2e:370:7334"]
 	// MX:  [10, "2.2.2.2"]
-	Rdata []string `json:"answer"`
+	Rdata []interface{} `json:"answer"`
 
 	// Region(grouping) that answer belongs to.
 	RegionName string `json:"region,omitempty"`
@@ -34,7 +34,7 @@ func (a *Answer) SetRegion(name string) {
 }
 
 // NewAnswer creates a generic Answer with given rdata.
-func NewAnswer(rdata []string) *Answer {
+func NewAnswer(rdata []interface{}) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
 		Rdata: rdata,
@@ -45,7 +45,7 @@ func NewAnswer(rdata []string) *Answer {
 func NewAv4Answer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{host},
+		Rdata: []interface{}{host},
 	}
 }
 
@@ -53,7 +53,7 @@ func NewAv4Answer(host string) *Answer {
 func NewAv6Answer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{host},
+		Rdata: []interface{}{host},
 	}
 }
 
@@ -61,7 +61,7 @@ func NewAv6Answer(host string) *Answer {
 func NewALIASAnswer(host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{host},
+		Rdata: []interface{}{host},
 	}
 }
 
@@ -69,7 +69,7 @@ func NewALIASAnswer(host string) *Answer {
 func NewCNAMEAnswer(name string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{name},
+		Rdata: []interface{}{name},
 	}
 }
 
@@ -77,7 +77,7 @@ func NewCNAMEAnswer(name string) *Answer {
 func NewTXTAnswer(text string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{text},
+		Rdata: []interface{}{text},
 	}
 }
 
@@ -85,14 +85,14 @@ func NewTXTAnswer(text string) *Answer {
 func NewMXAnswer(pri int, host string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{strconv.Itoa(pri), host},
+		Rdata: []interface{}{strconv.Itoa(pri), host},
 	}
 }
 
-func NewCAAAnswer(pri int, host string, caa string) *Answer {
+func NewCAAAnswer(pri int, issuance string, ca string) *Answer {
 	return &Answer{
 		Meta:  &data.Meta{},
-		Rdata: []string{strconv.Itoa(pri), host, caa},
+		Rdata: []interface{}{strconv.Itoa(pri), issuance, ca},
 	}
 }
 
@@ -100,7 +100,7 @@ func NewCAAAnswer(pri int, host string, caa string) *Answer {
 func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 	return &Answer{
 		Meta: &data.Meta{},
-		Rdata: []string{
+		Rdata: []interface{}{
 			strconv.Itoa(priority),
 			strconv.Itoa(weight),
 			strconv.Itoa(port),
