@@ -1,3 +1,5 @@
+// +build !integrationtest
+
 package rest
 
 import (
@@ -14,6 +16,10 @@ import (
 func TestCaaRecordIntegrationTest(t *testing.T){
 	apiKey := os.Getenv("NS1_APIKEY")
 	testDomain := os.Getenv("NS1_TESTDOMAIN")
+
+	if apiKey == "" || testDomain == "" {
+		return
+	}
 
 	httpClient := &http.Client{Timeout: time.Second * 10}
 	doer := Decorate(httpClient, Logging(log.New(os.Stdout, "", log.LstdFlags)))
