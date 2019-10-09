@@ -118,7 +118,7 @@ func NewZone(zone string) *Zone {
 // MakePrimary enables Primary, disables Secondary, and sets primary's
 // Secondaries to all provided ZoneSecondaryServers
 func (z *Zone) MakePrimary(secondaries ...ZoneSecondaryServer) {
-	z.Secondary = nil
+	z.Secondary = &ZoneSecondary{Enabled: false}
 	z.Primary = &ZonePrimary{
 		Enabled:     true,
 		Secondaries: secondaries,

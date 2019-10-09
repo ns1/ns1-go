@@ -47,6 +47,10 @@ func ExampleZone_MakePrimary() {
 	//         "notify": true
 	//       }
 	//     ]
+	//   },
+	//   "secondary": {
+	//     "error": null,
+	//     "enabled": false
 	//   }
 	// }
 
