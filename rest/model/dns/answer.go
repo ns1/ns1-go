@@ -25,36 +25,34 @@ type Answer struct {
 	RegionName string `json:"region,omitempty"`
 }
 
-// UnmarshalJSON parses responses to Answer and attempts to convert Rdata elements to string
-func (a *Answer) UnmarshalJSON(b []byte) error {
-	type TempAnswer struct {
-		ID         string        `json:"id,omitempty"`
-		Meta       *data.Meta    `json:"meta,omitempty"`
-		Rdata      []interface{} `json:"answer"`
-		RegionName string        `json:"region,omitempty"`
+// UnmarshalJSON parses responses to Answer and attempts to convert Rdata
+// elements to string.
+func (a *Answer) UnmarshalJSON(data []byte) error {
+	type Alias Answer
+	aux := &struct {
+		Rdata []interface{} `json:"answer"`
+		*Alias
+	}{
+		Alias: (*Alias)(a),
 	}
-	var temp TempAnswer
-
-	if err := json.Unmarshal(b, &temp); err != nil {
+	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 
-	a.ID = temp.ID
-	a.Meta = temp.Meta
-	a.RegionName = temp.RegionName
-
-	var rd []string
-	for _, record := range temp.Rdata {
+	var rdata []string
+	for _, record := range aux.Rdata {
 		switch v := record.(type) {
 		case string:
-			rd = append(rd, v)
+			rdata = append(rdata, v)
 		case float64:
-			rd = append(rd, strconv.Itoa(int(v)))
+			rdata = append(rdata, strconv.Itoa(int(v)))
 		default:
-			return fmt.Errorf("Could not unmarshal Rdata value %v (type %T) as type string", v, v)
+			return fmt.Errorf(
+				"Could not unmarshal Rdata value %[1]v (type %[1]T) as type string", v,
+			)
 		}
 	}
-	a.Rdata = rd
+	a.Rdata = rdata
 
 	return nil
 }
