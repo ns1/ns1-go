@@ -26,6 +26,16 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 		return nil, resp, err
 	}
 
+	// Handle pagination
+	nextURI := ParseLink(resp.Header.Get("Link")).Next()
+	for nextURI != "" {
+		nextResp, err := s.nextZones(&zl, nextURI)
+		if err != nil {
+			return nil, resp, err
+		}
+		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
+	}
+
 	return zl, resp, nil
 }
 
@@ -52,7 +62,49 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 		return nil, resp, err
 	}
 
+	nextURI := ParseLink(resp.Header.Get("Link")).Next()
+	for nextURI != "" {
+		nextResp, err := s.nextRecords(&z, nextURI)
+		if err != nil {
+			return nil, resp, err
+		}
+		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
+	}
+
 	return &z, resp, nil
+}
+
+func (s *ZonesService) nextZones(zl *[]*dns.Zone, uri string) (*http.Response, error) {
+	req, err := s.client.NewRequest("GET", uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	tmpZl := []*dns.Zone{}
+	resp, err := s.client.Do(req, &tmpZl)
+	if err != nil {
+		return nil, err
+	}
+	for z := range tmpZl {
+		*zl = append(*zl, tmpZl[z])
+	}
+	return resp, nil
+}
+
+func (s *ZonesService) nextRecords(z *dns.Zone, uri string) (*http.Response, error) {
+	req, err := s.client.NewRequest("GET", uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	var tmpZone dns.Zone
+	resp, err := s.client.Do(req, &tmpZone)
+	if err != nil {
+		return nil, err
+	}
+	// Aside from Records, the rest of the zone data stays the same
+	for r := range tmpZone.Records {
+		z.Records = append(z.Records, tmpZone.Records[r])
+	}
+	return resp, nil
 }
 
 // Create takes a *Zone and creates a new DNS zone.
