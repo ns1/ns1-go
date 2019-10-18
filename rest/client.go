@@ -46,6 +46,9 @@ type Client struct {
 	// Func to call after response is returned in Do
 	RateLimitFunc func(RateLimit)
 
+	// Whether the client should handle paginated responses automatically.
+	FollowPagination bool
+
 	// From the excellent github-go client.
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
@@ -74,10 +77,11 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	}
 
 	c := &Client{
-		httpClient:    httpClient,
-		Endpoint:      endpoint,
-		RateLimitFunc: defaultRateLimitFunc,
-		UserAgent:     defaultUserAgent,
+		httpClient:       httpClient,
+		Endpoint:         endpoint,
+		RateLimitFunc:    defaultRateLimitFunc,
+		UserAgent:        defaultUserAgent,
+		FollowPagination: true,
 	}
 
 	c.common.client = c
@@ -128,6 +132,11 @@ func SetUserAgent(ua string) func(*Client) {
 // SetRateLimitFunc sets a Client instances' RateLimitFunc.
 func SetRateLimitFunc(ratefunc func(rl RateLimit)) func(*Client) {
 	return func(c *Client) { c.RateLimitFunc = ratefunc }
+}
+
+// SetFollowPagination sets a Client instances' FollowPagination attribute.
+func SetFollowPagination(shouldFollow bool) func(*Client) {
+	return func(c *Client) { c.FollowPagination = shouldFollow }
 }
 
 // Do satisfies the Doer interface.

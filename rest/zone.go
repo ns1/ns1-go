@@ -26,14 +26,16 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 		return nil, resp, err
 	}
 
-	// Handle pagination
-	nextURI := ParseLink(resp.Header.Get("Link")).Next()
-	for nextURI != "" {
-		nextResp, err := s.nextZones(&zl, nextURI)
-		if err != nil {
-			return nil, resp, err
+	if s.client.FollowPagination == true {
+		// Handle pagination
+		nextURI := ParseLink(resp.Header.Get("Link")).Next()
+		for nextURI != "" {
+			nextResp, err := s.nextZones(&zl, nextURI)
+			if err != nil {
+				return nil, resp, err
+			}
+			nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
 		}
-		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
 	}
 
 	return zl, resp, nil
@@ -62,13 +64,16 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 		return nil, resp, err
 	}
 
-	nextURI := ParseLink(resp.Header.Get("Link")).Next()
-	for nextURI != "" {
-		nextResp, err := s.nextRecords(&z, nextURI)
-		if err != nil {
-			return nil, resp, err
+	if s.client.FollowPagination == true {
+		// Handle pagination
+		nextURI := ParseLink(resp.Header.Get("Link")).Next()
+		for nextURI != "" {
+			nextResp, err := s.nextRecords(&z, nextURI)
+			if err != nil {
+				return nil, resp, err
+			}
+			nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
 		}
-		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
 	}
 
 	return &z, resp, nil
@@ -100,7 +105,8 @@ func (s *ZonesService) nextRecords(z *dns.Zone, uri string) (*http.Response, err
 	if err != nil {
 		return nil, err
 	}
-	// Aside from Records, the rest of the zone data stays the same
+	// Aside from Records, the rest of the zone data is identical in the
+	// paginated response.
 	for r := range tmpZone.Records {
 		z.Records = append(z.Records, tmpZone.Records[r])
 	}
