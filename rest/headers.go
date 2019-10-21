@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -55,7 +56,13 @@ func ParseLink(s string) Links {
 
 		pieces := linkMatches[0]
 
-		link := &Link{URI: pieces[1], Extra: map[string]string{}}
+		// Make sure we have a reasonable URL
+		uri := ""
+		if _, err := url.ParseRequestURI(pieces[1]); err == nil {
+			uri = pieces[1]
+		}
+
+		link := &Link{URI: uri, Extra: map[string]string{}}
 
 		for _, extra := range semiRegexp.Split(pieces[2], -1) {
 			vals := equalRegexp.Split(extra, -1)

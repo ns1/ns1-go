@@ -21,21 +21,14 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 	}
 
 	zl := []*dns.Zone{}
-	resp, err := s.client.Do(req, &zl)
+	var resp *http.Response
+	if s.client.FollowPagination == true {
+		resp, err = s.client.DoWithPagination(req, &zl, s.nextZones)
+	} else {
+		resp, err = s.client.Do(req, &zl)
+	}
 	if err != nil {
 		return nil, resp, err
-	}
-
-	if s.client.FollowPagination == true {
-		// Handle pagination
-		nextURI := ParseLink(resp.Header.Get("Link")).Next()
-		for nextURI != "" {
-			nextResp, err := s.nextZones(&zl, nextURI)
-			if err != nil {
-				return nil, resp, err
-			}
-			nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
-		}
 	}
 
 	return zl, resp, nil
@@ -53,7 +46,12 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 	}
 
 	var z dns.Zone
-	resp, err := s.client.Do(req, &z)
+	var resp *http.Response
+	if s.client.FollowPagination == true {
+		resp, err = s.client.DoWithPagination(req, &z, s.nextRecords)
+	} else {
+		resp, err = s.client.Do(req, &z)
+	}
 	if err != nil {
 		switch err.(type) {
 		case *Error:
@@ -64,52 +62,32 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 		return nil, resp, err
 	}
 
-	if s.client.FollowPagination == true {
-		// Handle pagination
-		nextURI := ParseLink(resp.Header.Get("Link")).Next()
-		for nextURI != "" {
-			nextResp, err := s.nextRecords(&z, nextURI)
-			if err != nil {
-				return nil, resp, err
-			}
-			nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
-		}
-	}
-
 	return &z, resp, nil
 }
 
-func (s *ZonesService) nextZones(zl *[]*dns.Zone, uri string) (*http.Response, error) {
-	req, err := s.client.NewRequest("GET", uri, nil)
-	if err != nil {
-		return nil, err
-	}
+// gets and appends another list of zones to the passed list
+func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, error) {
 	tmpZl := []*dns.Zone{}
-	resp, err := s.client.Do(req, &tmpZl)
+	resp, err := s.client.getURI(&tmpZl, uri)
 	if err != nil {
 		return nil, err
 	}
-	for z := range tmpZl {
-		*zl = append(*zl, tmpZl[z])
-	}
+	zoneList := (*v).(*[]*dns.Zone)
+	*zoneList = append(*zoneList, tmpZl...)
 	return resp, nil
 }
 
-func (s *ZonesService) nextRecords(z *dns.Zone, uri string) (*http.Response, error) {
-	req, err := s.client.NewRequest("GET", uri, nil)
-	if err != nil {
-		return nil, err
-	}
+// gets and appends another set of records to the passed zone
+func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, error) {
 	var tmpZone dns.Zone
-	resp, err := s.client.Do(req, &tmpZone)
+	resp, err := s.client.getURI(&tmpZone, uri)
 	if err != nil {
 		return nil, err
 	}
+	zone := (*v).(*dns.Zone)
 	// Aside from Records, the rest of the zone data is identical in the
 	// paginated response.
-	for r := range tmpZone.Records {
-		z.Records = append(z.Records, tmpZone.Records[r])
-	}
+	zone.Records = append(zone.Records, tmpZone.Records...)
 	return resp, nil
 }
 
