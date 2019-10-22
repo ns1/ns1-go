@@ -12,9 +12,11 @@ import (
 )
 
 const (
-	clientVersion    = "2.0.0"
-	defaultEndpoint  = "https://api.nsone.net/v1/"
-	defaultUserAgent = "go-ns1/" + clientVersion
+	clientVersion = "2.0.0"
+
+	defaultEndpoint               = "https://api.nsone.net/v1/"
+	defaultShouldFollowPagination = true
+	defaultUserAgent              = "go-ns1/" + clientVersion
 
 	headerAuth          = "X-NSONE-Key"
 	headerRateLimit     = "X-Ratelimit-Limit"
@@ -46,6 +48,9 @@ type Client struct {
 	// Func to call after response is returned in Do
 	RateLimitFunc func(RateLimit)
 
+	// Whether the client should handle paginated responses automatically.
+	FollowPagination bool
+
 	// From the excellent github-go client.
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
@@ -74,10 +79,11 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	}
 
 	c := &Client{
-		httpClient:    httpClient,
-		Endpoint:      endpoint,
-		RateLimitFunc: defaultRateLimitFunc,
-		UserAgent:     defaultUserAgent,
+		httpClient:       httpClient,
+		Endpoint:         endpoint,
+		RateLimitFunc:    defaultRateLimitFunc,
+		UserAgent:        defaultUserAgent,
+		FollowPagination: defaultShouldFollowPagination,
 	}
 
 	c.common.client = c
@@ -130,6 +136,11 @@ func SetRateLimitFunc(ratefunc func(rl RateLimit)) func(*Client) {
 	return func(c *Client) { c.RateLimitFunc = ratefunc }
 }
 
+// SetFollowPagination sets a Client instances' FollowPagination attribute.
+func SetFollowPagination(shouldFollow bool) func(*Client) {
+	return func(c *Client) { c.FollowPagination = shouldFollow }
+}
+
 // Do satisfies the Doer interface.
 func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
@@ -154,6 +165,27 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	return resp, err
+}
+
+// NextFunc knows how to get and parse additional info from uri into v.
+type NextFunc func(v *interface{}, uri string) (*http.Response, error)
+
+// DoWithPagination Does, and follows Link headers for pagination. Preserves
+// and returns the _first_ http.Response (to match Do).
+func (c Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (*http.Response, error) {
+	resp, err := c.Do(req, v)
+	if err != nil {
+		return nil, err
+	}
+	nextURI := ParseLink(resp.Header.Get("Link")).Next()
+	for nextURI != "" {
+		nextResp, err := f(&v, nextURI)
+		if err != nil {
+			return nil, err
+		}
+		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
+	}
+	return resp, nil
 }
 
 // NewRequest constructs and returns a http.Request.
@@ -308,4 +340,16 @@ func SetStringParam(key, val string) func(*url.Values) {
 // SetIntParam sets a url integer query param given the parameters name.
 func SetIntParam(key string, val int) func(*url.Values) {
 	return func(v *url.Values) { v.Set(key, strconv.Itoa(val)) }
+}
+
+func (c *Client) getURI(v interface{}, uri string) (*http.Response, error) {
+	req, err := c.NewRequest("GET", uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(req, v)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
