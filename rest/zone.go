@@ -65,32 +65,6 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 	return &z, resp, nil
 }
 
-// gets and appends another list of zones to the passed list
-func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, error) {
-	tmpZl := []*dns.Zone{}
-	resp, err := s.client.getURI(&tmpZl, uri)
-	if err != nil {
-		return nil, err
-	}
-	zoneList := (*v).(*[]*dns.Zone)
-	*zoneList = append(*zoneList, tmpZl...)
-	return resp, nil
-}
-
-// gets and appends another set of records to the passed zone
-func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, error) {
-	var tmpZone dns.Zone
-	resp, err := s.client.getURI(&tmpZone, uri)
-	if err != nil {
-		return nil, err
-	}
-	zone := (*v).(*dns.Zone)
-	// Aside from Records, the rest of the zone data is identical in the
-	// paginated response.
-	zone.Records = append(zone.Records, tmpZone.Records...)
-	return resp, nil
-}
-
 // Create takes a *Zone and creates a new DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
@@ -165,6 +139,44 @@ func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 		return resp, err
 	}
 
+	return resp, nil
+}
+
+// nextZones is a pagination helper than gets and appends another list of zones
+// to the passed list.
+func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, error) {
+	tmpZl := []*dns.Zone{}
+	resp, err := s.client.getURI(&tmpZl, uri)
+	if err != nil {
+		return nil, err
+	}
+	zoneList, ok := (*v).(*[]*dns.Zone)
+	if !ok {
+		return nil, fmt.Errorf(
+			"incorrect value for v, expected value of type *[]*dns.Zone, got: %T", v,
+		)
+	}
+	*zoneList = append(*zoneList, tmpZl...)
+	return resp, nil
+}
+
+// nextRecords is a pagination helper tha gets and appends another set of
+// records to the passed zone.
+func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, error) {
+	var tmpZone dns.Zone
+	resp, err := s.client.getURI(&tmpZone, uri)
+	if err != nil {
+		return nil, err
+	}
+	zone, ok := (*v).(*dns.Zone)
+	if !ok {
+		return nil, fmt.Errorf(
+			"incorrect value for v, expected value of type *dns.Zone, got: %T", v,
+		)
+	}
+	// Aside from Records, the rest of the zone data is identical in the
+	// paginated response.
+	zone.Records = append(zone.Records, tmpZone.Records...)
 	return resp, nil
 }
 

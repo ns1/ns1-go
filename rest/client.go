@@ -142,7 +142,7 @@ func SetFollowPagination(shouldFollow bool) func(*Client) {
 }
 
 // Do satisfies the Doer interface.
-func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -167,11 +167,12 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	return resp, err
 }
 
-// nextFunc knows how to get and parse additional info from uri into v.
-type nextFunc func(v *interface{}, uri string) (*http.Response, error)
+// NextFunc knows how to get and parse additional info from uri into v.
+type NextFunc func(v *interface{}, uri string) (*http.Response, error)
 
-// DoWithPagination Does, and follows Link headers for pagination.
-func (c Client) DoWithPagination(req *http.Request, v interface{}, f nextFunc) (*http.Response, error) {
+// DoWithPagination Does, and follows Link headers for pagination. Preserves
+// and returns the _first_ http.Response (to match Do).
+func (c *Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (*http.Response, error) {
 	resp, err := c.Do(req, v)
 	if err != nil {
 		return nil, err
