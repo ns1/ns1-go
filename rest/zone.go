@@ -148,7 +148,7 @@ func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, er
 	tmpZl := []*dns.Zone{}
 	resp, err := s.client.getURI(&tmpZl, uri)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	zoneList, ok := (*v).(*[]*dns.Zone)
 	if !ok {
@@ -166,7 +166,7 @@ func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, 
 	var tmpZone dns.Zone
 	resp, err := s.client.getURI(&tmpZone, uri)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	zone, ok := (*v).(*dns.Zone)
 	if !ok {

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -9,13 +10,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPagination_zoneList(t *testing.T) {
+func TestZone_list_pagination(t *testing.T) {
 	// It should follow Links and gather all Zones into the list
-	testServer := mockAPI(t)
+	testServer := mockAPI(t, responseMap{"/zones": handleZoneList})
 	doer := testServer.Client()
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
-	zones, _, _ := client.Zones.List()
+	zones, resp, err := client.Zones.List()
+	assert.Nil(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
 
 	expected := []string{
 		"example.com",
@@ -23,20 +26,21 @@ func TestPagination_zoneList(t *testing.T) {
 		"example.org",
 		"example.io",
 	}
-
 	assert.Equal(t, 4, len(zones))
 	for idx := range zones {
 		assert.Equal(t, expected[idx], zones[idx].Zone)
 	}
 }
 
-func TestPagination_zoneRecords(t *testing.T) {
+func TestZone_get_pagination(t *testing.T) {
 	// It should follow Links and gather all Records into the Zone
-	testServer := mockAPI(t)
+	testServer := mockAPI(t, responseMap{"/zones/coolzone.cool": handleZoneGet})
 	doer := testServer.Client()
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
-	zone, _, _ := client.Zones.Get("coolzone.cool")
+	zone, resp, err := client.Zones.Get("coolzone.cool")
+	assert.Nil(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
 
 	expected := []string{
 		"a.coolzone.cool",
@@ -44,21 +48,24 @@ func TestPagination_zoneRecords(t *testing.T) {
 		"c.coolzone.cool",
 		"d.coolzone.cool",
 	}
-
 	assert.Equal(t, "coolzone.cool", zone.Zone)
 	assert.Equal(t, 4, len(zone.Records))
 	for idx := range zone.Records {
 		assert.Equal(t, expected[idx],  zone.Records[idx].Domain)
 	}
+
 }
 
-func TestPagination_disabled(t *testing.T) {
+func TestZone_pagination_disabled(t *testing.T) {
 	// It should not follow Links
-	testServer := mockAPI(t)
+	testServer := mockAPI(t, responseMap{"/zones": handleZoneList, "/zones/coolzone.cool": handleZoneGet})
 	doer := testServer.Client()
 	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
 
-	zones, _, _ := client.Zones.List()
+	zones, resp, err := client.Zones.List()
+	assert.Nil(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
+
 	expected := []string{
 		"example.com",
 		"coolzone.cool",
@@ -68,7 +75,10 @@ func TestPagination_disabled(t *testing.T) {
 		assert.Equal(t, expected[idx], zones[idx].Zone)
 	}
 
-	zone, _, _ := client.Zones.Get("coolzone.cool")
+	zone, resp, err := client.Zones.Get("coolzone.cool")
+	assert.Nil(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
+
 	expected = []string{
 		"a.coolzone.cool",
 		"b.coolzone.cool",
@@ -80,9 +90,36 @@ func TestPagination_disabled(t *testing.T) {
 	}
 }
 
-func mockAPI(t *testing.T) *httptest.Server {
+func TestZone_http_errors(t *testing.T) {
+	// It should have a non-nil resp with HTTP Errors, and
+	// it should have a JSON error if the response body cannot be parsed as JSON
+	testServer := mockAPI(t, responseMap{
+		"/zones": func(res http.ResponseWriter, req *http.Request) error {
+			res.WriteHeader(429)
+			res.Write([]byte("{}"))
+			return nil
+		},
+		"/zones/coolzone.cool": func(res http.ResponseWriter, req *http.Request) error {
+			res.WriteHeader(500)
+			res.Write([]byte("Internal Server Error"))
+			return nil
+		},
+	})
+	doer := testServer.Client()
+	client := NewClient(doer, SetEndpoint(testServer.URL))
 
-	const zoneListPath = "/zones"
+	zones, resp, err := client.Zones.List()
+	assert.IsType(t, &Error{}, err)
+	assert.Equal(t, 429, resp.StatusCode)
+	assert.Nil(t, zones)
+
+	zone, resp, err := client.Zones.Get("coolzone.cool")
+	assert.IsType(t, &json.SyntaxError{}, err)
+	assert.Equal(t, 500, resp.StatusCode)
+	assert.Nil(t, zone)
+}
+
+func handleZoneList(res http.ResponseWriter, req *http.Request) error {
 	const zoneListQuery = "?after=coolzone.cool&limit=2"
 	var zoneListLinkHeader = fmt.Sprintf(`</zones?%s>; rel="next"`, zoneListQuery)
 	const zoneListPageOne = `[
@@ -93,8 +130,21 @@ func mockAPI(t *testing.T) *httptest.Server {
     {"zone": "example.org"},
     {"zone": "example.io"}
   ]`
+	var body string
+	if req.URL.RawQuery == "" {
+		res.Header().Set("Link", zoneListLinkHeader)
+		body = zoneListPageOne
+	} else if req.URL.RawQuery == zoneListQuery {
+		body = zoneListPageTwo
+	} else {
+		return fmt.Errorf("unhandled query: %s", req.URL.RawQuery)
+	}
+	res.WriteHeader(200)
+	res.Write([]byte(body))
+	return nil
+}
 
-	const zoneGetPath = "/zones/coolzone.cool"
+func handleZoneGet(res http.ResponseWriter, req *http.Request) error {
 	const zoneGetQuery = "after=b.coolzone.cool&limit=2"
 	var zoneGetLinkHeader = fmt.Sprintf(
 		`</zones/coolzone.cool?%s>; rel="next"`, zoneGetQuery,
@@ -125,38 +175,31 @@ func mockAPI(t *testing.T) *httptest.Server {
       "type":"A"
     }]
   }`
-
-	handler := func(res http.ResponseWriter, req *http.Request) {
-		var body string
-		switch path := req.URL.Path; path {
-
-			case zoneListPath:
-				if req.URL.RawQuery == "" {
-					res.Header().Set("Link", zoneListLinkHeader)
-					body = zoneListPageOne
-				} else if req.URL.RawQuery == zoneListQuery {
-					body = zoneListPageTwo
-				} else {
-					t.Fatalf("unexpected query: %s", req.URL.RawQuery)
-				}
-
-			case zoneGetPath:
-				if req.URL.RawQuery == "" {
-					res.Header().Set("Link", zoneGetLinkHeader)
-					body = zoneGetPageOne
-				} else if req.URL.RawQuery == zoneGetQuery {
-					body = zoneGetPageTwo
-				} else {
-					t.Fatalf("unexpected query: %s", req.URL.RawQuery)
-				}
-
-			default:
-				t.Fatalf("should not hit default case")
-
-		}
-		res.WriteHeader(200)
-		res.Write([]byte(body))
+	var body string
+	if req.URL.RawQuery == "" {
+		res.Header().Set("Link", zoneGetLinkHeader)
+		body = zoneGetPageOne
+	} else if req.URL.RawQuery == zoneGetQuery {
+		body = zoneGetPageTwo
+	} else {
+		return fmt.Errorf("unhandled query: %s", req.URL.RawQuery)
 	}
+	res.WriteHeader(200)
+	res.Write([]byte(body))
+	return nil
+}
 
+type responseMap map[string]func(res http.ResponseWriter, req *http.Request) error
+
+func mockAPI(t *testing.T, rm responseMap) *httptest.Server {
+	handler := func(res http.ResponseWriter, req *http.Request) {
+		if handler, ok := rm[req.URL.Path]; ok {
+			if err := handler(res, req); err != nil {
+				t.Fatalf(err.Error())
+			}
+		} else {
+			t.Fatalf("unhandled path %s", req.URL.Path)
+		}
+	}
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
