@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -17,8 +18,8 @@ func TestZone_list_pagination(t *testing.T) {
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
 	zones, resp, err := client.Zones.List()
-	assert.Nil(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	assert.NoError(t, err, "expected no error")
+	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
 
 	expected := []string{
 		"example.com",
@@ -26,9 +27,9 @@ func TestZone_list_pagination(t *testing.T) {
 		"example.org",
 		"example.io",
 	}
-	assert.Equal(t, 4, len(zones))
+	assert.Equal(t, 4, len(zones), "found wrong number of zones")
 	for idx := range zones {
-		assert.Equal(t, expected[idx], zones[idx].Zone)
+		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
 	}
 }
 
@@ -39,8 +40,8 @@ func TestZone_get_pagination(t *testing.T) {
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
 	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.Nil(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	assert.NoError(t, err, "expected no error")
+	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
 
 	expected := []string{
 		"a.coolzone.cool",
@@ -48,8 +49,8 @@ func TestZone_get_pagination(t *testing.T) {
 		"c.coolzone.cool",
 		"d.coolzone.cool",
 	}
-	assert.Equal(t, "coolzone.cool", zone.Zone)
-	assert.Equal(t, 4, len(zone.Records))
+	assert.Equal(t, "coolzone.cool", zone.Zone, "zone.Zone does not match")
+	assert.Equal(t, 4, len(zone.Records), "found wrong number of records")
 	for idx := range zone.Records {
 		assert.Equal(t, expected[idx],  zone.Records[idx].Domain)
 	}
@@ -63,8 +64,8 @@ func TestZone_pagination_disabled(t *testing.T) {
 	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
 
 	zones, resp, err := client.Zones.List()
-	assert.Nil(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	assert.NoError(t, err, "expected no error")
+	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
 
 	expected := []string{
 		"example.com",
@@ -72,27 +73,30 @@ func TestZone_pagination_disabled(t *testing.T) {
 	}
 	assert.Equal(t, 2, len(zones))
 	for idx := range zones {
-		assert.Equal(t, expected[idx], zones[idx].Zone)
+		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
 	}
 
 	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.Nil(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	assert.NoError(t, err, "expected no error")
+	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
 
 	expected = []string{
 		"a.coolzone.cool",
 		"b.coolzone.cool",
 	}
-	assert.Equal(t, "coolzone.cool", zone.Zone)
-	assert.Equal(t, 2, len(zone.Records))
+	assert.Equal(t, "coolzone.cool", zone.Zone, "zone.Zone does not match")
+	assert.Equal(t, 2, len(zone.Records), "found wrong number of records")
 	for idx := range zone.Records {
-		assert.Equal(t, expected[idx],  zone.Records[idx].Domain)
+		assert.Equal(
+			t, expected[idx],  zone.Records[idx].Domain, "record.Domain does not match",
+		)
 	}
 }
 
 func TestZone_http_errors(t *testing.T) {
 	// It should have a non-nil resp with HTTP Errors, and
-	// it should have a JSON error if the response body cannot be parsed as JSON
+	// it should have a JSON error if the response body cannot be parsed as JSON,
+	// regardless of pagination.
 	testServer := mockAPI(t, responseMap{
 		"/zones": func(res http.ResponseWriter, req *http.Request) error {
 			res.WriteHeader(429)
@@ -109,14 +113,43 @@ func TestZone_http_errors(t *testing.T) {
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
 	zones, resp, err := client.Zones.List()
-	assert.IsType(t, &Error{}, err)
-	assert.Equal(t, 429, resp.StatusCode)
-	assert.Nil(t, zones)
+	assert.IsType(t, &Error{}, err, "error type does not match")
+	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zones, "zones is not nil")
 
 	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.IsType(t, &json.SyntaxError{}, err)
-	assert.Equal(t, 500, resp.StatusCode)
-	assert.Nil(t, zone)
+	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
+	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zone, "zone is not nil")
+
+	client = NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
+
+	zones, resp, err = client.Zones.List()
+	assert.IsType(t, &Error{}, err, "error type does not match")
+	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zones, "zones is not nil")
+
+	zone, resp, err = client.Zones.Get("coolzone.cool")
+	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
+	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zone, "zone is not nil")
+}
+
+func TestZone_nonhttp_errors(t *testing.T) {
+	// it should have a nil resp on non-HTTP error, regardless of pagination.
+	client := NewClient(errorClient{}, SetEndpoint(""))
+
+	zones, resp, err := client.Zones.List()
+	assert.Nil(t, resp, "resp is not nil")
+	assert.Error(t, err, "error was expected")
+	assert.Nil(t, zones, "zones is not nil")
+
+	client = NewClient(errorClient{}, SetEndpoint(""), SetFollowPagination(false))
+
+	zone, resp, err := client.Zones.Get("coolzone.cool")
+	assert.Nil(t, resp, "resp is not nil")
+	assert.Error(t, err, "error was expected")
+	assert.Nil(t, zone, "zone is not nil")
 }
 
 func handleZoneList(res http.ResponseWriter, req *http.Request) error {
@@ -202,4 +235,10 @@ func mockAPI(t *testing.T, rm responseMap) *httptest.Server {
 		}
 	}
 	return httptest.NewServer(http.HandlerFunc(handler))
+}
+
+type errorClient struct {}
+
+func (c errorClient) Do(req *http.Request) (*http.Response, error) {
+	return nil, errors.New("oops")
 }

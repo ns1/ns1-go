@@ -141,7 +141,9 @@ func SetFollowPagination(shouldFollow bool) func(*Client) {
 	return func(c *Client) { c.FollowPagination = shouldFollow }
 }
 
-// Do satisfies the Doer interface.
+// Do satisfies the Doer interface. resp will be nil if a non-HTTP error
+// occurs, otherwise it is available for inspection when the error reflects a
+// non-2XX response.
 func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -172,7 +174,8 @@ type NextFunc func(v *interface{}, uri string) (*http.Response, error)
 
 // DoWithPagination Does, and follows Link headers for pagination. The returned
 // Response is from the last URI visited - either the last page, or one that
-// responded with a non-2XX status.
+// responded with a non-2XX status. If a non-HTTP error occurs, resp will be
+// nil.
 func (c Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (*http.Response, error) {
 	resp, err := c.Do(req, v)
 	if err != nil {
