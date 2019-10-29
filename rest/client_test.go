@@ -90,7 +90,7 @@ func TestClient_DoWithHTTPClientError(t *testing.T) {
 }
 
 func TestClient_DoWithNon2XXResponse(t *testing.T) {
-	// It should return a pointer to the response, and a poiner to Error (with
+	// It should return a pointer to the response, and a pointer to Error (with
 	// the response)
 	httpClient := mockHTTPClient{}
 	client := NewClient(&httpClient, SetEndpoint(""))
@@ -157,6 +157,43 @@ func TestClient_DoWithPagination(t *testing.T) {
 
 	assert.Equal(t, &nextResp, resp)
 	assert.Nil(t, err)
+}
+
+func TestClient_getURI(t *testing.T) {
+	// It should delegate to client.Do
+	httpClient := mockHTTPClient{}
+	client := NewClient(&httpClient, SetEndpoint(""))
+
+	mockResp := http.Response{
+		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		StatusCode: 200,
+	}
+	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
+
+	var v interface{}
+	resp, err := client.getURI(v, "http://example.com")
+
+	assert.Equal(t, &mockResp, resp)
+	assert.Nil(t, err)
+}
+
+func TestClient_getURIWithNon2XXResponse(t *testing.T) {
+	// It should return a pointer to the response, and a pointer to Error (with
+	// the response
+	httpClient := mockHTTPClient{}
+	client := NewClient(&httpClient, SetEndpoint(""))
+
+	mockResp := http.Response{
+		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		StatusCode: 418,
+	}
+	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
+
+	var v interface{}
+	resp, err := client.getURI(v, "http://example.com")
+
+	assert.Equal(t, &mockResp, resp)
+	assert.Equal(t, &Error{Resp: &mockResp}, err)
 }
 
 type mockHTTPClient struct {
