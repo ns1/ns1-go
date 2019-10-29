@@ -141,7 +141,9 @@ func SetFollowPagination(shouldFollow bool) func(*Client) {
 	return func(c *Client) { c.FollowPagination = shouldFollow }
 }
 
-// Do satisfies the Doer interface.
+// Do satisfies the Doer interface. resp will be nil if a non-HTTP error
+// occurs, otherwise it is available for inspection when the error reflects a
+// non-2XX response.
 func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -170,20 +172,22 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 // NextFunc knows how to get and parse additional info from uri into v.
 type NextFunc func(v *interface{}, uri string) (*http.Response, error)
 
-// DoWithPagination Does, and follows Link headers for pagination. Preserves
-// and returns the _first_ http.Response (to match Do).
+// DoWithPagination Does, and follows Link headers for pagination. The returned
+// Response is from the last URI visited - either the last page, or one that
+// responded with a non-2XX status. If a non-HTTP error occurs, resp will be
+// nil.
 func (c Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (*http.Response, error) {
 	resp, err := c.Do(req, v)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	nextURI := ParseLink(resp.Header.Get("Link")).Next()
 	for nextURI != "" {
-		nextResp, err := f(&v, nextURI)
+		resp, err = f(&v, nextURI)
 		if err != nil {
-			return nil, err
+			return resp, err
 		}
-		nextURI = ParseLink(nextResp.Header.Get("Link")).Next()
+		nextURI = ParseLink(resp.Header.Get("Link")).Next()
 	}
 	return resp, nil
 }
@@ -347,9 +351,7 @@ func (c *Client) getURI(v interface{}, uri string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Do(req, v)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	// For non-2XX responses, Do returns the response as well as an error, for
+	// other errs, resp will be nil. Caller's responsibility to sort that out.
+	return c.Do(req, v)
 }
