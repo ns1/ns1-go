@@ -38,6 +38,7 @@ func (l Links) Next() string {
 
 // ParseLink parses a Link header value into a Links, mainly cribbed from:
 // https://github.com/peterhellberg/link/blob/master/link.go
+// The forceHTTPS parameter will rewrite any HTTP URLs it finds to HTTPS.
 func ParseLink(s string, forceHTTPS bool) Links {
 	if s == "" {
 		return nil
