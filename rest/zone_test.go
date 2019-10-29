@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestZone_list_pagination(t *testing.T) {
+func TestZone_List(t *testing.T) {
 	// It should follow Links and gather all Zones into the list
 	testServer := mockAPI(t, responseMap{"/zones": handleZoneList})
 	doer := testServer.Client()
@@ -33,7 +33,70 @@ func TestZone_list_pagination(t *testing.T) {
 	}
 }
 
-func TestZone_get_pagination(t *testing.T) {
+func TestZone_ListWithPaginationDisabled(t *testing.T) {
+	// It should not follow Links
+	testServer := mockAPI(t, responseMap{"/zones": handleZoneList})
+	doer := testServer.Client()
+	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
+
+	zones, resp, err := client.Zones.List()
+	assert.NoError(t, err, "expected no error")
+	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
+
+	expected := []string{
+		"example.com",
+		"coolzone.cool",
+	}
+	assert.Equal(t, 2, len(zones))
+	for idx := range zones {
+		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
+	}
+}
+
+func TestZone_ListWithHTTPErrors(t *testing.T) {
+	// It should have a non-nil resp, and it should have a JSON error if the
+	// response body cannot be parsed as JSON, regardless of pagination.
+	testServer := mockAPI(t, responseMap{
+		"/zones": func(res http.ResponseWriter, req *http.Request) error {
+			res.WriteHeader(429)
+			res.Write([]byte("{}"))
+			return nil
+		},
+	})
+	doer := testServer.Client()
+	client := NewClient(doer, SetEndpoint(testServer.URL))
+
+	zones, resp, err := client.Zones.List()
+	assert.IsType(t, &Error{}, err, "error type does not match")
+	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zones, "zones is not nil")
+
+	client = NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
+
+	zones, resp, err = client.Zones.List()
+	assert.IsType(t, &Error{}, err, "error type does not match")
+	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
+	assert.Nil(t, zones, "zones is not nil")
+}
+
+func TestZone_ListWithNonHTTPErrors(t *testing.T) {
+	// it should have a nil resp, regardless of pagination.
+	client := NewClient(errorClient{}, SetEndpoint(""))
+
+	zones, resp, err := client.Zones.List()
+	assert.Nil(t, resp, "resp is not nil")
+	assert.Error(t, err, "error was expected")
+	assert.Nil(t, zones, "zones is not nil")
+
+	client = NewClient(errorClient{}, SetEndpoint(""), SetFollowPagination(false))
+
+	zones, resp, err = client.Zones.List()
+	assert.Nil(t, resp, "resp is not nil")
+	assert.Error(t, err, "error was expected")
+	assert.Nil(t, zones, "zones is not nil")
+}
+
+func TestZone_Get(t *testing.T) {
 	// It should follow Links and gather all Records into the Zone
 	testServer := mockAPI(t, responseMap{"/zones/coolzone.cool": handleZoneGet})
 	doer := testServer.Client()
@@ -57,30 +120,17 @@ func TestZone_get_pagination(t *testing.T) {
 
 }
 
-func TestZone_pagination_disabled(t *testing.T) {
+func TestZone_GetWithPaginationDisabled(t *testing.T) {
 	// It should not follow Links
-	testServer := mockAPI(t, responseMap{"/zones": handleZoneList, "/zones/coolzone.cool": handleZoneGet})
+	testServer := mockAPI(t, responseMap{"/zones/coolzone.cool": handleZoneGet})
 	doer := testServer.Client()
 	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
-
-	zones, resp, err := client.Zones.List()
-	assert.NoError(t, err, "expected no error")
-	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
-
-	expected := []string{
-		"example.com",
-		"coolzone.cool",
-	}
-	assert.Equal(t, 2, len(zones))
-	for idx := range zones {
-		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
-	}
 
 	zone, resp, err := client.Zones.Get("coolzone.cool")
 	assert.NoError(t, err, "expected no error")
 	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
 
-	expected = []string{
+	expected := []string{
 		"a.coolzone.cool",
 		"b.coolzone.cool",
 	}
@@ -93,16 +143,10 @@ func TestZone_pagination_disabled(t *testing.T) {
 	}
 }
 
-func TestZone_http_errors(t *testing.T) {
-	// It should have a non-nil resp with HTTP Errors, and
-	// it should have a JSON error if the response body cannot be parsed as JSON,
-	// regardless of pagination.
+func TestZone_GetWithHTTPErrors(t *testing.T) {
+	// It should have a non-nil resp, and it should have a JSON error if the
+	// response body cannot be parsed as JSON, regardless of pagination.
 	testServer := mockAPI(t, responseMap{
-		"/zones": func(res http.ResponseWriter, req *http.Request) error {
-			res.WriteHeader(429)
-			res.Write([]byte("{}"))
-			return nil
-		},
 		"/zones/coolzone.cool": func(res http.ResponseWriter, req *http.Request) error {
 			res.WriteHeader(500)
 			res.Write([]byte("Internal Server Error"))
@@ -112,11 +156,6 @@ func TestZone_http_errors(t *testing.T) {
 	doer := testServer.Client()
 	client := NewClient(doer, SetEndpoint(testServer.URL))
 
-	zones, resp, err := client.Zones.List()
-	assert.IsType(t, &Error{}, err, "error type does not match")
-	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zones, "zones is not nil")
-
 	zone, resp, err := client.Zones.Get("coolzone.cool")
 	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
 	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
@@ -124,29 +163,24 @@ func TestZone_http_errors(t *testing.T) {
 
 	client = NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
 
-	zones, resp, err = client.Zones.List()
-	assert.IsType(t, &Error{}, err, "error type does not match")
-	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zones, "zones is not nil")
-
 	zone, resp, err = client.Zones.Get("coolzone.cool")
 	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
 	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
 	assert.Nil(t, zone, "zone is not nil")
 }
 
-func TestZone_nonhttp_errors(t *testing.T) {
-	// it should have a nil resp on non-HTTP error, regardless of pagination.
+func TestZone_GetWithNonHTTPErrors(t *testing.T) {
+	// it should have a nil resp, regardless of pagination.
 	client := NewClient(errorClient{}, SetEndpoint(""))
 
-	zones, resp, err := client.Zones.List()
+	zone, resp, err := client.Zones.Get("coolzone.cool")
 	assert.Nil(t, resp, "resp is not nil")
 	assert.Error(t, err, "error was expected")
-	assert.Nil(t, zones, "zones is not nil")
+	assert.Nil(t, zone, "zone is not nil")
 
 	client = NewClient(errorClient{}, SetEndpoint(""), SetFollowPagination(false))
 
-	zone, resp, err := client.Zones.Get("coolzone.cool")
+	zone, resp, err = client.Zones.Get("coolzone.cool")
 	assert.Nil(t, resp, "resp is not nil")
 	assert.Error(t, err, "error was expected")
 	assert.Nil(t, zone, "zone is not nil")
