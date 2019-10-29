@@ -38,7 +38,7 @@ func (l Links) Next() string {
 
 // ParseLink parses a Link header value into a Links, mainly cribbed from:
 // https://github.com/peterhellberg/link/blob/master/link.go
-func ParseLink(s string) Links {
+func ParseLink(s string, forceHTTPS bool) Links {
 	if s == "" {
 		return nil
 	}
@@ -58,8 +58,14 @@ func ParseLink(s string) Links {
 
 		// Make sure we have a reasonable URL
 		uri := ""
-		if _, err := url.ParseRequestURI(pieces[1]); err == nil {
-			uri = pieces[1]
+		if url, err := url.ParseRequestURI(pieces[1]); err == nil {
+
+			// See PLAT-188
+			if forceHTTPS && url.Scheme == "http" {
+				url.Scheme = "https"
+			}
+
+			uri = url.String()
 		}
 
 		link := &Link{URI: uri, Extra: map[string]string{}}

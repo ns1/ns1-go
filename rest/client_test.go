@@ -159,6 +159,35 @@ func TestClient_DoWithPagination(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestClient_DoWithPaginationForceHTTPS(t *testing.T) {
+	// When the endpoint is HTTPS, it should Force HTTPS when following Link
+	// headers
+	httpClient := mockHTTPClient{}
+	client := NewClient(&httpClient, SetEndpoint("https://"))
+
+	req, _ := http.NewRequest("GET", "https://example.com", new(bytes.Buffer))
+	firstResp := http.Response{
+		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Header: http.Header{"Link": []string{`<http://example.com/?after=1&limit=2>; rel="next"`}},
+		StatusCode: 200,
+	}
+	nextResp := http.Response{
+		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		StatusCode: 200,
+	}
+	var v interface{}
+
+	httpClient.On("Do", req).Return(&firstResp, nil)
+	httpClient.On("nextFunc", &v, "https://example.com/?after=1&limit=2").Return(&nextResp, nil)
+
+	resp, err := client.DoWithPagination(req, v, httpClient.nextFunc)
+
+	httpClient.AssertExpectations(t)
+
+	assert.Equal(t, &nextResp, resp)
+	assert.Nil(t, err)
+}
+
 func TestClient_getURI(t *testing.T) {
 	// It should delegate to client.Do
 	httpClient := mockHTTPClient{}
