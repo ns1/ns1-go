@@ -133,8 +133,9 @@ func TestClient_DoWithNonJSONResponse(t *testing.T) {
 func TestClient_DoWithPagination(t *testing.T) {
 	// It should call nextFunc
 	// It should return the last response without error
+	// It should not set HTTPS on the Link when endpoint is HTTP
 	httpClient := mockHTTPClient{}
-	client := NewClient(&httpClient, SetEndpoint(""))
+	client := NewClient(&httpClient, SetEndpoint("http://"))
 
 	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
 	firstResp := http.Response{
