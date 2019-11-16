@@ -7,8 +7,8 @@
 
 # git gofmt pre-commit hook
 #
-# To use, store as .git/hooks/pre-commit inside your repository and make sure
-# it has execute permissions.
+# To use, execute script/install-git-hooks and all the hooks will
+# by installed via symlink.
 #
 # This script does not handle file names that contain spaces.
 
