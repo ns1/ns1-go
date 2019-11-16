@@ -35,8 +35,8 @@ func (r Record) String() string {
 // NewRecord takes a zone, domain and record type t and creates a *Record with
 // UseClientSubnet: true & empty Answers.
 func NewRecord(zone string, domain string, t string) *Record {
-	domain = removeEnclosingDots(domain)
-	zone = removeEnclosingDots(zone)
+	domain = RemoveEnclosingDots(domain)
+	zone = RemoveEnclosingDots(zone)
 	if !strings.HasSuffix(domain, zone) {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
@@ -85,7 +85,7 @@ func (r *Record) AddFilter(fil *filter.Filter) {
 //
 // In other cases a domain or zone may be passed in with a preceding dot (.)
 // character which would likewise lead the system to fail.
-func removeEnclosingDots(inputString string) string {
+func RemoveEnclosingDots(inputString string) string {
 	if strings.HasSuffix(inputString, ".") {
 		inputString = inputString[0 : len(inputString)-1]
 	}
