@@ -1,0 +1,11 @@
+#!/bin/sh
+
+(
+    cd """$(dirname "$0")""" || exit 1
+    cd .. || exit 1
+    for hook_source in git-hooks/*; do
+        hook_name=$(basename "$hook_source")
+        echo "Linking $hook_name from $hook_source to .git/hooks/$hook_name"
+        ln -sf "git-hooks/$hook_name" ".git/hooks/$hook_name"
+    done
+)
