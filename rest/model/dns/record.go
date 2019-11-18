@@ -35,12 +35,9 @@ func (r Record) String() string {
 // NewRecord takes a zone, domain and record type t and creates a *Record with
 // UseClientSubnet: true & empty Answers.
 func NewRecord(zone string, domain string, t string) *Record {
-	domain = removeEnclosingDots(domain)
-	zone = removeEnclosingDots(zone)
 	if !strings.HasSuffix(domain, zone) {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
-
 	return &Record{
 		Meta:    &data.Meta{},
 		Zone:    zone,
@@ -77,20 +74,4 @@ func (r *Record) AddFilter(fil *filter.Filter) {
 	}
 
 	r.Filters = append(r.Filters, fil)
-}
-
-// Remove any dot (.) character prefix or suffix of the given string.
-// This is useful because dns names often end in '.' characters to signify
-// the root of the DNS tree.  But NS1 API does not support this.
-//
-// In other cases a domain or zone may be passed in with a preceding dot (.)
-// character which would likewise lead the system to fail.
-func removeEnclosingDots(inputString string) string {
-	if strings.HasSuffix(inputString, ".") {
-		inputString = inputString[0 : len(inputString)-1]
-	}
-	if strings.HasPrefix(inputString,"."){
-		inputString = inputString[1:len(inputString)]
-	}
-	return inputString
 }
