@@ -142,3 +142,17 @@ func NewCAAAnswer(flag int, tag, value string) *Answer {
 		Rdata: []string{strconv.Itoa(flag), tag, value},
 	}
 }
+
+// NewURLFWDAnswer creates an Answer for URLFWD record.
+func NewURLFWDAnswer(from, to, redirectType, pathForwardingMode, queryForwarding string) *Answer {
+	return &Answer{
+		Meta: &data.Meta{},
+		Rdata: []string{
+			from,
+			to,
+			redirectType,
+			pathForwardingMode,
+			queryForwarding,
+		},
+	}
+}
