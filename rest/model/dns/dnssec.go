@@ -14,15 +14,15 @@ type ZoneDNSSEC struct {
 
 // Keys holds a list of DNS Keys and a TTL
 type Keys struct {
-	DNSKey  []*Key `json:"dnskey,omitempty"`
-	TTL     int    `json:"ttl,omitempty"`
+	DNSKey []*Key      `json:"dnskey,omitempty"`
+	TTL    json.Number `json:"ttl,omitempty"`
 }
 
 // Delegation holds a list of DNS Keys, a list of DS Keys, and a TTL
 type Delegation struct {
-	DNSKey []*Key `json:"dnskey,omitempty"`
-	DS     []*Key `json:"ds,omitempty"`
-	TTL    int    `json:"ttl,omitempty"`
+	DNSKey []*Key      `json:"dnskey,omitempty"`
+	DS     []*Key      `json:"ds,omitempty"`
+	TTL    json.Number `json:"ttl,omitempty"`
 }
 
 // Key holds a DNS key

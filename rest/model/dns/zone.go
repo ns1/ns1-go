@@ -16,13 +16,13 @@ type Zone struct {
 	ID   string `json:"id,omitempty"`
 	Zone string `json:"zone,omitempty"`
 
-	TTL        int    `json:"ttl,omitempty"`
-	NxTTL      int    `json:"nx_ttl,omitempty"`
-	Retry      int    `json:"retry,omitempty"`
-	Serial     int    `json:"serial,omitempty"`
-	Refresh    int    `json:"refresh,omitempty"`
-	Expiry     int    `json:"expiry,omitempty"`
-	Hostmaster string `json:"hostmaster,omitempty"`
+	TTL        json.Number `json:"ttl,omitempty"`
+	NxTTL      json.Number `json:"nx_ttl,omitempty"`
+	Retry      int         `json:"retry,omitempty"`
+	Serial     int         `json:"serial,omitempty"`
+	Refresh    int         `json:"refresh,omitempty"`
+	Expiry     int         `json:"expiry,omitempty"`
+	Hostmaster string      `json:"hostmaster,omitempty"`
 
 	// If this is a linked zone, Link points to an existing standard zone,
 	// reusing its configuration and records. Link is a zones' domain name.
@@ -54,7 +54,7 @@ type ZoneRecord struct {
 	Link     string      `json:"link,omitempty"`
 	ShortAns []string    `json:"short_answers,omitempty"`
 	Tier     json.Number `json:"tier,omitempty"`
-	TTL      int         `json:"ttl,omitempty"`
+	TTL      json.Number `json:"ttl,omitempty"`
 	Type     string      `json:"type,omitempty"`
 }
 
@@ -149,8 +149,8 @@ func (z *Zone) MakeSecondary(ip string) {
 // does not affect the target zone at all.
 func (z *Zone) LinkTo(to string) {
 	z.Meta = nil
-	z.TTL = 0
-	z.NxTTL = 0
+	z.TTL = json.Number("0")
+	z.NxTTL = json.Number("0")
 	z.Retry = 0
 	z.Refresh = 0
 	z.Expiry = 0

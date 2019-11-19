@@ -56,7 +56,7 @@ func TestUnmarshalDNSSEC(t *testing.T) {
 	assert.Equal(t, d.Zone, "burping.cat.")
 
 	keys := d.Keys
-	assert.Equal(t, 3600, keys.TTL)
+	assert.Equal(t, json.Number("3600"), keys.TTL)
 	assert.Equal(t, 2, len(keys.DNSKey))
 	k := keys.DNSKey[0]
 	assert.Equal(t, "257", k.Flags)
@@ -70,7 +70,7 @@ func TestUnmarshalDNSSEC(t *testing.T) {
 	assert.Equal(t, "pxEUulkf8UZtE9fy2+4wJwM44xncypgGVps4hE4kQGA5TuC/XJPoKBX6e3B/QL9AmwFCgyFeC4uRNxoqxK0xOg==", k.PublicKey)
 
 	delegation := d.Delegation
-	assert.Equal(t, 3666, delegation.TTL)
+	assert.Equal(t, json.Number("3666"), delegation.TTL)
 	assert.Equal(t, 1, len(delegation.DNSKey))
 	k = delegation.DNSKey[0]
 	assert.Equal(t, "257", k.Flags)

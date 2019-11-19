@@ -59,7 +59,7 @@ func TestClient_Do(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
 
 	mockResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 		StatusCode: 200,
 	}
 	httpClient.On("Do", req).Return(&mockResp, nil)
@@ -97,7 +97,7 @@ func TestClient_DoWithNon2XXResponse(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
 
 	mockResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("")),
 		StatusCode: 404,
 	}
 	httpClient.On("Do", req).Return(&mockResp, nil)
@@ -117,7 +117,7 @@ func TestClient_DoWithNonJSONResponse(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
 
 	mockResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("INVALID")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("INVALID")),
 		StatusCode: 200,
 	}
 	httpClient.On("Do", req).Return(&mockResp, nil)
@@ -139,12 +139,12 @@ func TestClient_DoWithPagination(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
 	firstResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
-		Header: http.Header{"Link": []string{`<http://example.com/?after=1&limit=2>; rel="next"`}},
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Header:     http.Header{"Link": []string{`<http://example.com/?after=1&limit=2>; rel="next"`}},
 		StatusCode: 200,
 	}
 	nextResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 		StatusCode: 200,
 	}
 	var v interface{}
@@ -168,12 +168,12 @@ func TestClient_DoWithPaginationForceHTTPS(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", "https://example.com", new(bytes.Buffer))
 	firstResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
-		Header: http.Header{"Link": []string{`<http://example.com/?after=1&limit=2>; rel="next"`}},
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Header:     http.Header{"Link": []string{`<http://example.com/?after=1&limit=2>; rel="next"`}},
 		StatusCode: 200,
 	}
 	nextResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 		StatusCode: 200,
 	}
 	var v interface{}
@@ -195,7 +195,7 @@ func TestClient_getURI(t *testing.T) {
 	client := NewClient(&httpClient, SetEndpoint(""))
 
 	mockResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 		StatusCode: 200,
 	}
 	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
@@ -214,7 +214,7 @@ func TestClient_getURIWithNon2XXResponse(t *testing.T) {
 	client := NewClient(&httpClient, SetEndpoint(""))
 
 	mockResp := http.Response{
-		Body: ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 		StatusCode: 418,
 	}
 	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
