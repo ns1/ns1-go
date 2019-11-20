@@ -115,7 +115,7 @@ func TestZone_Get(t *testing.T) {
 	assert.Equal(t, "coolzone.cool", zone.Zone, "zone.Zone does not match")
 	assert.Equal(t, 4, len(zone.Records), "found wrong number of records")
 	for idx := range zone.Records {
-		assert.Equal(t, expected[idx],  zone.Records[idx].Domain)
+		assert.Equal(t, expected[idx], zone.Records[idx].Domain)
 	}
 
 }
@@ -138,7 +138,7 @@ func TestZone_GetWithPaginationDisabled(t *testing.T) {
 	assert.Equal(t, 2, len(zone.Records), "found wrong number of records")
 	for idx := range zone.Records {
 		assert.Equal(
-			t, expected[idx],  zone.Records[idx].Domain, "record.Domain does not match",
+			t, expected[idx], zone.Records[idx].Domain, "record.Domain does not match",
 		)
 	}
 }
@@ -271,7 +271,7 @@ func mockAPI(t *testing.T, rm responseMap) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
-type errorClient struct {}
+type errorClient struct{}
 
 func (c errorClient) Do(req *http.Request) (*http.Response, error) {
 	return nil, errors.New("oops")
