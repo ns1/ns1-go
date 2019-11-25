@@ -35,14 +35,30 @@ func TestUnmarshalAnswer(t *testing.T) {
 	assert.Equal(t, "us-east", a.RegionName, "Incorrect region")
 }
 
-func TestNewCAAAnswer(t *testing.T) {
-	expected := &Answer{
-		Meta: &data.Meta{},
-		Rdata: []string{
-			"0",
-			"issue",
-			"ca.test.zone",
+var newAnswerCases = []struct {
+	name string
+	in   *Answer
+	out  *Answer
+}{
+	{
+		"testCAAAnswer",
+		NewCAAAnswer(0, "issue", "ca.test.zone"),
+		&Answer{Meta: &data.Meta{}, Rdata: []string{"0", "issue", "ca.test.zone"}},
+	},
+	{
+		"testURLFWDAnswer",
+		NewURLFWDAnswer("/", "https://google.com", 302, 2, 0),
+		&Answer{
+			Meta:  &data.Meta{},
+			Rdata: []string{"/", "https://google.com", "302", "2", "0"},
 		},
+	},
+}
+
+func TestNewAnswers(t *testing.T) {
+	for _, tt := range newAnswerCases {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.in, tt.out, tt.name)
+		})
 	}
-	assert.Equal(t, expected, NewCAAAnswer(0, "issue", "ca.test.zone"))
 }

@@ -142,3 +142,49 @@ func NewCAAAnswer(flag int, tag, value string) *Answer {
 		Rdata: []string{strconv.Itoa(flag), tag, value},
 	}
 }
+
+// NewURLFWDAnswer creates an Answer for URLFWD record.
+func NewURLFWDAnswer(from, to string, redirectType, pathForwardingMode, queryForwarding int) *Answer {
+	return &Answer{
+		Meta: &data.Meta{},
+		Rdata: []string{
+			from,
+			to,
+			strconv.Itoa(redirectType),
+			strconv.Itoa(pathForwardingMode),
+			strconv.Itoa(queryForwarding),
+		},
+	}
+}
+
+// return Answer with Rdata as list of interface, with elements of the correct
+// type for API.
+func prepareURLFWDAnswer(a *Answer) (interface{}, error) {
+	type Alias Answer
+	redirectType, err := strconv.Atoi(a.Rdata[2])
+	if err != nil {
+		return nil, err
+	}
+	pathForwardingMode, err := strconv.Atoi(a.Rdata[3])
+	if err != nil {
+		return nil, err
+	}
+	queryForwarding, err := strconv.Atoi(a.Rdata[4])
+	if err != nil {
+		return nil, err
+	}
+	prepared := &struct {
+		Rdata []interface{} `json:"answer"`
+		*Alias
+	}{
+		Rdata: []interface{}{
+			a.Rdata[0],
+			a.Rdata[1],
+			redirectType,
+			pathForwardingMode,
+			queryForwarding,
+		},
+		Alias: (*Alias)(a),
+	}
+	return prepared, nil
+}
