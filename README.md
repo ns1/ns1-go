@@ -65,6 +65,9 @@ make test
 Local dev: use `go mod replace` in client code to point to local checkout of
 this repository.
 
+Consider running `./script/install-git-hooks` to install local git hooks for this
+project.
+
 # LICENSE
 
 Apache2 - see the included LICENSE file for more information
