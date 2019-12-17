@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
 )
 
@@ -96,7 +95,8 @@ func TestPrepareURLFWDAnswer(t *testing.T) {
 				return
 			}
 
-			require.Equal(t, tt.out, got.(*Alias))
+			assert.NoError(t, err)
+			assert.Equal(t, tt.out, got.(*Alias))
 		})
 	}
 }
