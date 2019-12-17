@@ -3,4 +3,5 @@
 set -e
 go get -u github.com/stretchr/testify/assert
 go get -u golang.org/x/lint/golint
+go get -u github.com/stretchr/objx
 go get ./...
