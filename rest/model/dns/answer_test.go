@@ -62,3 +62,41 @@ func TestNewAnswers(t *testing.T) {
 		})
 	}
 }
+
+func TestPrepareURLFWDAnswer(t *testing.T) {
+	tests := []struct {
+		name   string
+		in     *Answer
+		out    *Alias
+		expErr bool
+	}{
+		{
+			"valid",
+			&Answer{Rdata: []string{"/", "https://google.com", "302", "2", "0"}},
+			&Alias{
+				Rdata:       []interface{}{"/", "https://google.com", 302, 2, 0},
+				AliasAnswer: &AliasAnswer{Rdata: []string{"/", "https://google.com", "302", "2", "0"}},
+			},
+			false,
+		},
+		{
+			"invalid",
+			&Answer{Rdata: []string{"/", "https://google.com", "302", "2"}},
+			nil,
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := prepareURLFWDAnswer(tt.in)
+			if tt.expErr {
+				assert.Error(t, err)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.out, got.(*Alias))
+		})
+	}
+}
