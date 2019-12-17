@@ -2,6 +2,7 @@ package dns
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -25,15 +26,20 @@ type Answer struct {
 	RegionName string `json:"region,omitempty"`
 }
 
+// Alias is used as an alias for an answer so that the custom marshaler isn't used.
+type Alias struct {
+	Rdata []interface{} `json:"answer"`
+	*AliasAnswer
+}
+
+// AliasAnswer is a duplicate of Answer.
+type AliasAnswer Answer
+
 // UnmarshalJSON parses responses to Answer and attempts to convert Rdata
 // elements to string.
 func (a *Answer) UnmarshalJSON(data []byte) error {
-	type Alias Answer
-	aux := &struct {
-		Rdata []interface{} `json:"answer"`
-		*Alias
-	}{
-		Alias: (*Alias)(a),
+	aux := &Alias{
+		AliasAnswer: (*AliasAnswer)(a),
 	}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
@@ -160,7 +166,10 @@ func NewURLFWDAnswer(from, to string, redirectType, pathForwardingMode, queryFor
 // return Answer with Rdata as list of interface, with elements of the correct
 // type for API.
 func prepareURLFWDAnswer(a *Answer) (interface{}, error) {
-	type Alias Answer
+	if len(a.Rdata) < 5 {
+		return nil, errors.New("invalid number of arguments for Rdata")
+	}
+
 	redirectType, err := strconv.Atoi(a.Rdata[2])
 	if err != nil {
 		return nil, err
@@ -173,10 +182,8 @@ func prepareURLFWDAnswer(a *Answer) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	prepared := &struct {
-		Rdata []interface{} `json:"answer"`
-		*Alias
-	}{
+
+	prepared := &Alias{
 		Rdata: []interface{}{
 			a.Rdata[0],
 			a.Rdata[1],
@@ -184,7 +191,8 @@ func prepareURLFWDAnswer(a *Answer) (interface{}, error) {
 			pathForwardingMode,
 			queryForwarding,
 		},
-		Alias: (*Alias)(a),
+		AliasAnswer: (*AliasAnswer)(a),
 	}
+
 	return prepared, nil
 }

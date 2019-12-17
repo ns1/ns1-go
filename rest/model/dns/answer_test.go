@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
 )
 
@@ -59,6 +60,43 @@ func TestNewAnswers(t *testing.T) {
 	for _, tt := range newAnswerCases {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.in, tt.out, tt.name)
+		})
+	}
+}
+
+func TestPrepareURLFWDAnswer(t *testing.T) {
+	tests := []struct {
+		name   string
+		in     *Answer
+		out    *Alias
+		expErr bool
+	}{
+		{
+			"valid",
+			&Answer{Rdata: []string{"/", "https://google.com", "302", "2", "0"}},
+			&Alias{
+				Rdata:       []interface{}{"/", "https://google.com", 302, 2, 0},
+				AliasAnswer: &AliasAnswer{Rdata: []string{"/", "https://google.com", "302", "2", "0"}},
+			},
+			false,
+		},
+		{
+			"invalid",
+			&Answer{Rdata: []string{"/", "https://google.com", "302", "2"}},
+			nil,
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := prepareURLFWDAnswer(tt.in)
+			if tt.expErr {
+				assert.Error(t, err)
+				return
+			}
+
+			require.Equal(t, tt.out, got.(*Alias))
 		})
 	}
 }
