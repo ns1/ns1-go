@@ -11,16 +11,3 @@ type APIKey struct {
 	TeamIDs     []string       `json:"teams"`
 	Permissions PermissionsMap `json:"permissions"`
 }
-
-// DDIAPIKey wraps an NS1 /account/apikeys resource for DDI specifically.
-type DDIAPIKey struct {
-	// Read-only fields
-	ID         string `json:"id,omitempty"`
-	Key        string `json:"key,omitempty"`
-	LastAccess int    `json:"last_access,omitempty"`
-
-	Name    string   `json:"name"`
-	TeamIDs []string `json:"teams"`
-
-	Permissions DDIPermissionsMap `json:"permissions"`
-}

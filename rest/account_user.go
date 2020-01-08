@@ -165,18 +165,18 @@ var (
 	ErrUserMissing = errors.New("user does not exist")
 )
 
-func userToDDIUser(u *account.User) *account.DDIUser {
-	ddiUser := &account.DDIUser{
+func userToDDIUser(u *account.User) *ddiUser {
+	ddiUser := &ddiUser{
 		LastAccess: u.LastAccess,
 		Name:       u.Name,
 		Username:   u.Username,
 		Email:      u.Email,
 		TeamIDs:    u.TeamIDs,
 		Notify:     u.Notify,
-		Permissions: account.DDIPermissionsMap{
+		Permissions: ddiPermissionsMap{
 			DNS:  u.Permissions.DNS,
 			Data: u.Permissions.Data,
-			Account: account.PermissionsDDIAccount{
+			Account: permissionsDDIAccount{
 				ManageUsers:           u.Permissions.Account.ManageUsers,
 				ManageTeams:           u.Permissions.Account.ManageTeams,
 				ManageApikeys:         u.Permissions.Account.ManageApikeys,
@@ -187,7 +187,7 @@ func userToDDIUser(u *account.User) *account.DDIUser {
 	}
 
 	if u.Permissions.Security != nil {
-		ddiUser.Permissions.Security = account.PermissionsDDISecurity(*u.Permissions.Security)
+		ddiUser.Permissions.Security = permissionsDDISecurity(*u.Permissions.Security)
 	}
 
 	if u.Permissions.DHCP != nil {

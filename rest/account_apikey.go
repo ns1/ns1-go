@@ -167,17 +167,17 @@ var (
 	ErrKeyMissing = errors.New("key does not exist")
 )
 
-func apiKeyToDDIAPIKey(k *account.APIKey) *account.DDIAPIKey {
-	ddiAPIKey := &account.DDIAPIKey{
+func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
+	ddiAPIKey := &ddiAPIKey{
 		ID:         k.ID,
 		Key:        k.Key,
 		LastAccess: k.LastAccess,
 		Name:       k.Name,
 		TeamIDs:    k.TeamIDs,
-		Permissions: account.DDIPermissionsMap{
+		Permissions: ddiPermissionsMap{
 			DNS:  k.Permissions.DNS,
 			Data: k.Permissions.Data,
-			Account: account.PermissionsDDIAccount{
+			Account: permissionsDDIAccount{
 				ManageUsers:           k.Permissions.Account.ManageUsers,
 				ManageTeams:           k.Permissions.Account.ManageTeams,
 				ManageApikeys:         k.Permissions.Account.ManageApikeys,
@@ -188,7 +188,7 @@ func apiKeyToDDIAPIKey(k *account.APIKey) *account.DDIAPIKey {
 	}
 
 	if k.Permissions.Security != nil {
-		ddiAPIKey.Permissions.Security = account.PermissionsDDISecurity(*k.Permissions.Security)
+		ddiAPIKey.Permissions.Security = permissionsDDISecurity(*k.Permissions.Security)
 	}
 
 	if k.Permissions.DHCP != nil {

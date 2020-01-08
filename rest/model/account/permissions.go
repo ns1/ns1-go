@@ -7,8 +7,10 @@ type PermissionsMap struct {
 	Account    PermissionsAccount    `json:"account"`
 	Monitoring PermissionsMonitoring `json:"monitoring"`
 	Security   *PermissionsSecurity  `json:"security,omitempty"`
-	DHCP       *PermissionsDHCP      `json:"dhcp,omitempty"`
-	IPAM       *PermissionsIPAM      `json:"ipam,omitempty"`
+
+	// DHCP and IPAM are only relevant for DDI and should not be provided in managed.
+	DHCP *PermissionsDHCP `json:"dhcp,omitempty"`
+	IPAM *PermissionsIPAM `json:"ipam,omitempty"`
 }
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
@@ -41,7 +43,9 @@ type PermissionsAccount struct {
 
 // PermissionsSecurity wraps a User's "permissions.security" attribute.
 type PermissionsSecurity struct {
-	ManageGlobal2FA       bool `json:"manage_global_2fa"`
+	ManageGlobal2FA bool `json:"manage_global_2fa"`
+
+	// This field is only relevant for DDI and should not be set to true for managed.
 	ManageActiveDirectory bool `json:"manage_active_directory,omitempty"`
 }
 
@@ -51,31 +55,6 @@ type PermissionsMonitoring struct {
 	ManageLists bool `json:"manage_lists"`
 	ManageJobs  bool `json:"manage_jobs"`
 	ViewJobs    bool `json:"view_jobs"`
-}
-
-// DDIPermissionsMap wraps a User's "permissions" attribute for DDI.
-type DDIPermissionsMap struct {
-	DNS      PermissionsDNS         `json:"dns"`
-	Data     PermissionsData        `json:"data"`
-	Account  PermissionsDDIAccount  `json:"account"`
-	Security PermissionsDDISecurity `json:"security"`
-	DHCP     PermissionsDHCP        `json:"dhcp"`
-	IPAM     PermissionsIPAM        `json:"ipam"`
-}
-
-// PermissionsDDIAccount wraps a User's "permissions.account" attribute for DDI.
-type PermissionsDDIAccount struct {
-	ManageUsers           bool `json:"manage_users"`
-	ManageTeams           bool `json:"manage_teams"`
-	ManageApikeys         bool `json:"manage_apikeys"`
-	ManageAccountSettings bool `json:"manage_account_settings"`
-	ViewActivityLog       bool `json:"view_activity_log"`
-}
-
-// PermissionsDDISecurity wraps a User's "permissions.security" attribute for DDI.
-type PermissionsDDISecurity struct {
-	ManageGlobal2FA       bool `json:"manage_global_2fa"`
-	ManageActiveDirectory bool `json:"manage_active_directory"`
 }
 
 // PermissionsDHCP wraps a User's "permissions.dhcp" attribute for DDI.

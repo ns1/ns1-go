@@ -165,14 +165,14 @@ var (
 	ErrTeamMissing = errors.New("team does not exist")
 )
 
-func teamToDDITeam(t *account.Team) *account.DDITeam {
-	ddiTeam := &account.DDITeam{
+func teamToDDITeam(t *account.Team) *ddiTeam {
+	ddiTeam := &ddiTeam{
 		ID:   t.ID,
 		Name: t.Name,
-		Permissions: account.DDIPermissionsMap{
+		Permissions: ddiPermissionsMap{
 			DNS:  t.Permissions.DNS,
 			Data: t.Permissions.Data,
-			Account: account.PermissionsDDIAccount{
+			Account: permissionsDDIAccount{
 				ManageUsers:           t.Permissions.Account.ManageUsers,
 				ManageTeams:           t.Permissions.Account.ManageTeams,
 				ManageApikeys:         t.Permissions.Account.ManageApikeys,
@@ -183,7 +183,7 @@ func teamToDDITeam(t *account.Team) *account.DDITeam {
 	}
 
 	if t.Permissions.Security != nil {
-		ddiTeam.Permissions.Security = account.PermissionsDDISecurity(*t.Permissions.Security)
+		ddiTeam.Permissions.Security = permissionsDDISecurity(*t.Permissions.Security)
 	}
 
 	if t.Permissions.DHCP != nil {
