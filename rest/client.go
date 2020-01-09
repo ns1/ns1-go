@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	clientVersion = "2.0.0"
+	clientVersion = "2.1.0"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -50,6 +50,9 @@ type Client struct {
 
 	// Whether the client should handle paginated responses automatically.
 	FollowPagination bool
+
+	// Enables permissions compatibility with the DDI API.
+	DDI bool
 
 	// From the excellent github-go client.
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
@@ -139,6 +142,11 @@ func SetRateLimitFunc(ratefunc func(rl RateLimit)) func(*Client) {
 // SetFollowPagination sets a Client instances' FollowPagination attribute.
 func SetFollowPagination(shouldFollow bool) func(*Client) {
 	return func(c *Client) { c.FollowPagination = shouldFollow }
+}
+
+// SetDDIAPI configures the client to use permissions compatible with the DDI API.
+func SetDDIAPI() func(*Client) {
+	return func(c *Client) { c.DDI = true }
 }
 
 // Do satisfies the Doer interface. resp will be nil if a non-HTTP error
