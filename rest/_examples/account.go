@@ -9,6 +9,7 @@ import (
 	"time"
 
 	api "gopkg.in/ns1/ns1-go.v2/rest"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
 var client *api.Client
@@ -55,5 +56,15 @@ func main() {
 	for _, k := range keys {
 		b, _ := json.MarshalIndent(k, "", "  ")
 		fmt.Println(string(b))
+	}
+
+	key := account.APIKey{
+		Name:              "new-example",
+		IPWhitelist:       []string{"1.1.1.1", "2.2.2.2"},
+		IPWhitelistStrict: true,
+	}
+
+	if _, err := client.APIKeys.Create(&key); err != nil {
+		log.Fatal(err)
 	}
 }
