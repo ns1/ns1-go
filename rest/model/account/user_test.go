@@ -4,23 +4,70 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUnmarshalUsers(t *testing.T) {
-	d := []byte(`[
-  {
+	tests := []struct {
+		name string
+		in   []byte
+		out  User
+	}{
+		{
+			"basic",
+			[]byte(`{
     "permissions": {},
     "teams": [],
     "email": "support@nsone.net",
     "last_access": 1376325771.0,
+    "created": 1376325771.0,
     "notify": {
       "billing": true
     },
     "name": "API Example",
-    "username": "apiexample"
-  },
-  {
+    "username": "apiexample",
+	"ip_whitelist": ["1.1.1.1", "2.2.2.2"],
+	"ip_whitelist_strict": true,
+	"2fa_enabled": true,
+	"shared_auth": {
+        "saml": {
+            "sso": true,
+            "idp": {
+                "use_metadata_url": true,
+                "metadata_url": null,
+                "metadata_file": null,
+                "provider": "okta"
+            }
+        }
+    }
+  }`),
+			User{
+				Username:             "apiexample",
+				Name:                 "API Example",
+				Email:                "support@nsone.net",
+				LastAccess:           1376325771.0,
+				Created:              1376325771.0,
+				Notify:               NotificationSettings{true},
+				TeamIDs:              []string{},
+				IPWhitelist:          []string{"1.1.1.1", "2.2.2.2"},
+				IPWhitelistStrict:    true,
+				TwoFactorAuthEnabled: true,
+				SharedAuth: SharedAuth{
+					SAML: SAML{
+						SSO: true,
+						IDP: IDP{
+							UseMetadataURL: pointerBool(true),
+							MetadataURL:    nil,
+							MetadataFile:   nil,
+							Provider:       pointerString("okta"),
+						},
+					},
+				},
+			},
+		},
+		{
+			"perms",
+			[]byte(`{
     "permissions": {
       "dns": {
         "view_zones": true,
@@ -58,60 +105,60 @@ func TestUnmarshalUsers(t *testing.T) {
     },
     "name": "New User",
     "username": "newuser"
-  }
-]
-`)
-	ul := []*User{}
-	if err := json.Unmarshal(d, &ul); err != nil {
-		t.Error(err)
-	}
-	assert.Equal(t, len(ul), 2, "Userlist should have 2 users")
-
-	u := ul[0]
-	assert.Equal(t, u.TeamIDs, []string{}, "User should have empty teams")
-	assert.Equal(t, u.Email, "support@nsone.net", "User wrong email")
-	assert.Equal(t, u.LastAccess, 1376325771.0, "User wrong last access")
-	assert.Equal(t, u.Name, "API Example", "User wrong name")
-	assert.Equal(t, u.Username, "apiexample", "User wrong username")
-	assert.Equal(t, u.Notify, NotificationSettings{true}, "User wrong notify")
-	assert.Equal(t, u.Permissions, PermissionsMap{}, "User should have empty permissions")
-
-	u2 := ul[1]
-	assert.Equal(t, u2.TeamIDs, []string{"520422919f782d37dffb588a"}, "User should have empty teams")
-	assert.Equal(t, u2.Email, "newuser@example.com", "User wrong email")
-	assert.Equal(t, u2.LastAccess, 0.0, "User wrong last access")
-	assert.Equal(t, u2.Name, "New User", "User wrong name")
-	assert.Equal(t, u2.Username, "newuser", "User wrong username")
-	assert.Equal(t, u.Notify, NotificationSettings{true}, "User wrong notify")
-
-	permMap := PermissionsMap{
-		DNS: PermissionsDNS{
-			ViewZones:           true,
-			ManageZones:         true,
-			ZonesAllowByDefault: false,
-			ZonesDeny:           []string{},
-			ZonesAllow:          []string{"example.com"},
-		},
-		Data: PermissionsData{
-			PushToDatafeeds:   false,
-			ManageDatasources: false,
-			ManageDatafeeds:   false,
-		},
-		Account: PermissionsAccount{
-			ManagePaymentMethods:  false,
-			ManagePlan:            false,
-			ManageTeams:           false,
-			ManageApikeys:         false,
-			ManageAccountSettings: false,
-			ViewActivityLog:       false,
-			ViewInvoices:          false,
-			ManageUsers:           false,
-		},
-		Monitoring: PermissionsMonitoring{
-			ManageLists: false,
-			ManageJobs:  false,
-			ViewJobs:    false,
+  }`),
+			User{
+				Username:   "newuser",
+				Name:       "New User",
+				Email:      "newuser@example.com",
+				TeamIDs:    []string{"520422919f782d37dffb588a"},
+				LastAccess: 0.0,
+				Notify:     NotificationSettings{true},
+				Permissions: PermissionsMap{
+					DNS: PermissionsDNS{
+						ViewZones:           true,
+						ManageZones:         true,
+						ZonesAllowByDefault: false,
+						ZonesDeny:           []string{},
+						ZonesAllow:          []string{"example.com"},
+					},
+					Data: PermissionsData{
+						PushToDatafeeds:   false,
+						ManageDatasources: false,
+						ManageDatafeeds:   false,
+					},
+					Account: PermissionsAccount{
+						ManagePaymentMethods:  false,
+						ManagePlan:            false,
+						ManageTeams:           false,
+						ManageApikeys:         false,
+						ManageAccountSettings: false,
+						ViewActivityLog:       false,
+						ViewInvoices:          false,
+						ManageUsers:           false,
+					},
+					Monitoring: PermissionsMonitoring{
+						ManageLists: false,
+						ManageJobs:  false,
+						ViewJobs:    false,
+					},
+				},
+			},
 		},
 	}
-	assert.Equal(t, u2.Permissions, permMap, "User wrong permissions")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var u User
+			require.NoError(t, json.Unmarshal(tt.in, &u))
+			require.Equal(t, tt.out, u)
+		})
+	}
+}
+
+func pointerBool(b bool) *bool {
+	return &b
+}
+
+func pointerString(s string) *string {
+	return &s
 }
