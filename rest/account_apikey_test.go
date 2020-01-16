@@ -49,6 +49,8 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		assert.NotNil(t, k.Permissions.Security)
 		assert.NotNil(t, k.Permissions.DHCP)
 		assert.NotNil(t, k.Permissions.IPAM)
+		assert.NotNil(t, k.IPWhitelist)
+		assert.True(t, k.IPWhitelistStrict)
 
 		w.Write(b)
 	}))
@@ -56,10 +58,12 @@ func TestCreateDDIAPIKey(t *testing.T) {
 	c := NewClient(nil, SetEndpoint(ts.URL), SetDDIAPI())
 
 	k := &account.APIKey{
-		ID:          "id-1",
-		Key:         "key-1",
-		Name:        "name-1",
-		Permissions: account.PermissionsMap{},
+		ID:                "id-1",
+		Key:               "key-1",
+		Name:              "name-1",
+		IPWhitelist:       []string{"1.1.1.1"},
+		IPWhitelistStrict: true,
+		Permissions:       account.PermissionsMap{},
 	}
 
 	_, err := c.APIKeys.Create(k)

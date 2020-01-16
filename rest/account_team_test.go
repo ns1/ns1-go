@@ -48,6 +48,7 @@ func TestCreateDDITeam(t *testing.T) {
 		assert.NotNil(t, tm.Permissions.Security)
 		assert.NotNil(t, tm.Permissions.DHCP)
 		assert.NotNil(t, tm.Permissions.IPAM)
+		assert.NotNil(t, tm.IPWhitelist)
 
 		w.Write(b)
 	}))
@@ -55,8 +56,11 @@ func TestCreateDDITeam(t *testing.T) {
 	c := NewClient(nil, SetEndpoint(ts.URL), SetDDIAPI())
 
 	tm := &account.Team{
-		ID:          "id-1",
-		Name:        "team-1",
+		ID:   "id-1",
+		Name: "team-1",
+		IPWhitelist: []account.IPWhitelist{
+			{Name: "whitelist", Values: []string{"1.1.1.1"}},
+		},
 		Permissions: account.PermissionsMap{},
 	}
 

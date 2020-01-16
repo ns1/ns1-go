@@ -169,11 +169,13 @@ var (
 
 func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
 	ddiAPIKey := &ddiAPIKey{
-		ID:         k.ID,
-		Key:        k.Key,
-		LastAccess: k.LastAccess,
-		Name:       k.Name,
-		TeamIDs:    k.TeamIDs,
+		ID:                k.ID,
+		Key:               k.Key,
+		LastAccess:        k.LastAccess,
+		Name:              k.Name,
+		TeamIDs:           k.TeamIDs,
+		IPWhitelist:       k.IPWhitelist,
+		IPWhitelistStrict: k.IPWhitelistStrict,
 		Permissions: ddiPermissionsMap{
 			DNS:  k.Permissions.DNS,
 			Data: k.Permissions.Data,

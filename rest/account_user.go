@@ -167,12 +167,14 @@ var (
 
 func userToDDIUser(u *account.User) *ddiUser {
 	ddiUser := &ddiUser{
-		LastAccess: u.LastAccess,
-		Name:       u.Name,
-		Username:   u.Username,
-		Email:      u.Email,
-		TeamIDs:    u.TeamIDs,
-		Notify:     u.Notify,
+		LastAccess:        u.LastAccess,
+		Name:              u.Name,
+		Username:          u.Username,
+		Email:             u.Email,
+		TeamIDs:           u.TeamIDs,
+		Notify:            u.Notify,
+		IPWhitelist:       u.IPWhitelist,
+		IPWhitelistStrict: u.IPWhitelistStrict,
 		Permissions: ddiPermissionsMap{
 			DNS:  u.Permissions.DNS,
 			Data: u.Permissions.Data,

@@ -10,6 +10,6 @@ type APIKey struct {
 	Name              string         `json:"name"`
 	TeamIDs           []string       `json:"teams"`
 	Permissions       PermissionsMap `json:"permissions"`
-	IPWhitelist       []string       `json:"ip_whitelist,omitempty"`
+	IPWhitelist       []string       `json:"ip_whitelist"`
 	IPWhitelistStrict bool           `json:"ip_whitelist_strict"`
 }
