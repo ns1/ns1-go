@@ -49,6 +49,8 @@ func TestCreateDDIUser(t *testing.T) {
 		assert.NotNil(t, u.Permissions.Security)
 		assert.NotNil(t, u.Permissions.DHCP)
 		assert.NotNil(t, u.Permissions.IPAM)
+		assert.NotNil(t, u.IPWhitelist)
+		assert.True(t, u.IPWhitelistStrict)
 
 		w.Write(b)
 	}))
@@ -56,10 +58,12 @@ func TestCreateDDIUser(t *testing.T) {
 	c := NewClient(nil, SetEndpoint(ts.URL), SetDDIAPI())
 
 	u := &account.User{
-		Name:        "name-1",
-		Username:    "user-1",
-		Email:       "email-1",
-		Permissions: account.PermissionsMap{},
+		Name:              "name-1",
+		Username:          "user-1",
+		Email:             "email-1",
+		IPWhitelist:       []string{"1.1.1.1"},
+		IPWhitelistStrict: true,
+		Permissions:       account.PermissionsMap{},
 	}
 
 	_, err := c.Users.Create(u)

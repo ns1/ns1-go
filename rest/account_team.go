@@ -167,8 +167,9 @@ var (
 
 func teamToDDITeam(t *account.Team) *ddiTeam {
 	ddiTeam := &ddiTeam{
-		ID:   t.ID,
-		Name: t.Name,
+		ID:          t.ID,
+		Name:        t.Name,
+		IPWhitelist: t.IPWhitelist,
 		Permissions: ddiPermissionsMap{
 			DNS:  t.Permissions.DNS,
 			Data: t.Permissions.Data,
