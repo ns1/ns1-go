@@ -12,7 +12,7 @@ type User struct {
 	TeamIDs              []string             `json:"teams"`
 	Notify               NotificationSettings `json:"notify"`
 	Permissions          PermissionsMap       `json:"permissions"`
-	IPWhitelist          []string             `json:"ip_whitelist,omitempty"`
+	IPWhitelist          []string             `json:"ip_whitelist"`
 	IPWhitelistStrict    bool                 `json:"ip_whitelist_strict"`
 	TwoFactorAuthEnabled bool                 `json:"2fa_enabled"`
 	InviteToken          string               `json:"invite_token,omitempty"`
