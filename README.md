@@ -2,6 +2,8 @@
 
 # NS1 Golang SDK
 
+> This project is in [active development](https://github.com/ns1/community/blob/master/project_status/ACTIVE_DEVELOPMENT.md).
+
 The golang client for the NS1 API: https://ns1.com/api/
 
 # Installing
@@ -53,8 +55,7 @@ func main() {
 
 Contributing
 ============
-
-Contributions, ideas and criticisms are all welcome.
+Pull Requests and issues are welcome. See the [NS1 Contribution Guidelines](https://github.com/ns1/community) for more information.
 
 Run tests:
 
