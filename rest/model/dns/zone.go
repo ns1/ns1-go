@@ -100,7 +100,7 @@ type TSIG struct {
 	Key string `json:"key,omitempty"`
 
 	// Whether TSIG is enabled for a secondary zone.
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled bool `json:"enabled"`
 	// Which hashing algorithm
 	Hash string `json:"hash,omitempty"`
 	// Name of the TSIG key
