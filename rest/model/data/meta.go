@@ -176,7 +176,15 @@ func FormatInterface(i interface{}) string {
 	case []interface{}:
 		slc := make([]string, 0)
 		for _, s := range v {
-			slc = append(slc, s.(string))
+			switch ss := s.(type) {
+			case string:
+				slc = append(slc, ss)
+			// The ASN field specifically is returned from the API as an integer,
+			// which Go treats as a float64 when it parses the json,
+			// so this is to account for that field.
+			case float64:
+				slc = append(slc, strconv.FormatFloat(ss, 'f', -1, 64))
+			}
 		}
 		return strings.Join(slc, ",")
 	case map[string]interface{}:
@@ -235,20 +243,22 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 	mt := mv.Type()
 	for k, v := range m {
 		name := ToCamel(k)
-		if name == "UsState" {
+		switch name {
+		case "UsState":
 			name = "USState"
-		} else if name == "Loadavg" {
+		case "Loadavg":
 			name = "LoadAvg"
-		} else if name == "CaProvince" {
+		case "CaProvince":
 			name = "CAProvince"
-		} else if name == "IpPrefixes" {
+		case "IpPrefixes":
 			name = "IPPrefixes"
-		} else if name == "Asn" {
+		case "Asn":
 			name = "ASN"
 		}
 		if _, ok := mt.FieldByName(name); ok {
 			fv := mv.FieldByName(name)
-			if name == "Up" {
+			switch name {
+			case "Up":
 				if v.(string) == "1" || strings.ToLower(v.(string)) == "true" {
 					fv.Set(reflect.ValueOf(true))
 				} else if v.(string) == "0" || strings.ToLower(v.(string)) == "false" {
@@ -256,7 +266,16 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 				} else {
 					fv.Set(reflect.ValueOf(ParseType(v.(string))))
 				}
-			} else {
+			case "ASN":
+				// If there is only one ASN, it should still be treated as a string.-
+				// otherwise this gets parsed into a float64 and breaks stuff.
+				i := strings.Index(v.(string), ",")
+				if i == -1 {
+					fv.Set(reflect.ValueOf(v.(string)))
+				} else {
+					fv.Set(reflect.ValueOf(ParseType(v.(string))))
+				}
+			default:
 				fv.Set(reflect.ValueOf(ParseType(v.(string))))
 			}
 		}

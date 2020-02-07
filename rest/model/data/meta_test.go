@@ -16,6 +16,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta.Weight = 10.0
 	meta.Country = []string{"US", "UK"}
 	meta.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
+	meta.ASN = []interface{}{float64(1), float64(2)}
 	m := meta.StringMap()
 
 	if m["up"].(string) != "1" {
@@ -48,6 +49,10 @@ func TestMeta_StringMap(t *testing.T) {
 
 	if m["ip_prefixes"].(string) != "1.1.1.1/24,2.2.2.2/24" {
 		t.Fatal("IP prefixes should be '1.1.1.1/24,2.2.2.2/24")
+	}
+
+	if m["asn"].(string) != "1,2" {
+		t.Fatal("ASN should be '1,2'")
 	}
 
 	expected := `{"feed":"12345678"}`
@@ -134,7 +139,12 @@ func TestMetaFromMap(t *testing.T) {
 	m["connections"] = "5"
 	m["longitude"] = `{"feed":"12345678"}`
 	m["ip_prefixes"] = "1.1.1.1/24,2.2.2.2/24"
+	m["asn"] = "1"
 	meta := MetaFromMap(m)
+
+	if meta.ASN.(string) != "1" {
+		t.Fatal("meta.ASN should have been 1", meta.ASN)
+	}
 
 	if !meta.Up.(bool) {
 		t.Fatal("meta.Up should be true")
@@ -184,6 +194,13 @@ func TestMetaFromMap(t *testing.T) {
 
 	if meta.Up.(FeedPtr).FeedID != "12345678" {
 		t.Fatal("meta.Up should be a feed ptr with id 12345678, was", meta.Up)
+	}
+
+	m["asn"] = "1,2,3"
+	meta = MetaFromMap(m)
+	expected = []string{"1", "2", "3"}
+	if !reflect.DeepEqual(meta.ASN.([]string), expected) {
+		t.Fatal("meta.ASN should be a slice containing elements `1`, `2`, and `3`")
 	}
 }
 
