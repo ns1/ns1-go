@@ -17,6 +17,11 @@ func TestMeta_StringMap(t *testing.T) {
 	meta.Country = []string{"US", "UK"}
 	meta.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
 	meta.ASN = []interface{}{float64(1), float64(2)}
+	meta.Pulsar = []interface{}{map[string]interface{}{
+		"job_id":     "abcdef",
+		"bias":       "*0.55",
+		"a5m_cutoff": 0.9,
+	}}
 	m := meta.StringMap()
 
 	if m["up"].(string) != "1" {
@@ -55,7 +60,12 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("ASN should be '1,2'")
 	}
 
-	expected := `{"feed":"12345678"}`
+	expected := `[{"a5m_cutoff":0.9,"bias":"*0.55","job_id":"abcdef"}]`
+	if m["pulsar"].(string) != expected {
+		t.Fatal("pulsar should be", expected, "was", m["pulsar"].(string))
+	}
+
+	expected = `{"feed":"12345678"}`
 	if m["longitude"].(string) != expected {
 		t.Fatal("longitude should be", expected, "was", m["longitude"].(string))
 	}
@@ -140,6 +150,7 @@ func TestMetaFromMap(t *testing.T) {
 	m["longitude"] = `{"feed":"12345678"}`
 	m["ip_prefixes"] = "1.1.1.1/24,2.2.2.2/24"
 	m["asn"] = "1"
+	m["pulsar"] = `[{"job_id":"abcdef","bias":"*0.55","a5m_cutoff":0.9}]`
 	meta := MetaFromMap(m)
 
 	if meta.ASN.(string) != "1" {
@@ -160,6 +171,15 @@ func TestMetaFromMap(t *testing.T) {
 
 	if meta.Longitude.(FeedPtr).FeedID != "12345678" {
 		t.Fatal("meta.Longitude should be a feed ptr with id 12345678, was", meta.Longitude)
+	}
+
+	expect := []map[string]interface{}{map[string]interface{}{
+		"job_id":     "abcdef",
+		"bias":       "*0.55",
+		"a5m_cutoff": 0.9,
+	}}
+	if !reflect.DeepEqual(meta.Pulsar, expect) {
+		t.Fatalf("meta.Pulsar should be %v, was %v", expect, meta.Pulsar)
 	}
 
 	expected := []string{"1.1.1.1/24", "2.2.2.2/24"}
@@ -228,6 +248,11 @@ func TestMeta_Validate(t *testing.T) {
 	m.Requests = 10
 	m.IPPrefixes = "10.0.0.1/24"
 	m.Priority = 1
+	m.Pulsar = []interface{}{map[string]interface{}{
+		"job_id":     "abcd",
+		"bias":       "*0.55",
+		"a5m_cutoff": 0.9,
+	}}
 	errs := m.Validate()
 	if len(errs) > 0 {
 		t.Fatal("there should be 0 errors, but there were", len(errs), ":", errs)
@@ -253,9 +278,10 @@ func TestMeta_Validate(t *testing.T) {
 	m.Requests = -1
 	m.IPPrefixes = "1234567"
 	m.Priority = -1
+	m.Pulsar = []interface{}{map[string]interface{}{}}
 	errs = m.Validate()
-	if len(errs) != 14 {
-		t.Fatal("expected 14 errors, but there were", len(errs), ":", errs)
+	if len(errs) != 15 {
+		t.Fatal("expected 15 errors, but there were", len(errs), ":", errs)
 	}
 
 	m = &Meta{}
@@ -263,16 +289,20 @@ func TestMeta_Validate(t *testing.T) {
 	m.Country = []interface{}{"US", "CANADA"}
 	m.IPPrefixes = []interface{}{"1234567", "1.1.1.1/24"}
 	m.Up = struct{}{}
+	m.Pulsar = []interface{}{map[string]interface{}{
+		"job_id": true,
+	}}
 	errs = m.Validate()
-	if len(errs) != 4 {
-		t.Fatal("expected 4 errors, but there were", len(errs), ":", errs)
+	if len(errs) != 5 {
+		t.Fatal("expected 5 errors, but there were", len(errs), ":", errs)
 	}
 
-	// Test validation of []string values passed from Terraform
+	// Test validation of []string and string values passed from Terraform
 	m = &Meta{}
 	m.Georegion = []string{"US-EAST", "US-CENTRAL"}
 	m.Country = []string{"US", "CA"}
 	m.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
+	m.Pulsar = `[{"job_id":"abcd","bias":"*0.55","a5m_cutoff":0.9}]`
 	errs = m.Validate()
 	if len(errs) > 0 {
 		t.Fatal("there should be 0 errors, but there were", len(errs), ":", errs)
@@ -282,8 +312,9 @@ func TestMeta_Validate(t *testing.T) {
 	m.Georegion = []string{"US-EAST", "fantasy land"}
 	m.Country = []string{"US", "CANADA"}
 	m.IPPrefixes = []string{"1234567", "1.1.1.1/24"}
+	m.Pulsar = "blah"
 	errs = m.Validate()
-	if len(errs) != 3 {
-		t.Fatal("expected 3 errors, but there were", len(errs), ":", errs)
+	if len(errs) != 4 {
+		t.Fatal("expected 4 errors, but there were", len(errs), ":", errs)
 	}
 }
