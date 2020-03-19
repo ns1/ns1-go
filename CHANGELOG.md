@@ -1,4 +1,8 @@
-## 2.3.0 (Unreleased)
+## 2.4.0 (Unreleased)
+
+## 2.3.0 (March 19, 2020)
+FEATURES:
+* Support for pulsar metadata on answers
 
 ## 2.2.1 (Febuary 14, 2020)
 BUG FIXES
