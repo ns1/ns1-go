@@ -37,8 +37,14 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var test *testCase
 	for _, t := range tests {
-		if !assert.Equal(new(testifyT), t.request.body, body) {
-			continue
+		if !t.request.json {
+			if !assert.Equal(new(testifyT), t.request.body, body) {
+				continue
+			}
+		} else {
+			if !assert.JSONEq(new(testifyT), string(t.request.body), string(body)) {
+				continue
+			}
 		}
 
 		if !compareHeaders(t.request.headers, r.Header) {
