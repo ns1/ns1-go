@@ -15,6 +15,7 @@ type testCase struct {
 	request struct {
 		headers http.Header
 		body    []byte
+		json    bool
 	}
 	response struct {
 		headers http.Header
@@ -44,10 +45,10 @@ func (s *Service) AddTestCase(
 	tc.response.headers = responseHeaders
 
 	var err error
-	if tc.request.body, err = convertBody(requestBody); err != nil {
+	if tc.request.body, tc.request.json, err = convertBody(requestBody); err != nil {
 		return fmt.Errorf("unable to convert request body to []byte: %s", err)
 	}
-	if tc.response.body, err = convertBody(responseBody); err != nil {
+	if tc.response.body, _, err = convertBody(responseBody); err != nil {
 		return fmt.Errorf("unable to convert response body to []byte: %s", err)
 	}
 
@@ -73,13 +74,19 @@ func (s *Service) AddTestCase(
 	return nil
 }
 
-func convertBody(body interface{}) ([]byte, error) {
+// ClearTestCases removes all previously added test cases
+func (s *Service) ClearTestCases() {
+	s.tests = map[string]map[string][]*testCase{}
+}
+
+func convertBody(body interface{}) ([]byte, bool, error) {
 	switch b := body.(type) {
 	case []byte:
-		return b, nil
+		return b, false, nil
 	case string:
-		return []byte(b), nil
+		return []byte(b), false, nil
 	}
 
-	return json.Marshal(body)
+	data, err := json.Marshal(body)
+	return data, true, err
 }
