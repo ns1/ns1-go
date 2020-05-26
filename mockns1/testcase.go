@@ -36,7 +36,7 @@ func (s *Service) AddTestCase(
 	if !strings.HasPrefix(uri, "/v1/") {
 		uri = "/v1/" + uri
 	}
-	uri = strings.ReplaceAll(uri, "//", "/")
+	uri = strings.Replace(uri, "//", "/", -1)
 
 	tc := &testCase{
 		status: returnStatus,
