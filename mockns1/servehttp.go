@@ -37,22 +37,10 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var test *testCase
 	for _, t := range tests {
-		if !t.request.json {
-			if !assert.Equal(new(testifyT), t.request.body, body) {
-				continue
-			}
-		} else {
-			if !assert.JSONEq(new(testifyT), string(t.request.body), string(body)) {
-				continue
-			}
+		if compareBody(t, body) && compareHeaders(t.request.headers, r.Header) {
+			test = t
+			break
 		}
-
-		if !compareHeaders(t.request.headers, r.Header) {
-			continue
-		}
-
-		test = t
-		break
 	}
 
 	if test == nil {
@@ -69,6 +57,14 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(test.status)
 	w.Write(test.response.body) // nolint: errcheck
+}
+
+func compareBody(test *testCase, body []byte) bool {
+	if !test.request.json {
+		return assert.Equal(new(testifyT), test.request.body, body)
+	}
+
+	return assert.JSONEq(new(testifyT), string(test.request.body), string(body))
 }
 
 func notFoundResponse(w http.ResponseWriter, reason string) {
