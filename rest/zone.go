@@ -22,7 +22,7 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 
 	zl := []*dns.Zone{}
 	var resp *http.Response
-	if s.client.FollowPagination == true {
+	if s.client.FollowPagination {
 		resp, err = s.client.DoWithPagination(req, &zl, s.nextZones)
 	} else {
 		resp, err = s.client.Do(req, &zl)
@@ -47,7 +47,7 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 
 	var z dns.Zone
 	var resp *http.Response
-	if s.client.FollowPagination == true {
+	if s.client.FollowPagination {
 		resp, err = s.client.DoWithPagination(req, &z, s.nextRecords)
 	} else {
 		resp, err = s.client.Do(req, &z)

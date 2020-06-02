@@ -1,274 +1,258 @@
-package rest
+package rest_test
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/ns1/ns1-go.v2/mockns1"
+	api "gopkg.in/ns1/ns1-go.v2/rest"
+	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
 )
 
-func TestZone_List(t *testing.T) {
-	// It should follow Links and gather all Zones into the list
-	testServer := mockAPI(t, responseMap{"/zones": handleZoneList})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL))
+func TestZone(t *testing.T) {
+	mock, doer, err := mockns1.New(t)
+	require.Nil(t, err)
+	defer mock.Shutdown()
 
-	zones, resp, err := client.Zones.List()
-	assert.NoError(t, err, "expected no error")
-	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
+	client := api.NewClient(doer, api.SetEndpoint("https://"+mock.Address+"/v1/"))
 
-	expected := []string{
-		"example.com",
-		"coolzone.cool",
-		"example.org",
-		"example.io",
-	}
-	assert.Equal(t, 4, len(zones), "found wrong number of zones")
-	for idx := range zones {
-		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
-	}
-}
+	t.Run("List", func(t *testing.T) {
+		t.Run("Pagination", func(t *testing.T) {
+			defer mock.ClearTestCases()
 
-func TestZone_ListWithPaginationDisabled(t *testing.T) {
-	// It should not follow Links
-	testServer := mockAPI(t, responseMap{"/zones": handleZoneList})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
-
-	zones, resp, err := client.Zones.List()
-	assert.NoError(t, err, "expected no error")
-	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
-
-	expected := []string{
-		"example.com",
-		"coolzone.cool",
-	}
-	assert.Equal(t, 2, len(zones))
-	for idx := range zones {
-		assert.Equal(t, expected[idx], zones[idx].Zone, "zone.Zone does not match")
-	}
-}
-
-func TestZone_ListWithHTTPErrors(t *testing.T) {
-	// It should have a non-nil resp, and it should have a JSON error if the
-	// response body cannot be parsed as JSON, regardless of pagination.
-	testServer := mockAPI(t, responseMap{
-		"/zones": func(res http.ResponseWriter, req *http.Request) error {
-			res.WriteHeader(429)
-			res.Write([]byte("{}"))
-			return nil
-		},
-	})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL))
-
-	zones, resp, err := client.Zones.List()
-	assert.IsType(t, &Error{}, err, "error type does not match")
-	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zones, "zones is not nil")
-
-	client = NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
-
-	zones, resp, err = client.Zones.List()
-	assert.IsType(t, &Error{}, err, "error type does not match")
-	assert.Equal(t, 429, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zones, "zones is not nil")
-}
-
-func TestZone_ListWithNonHTTPErrors(t *testing.T) {
-	// it should have a nil resp, regardless of pagination.
-	client := NewClient(errorClient{}, SetEndpoint(""))
-
-	zones, resp, err := client.Zones.List()
-	assert.Nil(t, resp, "resp is not nil")
-	assert.Error(t, err, "error was expected")
-	assert.Nil(t, zones, "zones is not nil")
-
-	client = NewClient(errorClient{}, SetEndpoint(""), SetFollowPagination(false))
-
-	zones, resp, err = client.Zones.List()
-	assert.Nil(t, resp, "resp is not nil")
-	assert.Error(t, err, "error was expected")
-	assert.Nil(t, zones, "zones is not nil")
-}
-
-func TestZone_Get(t *testing.T) {
-	// It should follow Links and gather all Records into the Zone
-	testServer := mockAPI(t, responseMap{"/zones/coolzone.cool": handleZoneGet})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL))
-
-	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.NoError(t, err, "expected no error")
-	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
-
-	expected := []string{
-		"a.coolzone.cool",
-		"b.coolzone.cool",
-		"c.coolzone.cool",
-		"d.coolzone.cool",
-	}
-	assert.Equal(t, "coolzone.cool", zone.Zone, "zone.Zone does not match")
-	assert.Equal(t, 4, len(zone.Records), "found wrong number of records")
-	for idx := range zone.Records {
-		assert.Equal(t, expected[idx], zone.Records[idx].Domain)
-	}
-
-}
-
-func TestZone_GetWithPaginationDisabled(t *testing.T) {
-	// It should not follow Links
-	testServer := mockAPI(t, responseMap{"/zones/coolzone.cool": handleZoneGet})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
-
-	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.NoError(t, err, "expected no error")
-	assert.Equal(t, 200, resp.StatusCode, "status code does not match")
-
-	expected := []string{
-		"a.coolzone.cool",
-		"b.coolzone.cool",
-	}
-	assert.Equal(t, "coolzone.cool", zone.Zone, "zone.Zone does not match")
-	assert.Equal(t, 2, len(zone.Records), "found wrong number of records")
-	for idx := range zone.Records {
-		assert.Equal(
-			t, expected[idx], zone.Records[idx].Domain, "record.Domain does not match",
-		)
-	}
-}
-
-func TestZone_GetWithHTTPErrors(t *testing.T) {
-	// It should have a non-nil resp, and it should have a JSON error if the
-	// response body cannot be parsed as JSON, regardless of pagination.
-	testServer := mockAPI(t, responseMap{
-		"/zones/coolzone.cool": func(res http.ResponseWriter, req *http.Request) error {
-			res.WriteHeader(500)
-			res.Write([]byte("Internal Server Error"))
-			return nil
-		},
-	})
-	doer := testServer.Client()
-	client := NewClient(doer, SetEndpoint(testServer.URL))
-
-	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
-	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zone, "zone is not nil")
-
-	client = NewClient(doer, SetEndpoint(testServer.URL), SetFollowPagination(false))
-
-	zone, resp, err = client.Zones.Get("coolzone.cool")
-	assert.IsType(t, &json.SyntaxError{}, err, "error type does not match")
-	assert.Equal(t, 500, resp.StatusCode, "status code does not match")
-	assert.Nil(t, zone, "zone is not nil")
-}
-
-func TestZone_GetWithNonHTTPErrors(t *testing.T) {
-	// it should have a nil resp, regardless of pagination.
-	client := NewClient(errorClient{}, SetEndpoint(""))
-
-	zone, resp, err := client.Zones.Get("coolzone.cool")
-	assert.Nil(t, resp, "resp is not nil")
-	assert.Error(t, err, "error was expected")
-	assert.Nil(t, zone, "zone is not nil")
-
-	client = NewClient(errorClient{}, SetEndpoint(""), SetFollowPagination(false))
-
-	zone, resp, err = client.Zones.Get("coolzone.cool")
-	assert.Nil(t, resp, "resp is not nil")
-	assert.Error(t, err, "error was expected")
-	assert.Nil(t, zone, "zone is not nil")
-}
-
-func handleZoneList(res http.ResponseWriter, req *http.Request) error {
-	const zoneListQuery = "?after=coolzone.cool&limit=2"
-	var zoneListLinkHeader = fmt.Sprintf(`</zones?%s>; rel="next"`, zoneListQuery)
-	const zoneListPageOne = `[
-    {"zone": "example.com"},
-    {"zone": "coolzone.cool"}
-  ]`
-	const zoneListPageTwo = `[
-    {"zone": "example.org"},
-    {"zone": "example.io"}
-  ]`
-	var body string
-	if req.URL.RawQuery == "" {
-		res.Header().Set("Link", zoneListLinkHeader)
-		body = zoneListPageOne
-	} else if req.URL.RawQuery == zoneListQuery {
-		body = zoneListPageTwo
-	} else {
-		return fmt.Errorf("unhandled query: %s", req.URL.RawQuery)
-	}
-	res.WriteHeader(200)
-	res.Write([]byte(body))
-	return nil
-}
-
-func handleZoneGet(res http.ResponseWriter, req *http.Request) error {
-	const zoneGetQuery = "after=b.coolzone.cool&limit=2"
-	var zoneGetLinkHeader = fmt.Sprintf(
-		`</zones/coolzone.cool?%s>; rel="next"`, zoneGetQuery,
-	)
-	const zoneGetPageOne = `{
-    "zone": "coolzone.cool",
-    "records": [{
-      "domain":"a.coolzone.cool",
-      "short_answers": ["1.1.1.1"],
-      "type":"A"
-    },
-    {
-      "domain":"b.coolzone.cool",
-      "short_answers": ["2.2.2.2"],
-      "type":"A"
-    }]
-  }`
-	const zoneGetPageTwo = `{
-    "zone": "coolzone.cool",
-    "records": [{
-      "domain":"c.coolzone.cool",
-      "short_answers": ["3.3.3.3"],
-      "type":"A"
-    },
-    {
-      "domain":"d.coolzone.cool",
-      "short_answers": ["4.4.4.4"],
-      "type":"A"
-    }]
-  }`
-	var body string
-	if req.URL.RawQuery == "" {
-		res.Header().Set("Link", zoneGetLinkHeader)
-		body = zoneGetPageOne
-	} else if req.URL.RawQuery == zoneGetQuery {
-		body = zoneGetPageTwo
-	} else {
-		return fmt.Errorf("unhandled query: %s", req.URL.RawQuery)
-	}
-	res.WriteHeader(200)
-	res.Write([]byte(body))
-	return nil
-}
-
-type responseMap map[string]func(res http.ResponseWriter, req *http.Request) error
-
-func mockAPI(t *testing.T, rm responseMap) *httptest.Server {
-	handler := func(res http.ResponseWriter, req *http.Request) {
-		if handler, ok := rm[req.URL.Path]; ok {
-			if err := handler(res, req); err != nil {
-				t.Fatalf(err.Error())
+			client.FollowPagination = true
+			zones := []*dns.Zone{
+				{Zone: "a.list.zone"},
+				{Zone: "b.list.zone"},
+				{Zone: "c.list.zone"},
+				{Zone: "d.list.zone"},
 			}
-		} else {
-			t.Fatalf("unhandled path %s", req.URL.Path)
+			require.Nil(t, mock.AddZoneListTestCase(nil, nil, zones))
+
+			respZones, _, err := client.Zones.List()
+			require.Nil(t, err)
+			require.NotNil(t, respZones)
+			require.Equal(t, len(zones), len(respZones))
+
+			for i := range zones {
+				require.Equal(t, zones[i].Zone, respZones[i].Zone, i)
+			}
+		})
+
+		t.Run("No Pagination", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			client.FollowPagination = false
+			zones := []*dns.Zone{
+				{Zone: "a.list.zone"},
+				{Zone: "b.list.zone"},
+			}
+
+			header := http.Header{}
+			header.Set("Link", `</zones?b.list.zone&limit=2>; rel="next"`)
+
+			require.Nil(t, mock.AddZoneListTestCase(nil, header, zones))
+
+			respZones, resp, err := client.Zones.List()
+			require.Nil(t, err)
+			require.NotNil(t, respZones)
+			require.Equal(t, len(zones), len(respZones))
+			require.Contains(t, resp.Header.Get("Link"), "zones?b.list.zone")
+
+			for i := range zones {
+				require.Equal(t, zones[i].Zone, respZones[i].Zone, i)
+			}
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			t.Run("HTTP", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/zones", http.StatusNotFound,
+					nil, nil, "", `{"message": "test error"}`,
+				))
+
+				zones, resp, err := client.Zones.List()
+				require.Nil(t, zones)
+				require.NotNil(t, err)
+				require.Contains(t, err.Error(), "test error")
+				require.Equal(t, http.StatusNotFound, resp.StatusCode)
+			})
+
+			t.Run("Other", func(t *testing.T) {
+				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+				zones, resp, err := c.Zones.List()
+				require.Nil(t, resp)
+				require.Error(t, err)
+				require.Nil(t, zones)
+			})
+		})
+	})
+
+	t.Run("Get", func(t *testing.T) {
+		zoneName := "a.get.zone"
+
+		t.Run("Pagination", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			client.FollowPagination = true
+			zone := &dns.Zone{
+				Zone: "a.get.zone",
+				Records: []*dns.ZoneRecord{
+					{Domain: "1.a.get.zone"},
+					{Domain: "2.a.get.zone"},
+					{Domain: "3.a.get.zone"},
+					{Domain: "4.a.get.zone"},
+				},
+			}
+			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, nil, zone))
+
+			respZone, _, err := client.Zones.Get(zoneName)
+			require.Nil(t, err)
+			require.NotNil(t, respZone)
+			require.Equal(t, len(zone.Records), len(respZone.Records))
+
+			for i := range zone.Records {
+				require.Equal(t, zone.Records[i].Domain, respZone.Records[i].Domain, i)
+			}
+		})
+
+		t.Run("No Pagination", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			client.FollowPagination = false
+			zone := &dns.Zone{
+				Zone: "a.get.zone",
+				Records: []*dns.ZoneRecord{
+					{Domain: "1.a.get.zone"},
+					{Domain: "2.a.get.zone"},
+				},
+			}
+
+			link := `zones/` + zoneName + `?after=3.` + zoneName
+			header := http.Header{}
+			header.Set("Link", `</`+link+`&limit=2>; rel="next"`)
+
+			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, header, zone))
+
+			respZone, resp, err := client.Zones.Get(zoneName)
+			require.Nil(t, err)
+			require.NotNil(t, respZone)
+			require.Equal(t, len(zone.Records), len(respZone.Records))
+			require.Contains(t, resp.Header.Get("Link"), link)
+
+			for i := range zone.Records {
+				require.Equal(t, zone.Records[i].Domain, respZone.Records[i].Domain, i)
+			}
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			t.Run("HTTP", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/zones/"+zoneName, http.StatusNotFound,
+					nil, nil, "", `{"message": "test error"}`,
+				))
+
+				zone, resp, err := client.Zones.Get(zoneName)
+				require.Nil(t, zone)
+				require.NotNil(t, err)
+				require.Contains(t, err.Error(), "test error")
+				require.Equal(t, http.StatusNotFound, resp.StatusCode)
+			})
+
+			t.Run("Other", func(t *testing.T) {
+				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+				zones, resp, err := c.Zones.Get(zoneName)
+				require.Nil(t, resp)
+				require.Error(t, err)
+				require.Nil(t, zones)
+			})
+		})
+	})
+
+	t.Run("Create", func(t *testing.T) {
+		zone := &dns.Zone{
+			Zone: "create.zone",
+			TTL:  42,
 		}
-	}
-	return httptest.NewServer(http.HandlerFunc(handler))
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddZoneCreateTestCase(nil, nil, zone, zone))
+
+			_, err := client.Zones.Create(zone)
+			require.Nil(t, err)
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodPut, "/zones/create.zone", http.StatusNotFound,
+				nil, nil, zone, `{"message": "zone already exists"}`,
+			))
+
+			_, err := client.Zones.Create(zone)
+			require.Equal(t, api.ErrZoneExists, err)
+		})
+	})
+
+	t.Run("Update", func(t *testing.T) {
+		zone := &dns.Zone{
+			Zone: "update.zone",
+			TTL:  42,
+		}
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddZoneUpdateTestCase(nil, nil, zone, zone))
+
+			_, err := client.Zones.Update(zone)
+			require.Nil(t, err)
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodPost, "/zones/update.zone", http.StatusNotFound,
+				nil, nil, zone, `{"message": "zone not found"}`,
+			))
+
+			_, err := client.Zones.Update(zone)
+			require.Equal(t, api.ErrZoneMissing, err)
+		})
+	})
+
+	t.Run("Delete", func(t *testing.T) {
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddZoneDeleteTestCase("delete.zone", nil, nil))
+
+			_, err := client.Zones.Delete("delete.zone")
+			require.Nil(t, err)
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodDelete, "/zones/delete.zone", http.StatusNotFound,
+				nil, nil, "", `{"message": "zone not found"}`,
+			))
+
+			_, err := client.Zones.Delete("delete.zone")
+			require.Equal(t, api.ErrZoneMissing, err)
+		})
+	})
 }
 
 type errorClient struct{}
