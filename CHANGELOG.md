@@ -1,4 +1,4 @@
-## 2.5.0 (Unrelease)
+## 2.5.0 (Unreleased)
 
 ## 2.4.0
 FEATURES:
