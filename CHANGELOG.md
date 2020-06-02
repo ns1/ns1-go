@@ -1,4 +1,8 @@
-## 2.4.0 (Unreleased)
+## 2.5.0 (Unreleased)
+
+## 2.4.0
+FEATURES:
+* Exported mock API service - @iamgnat
 
 ## 2.3.0 (March 19, 2020)
 FEATURES:
