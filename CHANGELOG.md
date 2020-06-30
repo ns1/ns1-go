@@ -1,5 +1,9 @@
 ## 2.5.0 (Unreleased)
 
+## 2.4.1
+BUGFIX:
+* Fix incorrect tag
+
 ## 2.4.0
 FEATURES:
 * Exported mock API service - @iamgnat
