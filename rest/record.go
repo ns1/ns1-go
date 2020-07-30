@@ -42,7 +42,7 @@ func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Respons
 // The given record must have at least one answer.
 // NS1 API docs: https://ns1.com/api/#record-put
 func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
-	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
+	path := fmt.Sprintf("zones/%s/%s/%s", r.GetZoneName(), r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("PUT", path, &r)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 // Only the fields to be updated are required in the given record.
 // NS1 API docs: https://ns1.com/api/#record-post
 func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
-	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
+	path := fmt.Sprintf("zones/%s/%s/%s", r.GetZoneName(), r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("POST", path, &r)
 	if err != nil {

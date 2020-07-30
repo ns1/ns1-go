@@ -16,7 +16,7 @@ var marshalRecordCases = []struct {
 		"marshalCAARecord",
 		NewRecord("example.com", "caa.example.com", "CAA"),
 		[]*Answer{NewCAAAnswer(0, "issue", "letsencrypt.org")},
-		[]byte(`{"meta":{},"zone":"example.com","domain":"caa.example.com","type":"CAA","answers":[{"meta":{},"answer":["0","issue","letsencrypt.org"]}],"filters":[]}`),
+		[]byte(`{"meta":{},"zone_name":"example.com","zone":"example.com","domain":"caa.example.com","type":"CAA","answers":[{"meta":{},"answer":["0","issue","letsencrypt.org"]}],"filters":[]}`),
 	},
 	{
 		"marshalURLFWDRecord",
@@ -25,7 +25,7 @@ var marshalRecordCases = []struct {
 			NewURLFWDAnswer("/net", "https://example.net", 301, 1, 1),
 			NewURLFWDAnswer("/org", "https://example.org", 302, 2, 0),
 		},
-		[]byte(`{"answers":[{"answer":["/net","https://example.net",301,1,1],"meta":{}},{"answer":["/org","https://example.org",302,2,0],"meta":{}}],"meta":{},"zone":"example.com","domain":"fwd.example.com","type":"URLFWD","filters":[]}`),
+		[]byte(`{"answers":[{"answer":["/net","https://example.net",301,1,1],"meta":{}},{"answer":["/org","https://example.org",302,2,0],"meta":{}}],"meta":{},"zone_name":"example.com","zone":"example.com","domain":"fwd.example.com","type":"URLFWD","filters":[]}`),
 	},
 }
 
