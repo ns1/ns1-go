@@ -14,6 +14,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta.Georegion = []interface{}{"US-EAST"}
 	meta.Priority = 10
 	meta.Weight = 10.0
+	meta.Cost = 25.0
 	meta.Country = []string{"US", "UK"}
 	meta.IPPrefixes = []string{"1.1.1.1/24", "2.2.2.2/24"}
 	meta.ASN = []interface{}{float64(1), float64(2)}
@@ -46,6 +47,10 @@ func TestMeta_StringMap(t *testing.T) {
 
 	if m["weight"].(string) != "10" {
 		t.Fatal("weight should be 10")
+	}
+
+	if m["cost"].(string) != "25" {
+		t.Fatal("cost should be 25")
 	}
 
 	if m["country"].(string) != "US,UK" {
@@ -245,6 +250,7 @@ func TestMeta_Validate(t *testing.T) {
 	m.Note = "Testing out this cool meta validation"
 	m.LoadAvg = 3.14
 	m.Weight = 40.0
+	m.Cost = 60.0
 	m.Requests = 10
 	m.IPPrefixes = "10.0.0.1/24"
 	m.Priority = 1
@@ -275,12 +281,13 @@ func TestMeta_Validate(t *testing.T) {
 	m.Note = string(make([]rune, 257))
 	m.LoadAvg = -3.14
 	m.Weight = -40.0
+	m.Cost = -70.0
 	m.Requests = -1
 	m.IPPrefixes = "1234567"
 	m.Priority = -1
 	m.Pulsar = []interface{}{map[string]interface{}{}}
 	errs = m.Validate()
-	if len(errs) != 15 {
+	if len(errs) != 16 {
 		t.Fatal("expected 15 errors, but there were", len(errs), ":", errs)
 	}
 
