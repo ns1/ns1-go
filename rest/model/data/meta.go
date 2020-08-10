@@ -129,6 +129,12 @@ type Meta struct {
 	// Values between 0 and 100 are recommended for simplicity's sake.
 	// float64 or FeedPtr.
 	Weight interface{} `json:"weight,omitempty"`
+	
+	// Indicates a cost.
+	// Filters that use costs normalize them.
+	// Any positive values are allowed.
+	// float64 or FeedPtr.
+	Cost interface{} `json:"cost,omitempty"`
 
 	// Indicates a "low watermark" to use for load shedding.
 	// The value should depend on the metric used to determine
@@ -527,6 +533,10 @@ var validationMap = map[string]metaValidation{
 	"Weight": {kinds(reflect.Float64, reflect.Int), checkFuncs(
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Weight", v)
+		})},
+	"Cost": {kinds(reflect.Float64, reflect.Int), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Cost", v)
 		})},
 	"LowWatermark":  {kinds(reflect.Int), nil},
 	"HighWatermark": {kinds(reflect.Int), nil},
