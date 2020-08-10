@@ -528,6 +528,10 @@ var validationMap = map[string]metaValidation{
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Weight", v)
 		})},
+	"Cost": {kinds(reflect.Float64, reflect.Int), checkFuncs(
+		func(v reflect.Value) error {
+			return validatePositiveNumber("Cost", v)
+		})},
 	"LowWatermark":  {kinds(reflect.Int), nil},
 	"HighWatermark": {kinds(reflect.Int), nil},
 }
