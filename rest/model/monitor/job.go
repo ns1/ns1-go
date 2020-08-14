@@ -153,7 +153,6 @@ func NewHTTPV3Config(url, method, ua, auth string, connTimeout int, it time.Dura
 		"tls_skip_verify": tlsSkipVerify,
 		"follow_redirect": followRedir,
 	}
-
 }
 
 // NewDNSConfig constructs/returns a job configuration for DNS type jobs.
