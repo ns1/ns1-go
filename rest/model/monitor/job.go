@@ -123,7 +123,24 @@ type Rule struct {
 // ua is the user agent text in the request header.
 // auth is the authorization header to use in request.
 // connTimeout is the timeout(in sec) to wait for query output.
-func NewHTTPConfig(url, method, ua, auth string, connTimeout int, it time.Duration, reqIPV4 bool, vhost string, tlsSkipVerify bool, followRedir bool) *Config {
+func NewHTTPConfig(url, method, ua, auth string, connTimeout int) *Config {
+	return &Config{
+		"url":             url, // Required
+		"method":          method,
+		"user_agent":      ua,
+		"authorization":   auth,
+		"connect_timeout": connTimeout,
+	}
+
+}
+
+// NewHTTPV3Config constructs/returns a job configuration for HTTP type jobs, with additional V3 fields.
+// url is the URL to query. (Required)
+// method is the HTTP method(valid methods are HEAD, GET, and POST).
+// ua is the user agent text in the request header.
+// auth is the authorization header to use in request.
+// connTimeout is the timeout(in sec) to wait for query output.
+func NewHTTPV3Config(url, method, ua, auth string, connTimeout int, it time.Duration, reqIPV4 bool, vhost string, tlsSkipVerify bool, followRedir bool) *Config {
 	return &Config{
 		"url":             url, // Required
 		"method":          method,
