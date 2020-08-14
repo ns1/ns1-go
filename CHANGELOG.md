@@ -1,5 +1,9 @@
 ## 2.5.0 (Unreleased)
 
+## 2.4.2
+FEATURES:
+* Added support for "cost" meta option on records
+
 ## 2.4.1
 BUGFIX:
 * Fix incorrect tag
