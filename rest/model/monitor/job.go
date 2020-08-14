@@ -135,6 +135,7 @@ func NewHTTPConfig(url, method, ua, auth string, connTimeout int) *Config {
 }
 
 // NewHTTPV3Config constructs/returns a job configuration for HTTP type jobs, with additional V3 fields.
+// v3 must be enabled in customer configuration
 // url is the URL to query. (Required)
 // method is the HTTP method(valid methods are HEAD, GET, and POST).
 // ua is the user agent text in the request header.
