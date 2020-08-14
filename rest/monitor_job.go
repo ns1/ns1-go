@@ -54,6 +54,7 @@ func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
 // NS1 API docs: https://ns1.com/api/#jobs-put
 func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
+
 	req, err := s.client.NewRequest("PUT", path, &mj)
 	if err != nil {
 		return nil, err
