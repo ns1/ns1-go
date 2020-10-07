@@ -1,4 +1,6 @@
 ## 2.5.0 (Unreleased)
+FEATURES:
+* Added support for named zones
 
 ## 2.4.2
 FEATURES:
