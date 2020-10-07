@@ -111,7 +111,7 @@ $ENDPOINT/v1/zones/example-internal -d '{zone: example.com, name: example-intern
                    L___ NAME             L____ ZONE         L____ NAME
 
 `example-internal` shares the FQDN with `example.com`. API calls using
-`example.com` as the identifier will uniquely identify the first zone, to
+`example.com` as the identifier will uniquely identify the first zone. To
 address the second zone, `example-internal` must be used in the identifier
 
 So, you can continue to use the FQDN as an identifier - in fact, if you
@@ -128,7 +128,7 @@ For compatibility, we've left the `zone` variable alone in existing functions.
 When name and FQDN differ, and you are calling a func that takes `zone`, you
 want to pass the identifier, `name`. The only time you need to be sure to pass
 the zone's FQDN is on zone or record creation, where we need to know it.
-Otherwise, we're doing lookups, and the `name` is the unambigious field.
+Otherwise, we're doing lookups, and the `name` is the unambiguous field.
 
 For those using views, the NewNamedZone and NewNamedRecord funcs are provided
 to create zones and records. If not using views, you can opt to continue using
