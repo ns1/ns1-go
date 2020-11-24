@@ -5,23 +5,24 @@ type SynthesizeDNSRecords struct {
 	Enabled bool `json:"enabled,omitempty"`
 }
 
-// Settings encapsulates common values between SettingsV4 and Sett
+// Settings encapsulates common values between SettingsV4 and SettingsV6
 type Settings struct {
+	// Enabled indicates whether v4 or v6 is enabled
 	Enabled *bool `json:"enabled,omitempty"`
 
-	// how long leases given out by the server are valid
+	// ValidLifetimeSecs how long leases given out by the server are valid
 	ValidLifetimeSecs *int `json:"valid_lifetime_secs,omitempty"`
 
-	// length of DHCP T1 timer
+	// RenewTimerSecs length of DHCP T1 timer
 	RenewTimerSecs *int `json:"renew_timer_secs,omitempty"`
 
-	// length of DHCP T2 timer
+	// RebindTimerSecs length of DHCP T2 timer
 	RebindTimerSecs *int `json:"rebind_timer_secs,omitempty"`
 
-	// https://tools.ietf.org/html/rfc6842
+	// EchoClientID https://tools.ietf.org/html/rfc6842
 	EchoClientID *bool `json:"echo_client_id,omitempty"`
 
-	// base dhcp options -- will be combined with later levels; should effectively be unique by option name
+	// Options base dhcp options -- will be combined with later levels; should effectively be unique by option name
 	Options OptionSet `json:"options"`
 
 	SynthesizeDNSRecords *SynthesizeDNSRecords `json:"nsone-ddns,omitempty"`
@@ -29,26 +30,26 @@ type Settings struct {
 	QualifyingSuffix *string `json:"qualifying_suffix,omitempty"`
 	GeneratedPrefix  *string `json:"generated_prefix,omitempty"`
 
-	// how long lease will stay unavailable for assignment after DHCPDECLINE
+	// DeclineProbationPeriod how long lease will stay unavailable for assignment after DHCPDECLINE
 	DeclineProbationPeriod *int `json:"decline_probation_period,omitempty"`
 
-	// interval between reclamation cycles in seconds
+	// ReclaimTimerWaitTime interval between reclamation cycles in seconds
 	ReclaimTimerWaitTime *int `json:"reclaim_timer_wait_time,omitempty"`
 
-	// how often the server initiates lease reclamation in seconds
+	// FlushReclaimedTimerWaitTime how often the server initiates lease reclamation in seconds
 	FlushReclaimedTimerWaitTime *int `json:"flush_reclaimed_timer_wait_time,omitempty"`
 
-	// how long the lease should be kept after it is reclaimed in seconds
+	// HoldReclaimedTime how long the lease should be kept after it is reclaimed in seconds
 	HoldReclaimedTime *int `json:"hold_reclaimed_time,omitempty"`
 
-	// maximum number of leases to process at once (zero is unlimited)
+	// MaxReclaimLeases maximum number of leases to process at once (zero is unlimited)
 	MaxReclaimLeases *int `json:"max_reclaim_leases,omitempty"`
 
-	// upper limit to the length of time a lease reclamation procedure can take
+	// MaxReclaimTime upper limit to the length of time a lease reclamation procedure can take
 	// (in milliseconds)
 	MaxReclaimTime *int `json:"max_reclaim_time,omitempty"`
 
-	// how many consecutive cycles must end with remaining leases before a warning
+	// UnwarnedReclaimCycles how many consecutive cycles must end with remaining leases before a warning
 	// is printed
 	UnwarnedReclaimCycles *int `json:"unwarned_reclaim_cycles,omitempty"`
 }
