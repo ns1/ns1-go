@@ -72,6 +72,7 @@ type Client struct {
 	Zones         *ZonesService
 	DNSSEC        *DNSSECService
 	IPAM          *IPAMService
+	ScopeGroup    *ScopeGroupService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -105,6 +106,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Zones = (*ZonesService)(&c.common)
 	c.DNSSEC = (*DNSSECService)(&c.common)
 	c.IPAM = (*IPAMService)(&c.common)
+	c.ScopeGroup = (*ScopeGroupService)(&c.common)
 
 	for _, option := range options {
 		option(c)
