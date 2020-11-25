@@ -44,7 +44,7 @@ func (s *ScopeGroupService) Get(sgID int) (*dhcp.ScopeGroup, *http.Response, err
 	return sg, resp, nil
 }
 
-// CreateScopeGroup creates an scope group.
+// Create creates a scope group.
 // The Name field is required.
 //
 // NS1 API docs: https://ns1.com/api#putcreate-a-scope-group
@@ -69,7 +69,7 @@ func (s *ScopeGroupService) Create(sg *dhcp.ScopeGroup) (*dhcp.ScopeGroup, *http
 	return respSg, resp, nil
 }
 
-// EditScopeGroup updates an existing scope group.
+// Edit updates an existing scope group.
 // The ID field is required.
 //
 // NS1 API docs: https://ns1.com/api#postedit-scope-group
@@ -92,7 +92,7 @@ func (s *ScopeGroupService) Edit(sg *dhcp.ScopeGroup) (*dhcp.ScopeGroup, *http.R
 	return sg, resp, nil
 }
 
-// DeleteScopeGroup removes a Scope Group entirely.
+// Delete removes a Scope Group entirely.
 //
 // NS1 API docs: https://ns1.com/api#deleteremove-scope-group-by-id
 func (s *ScopeGroupService) Delete(id int) (*http.Response, error) {
