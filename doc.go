@@ -5,4 +5,4 @@
 //
 //      https://ns1.com/
 //
-package ns1
+package main
