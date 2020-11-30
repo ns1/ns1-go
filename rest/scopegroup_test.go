@@ -19,35 +19,33 @@ func TestDHCPScopeGroup(t *testing.T) {
 	client := api.NewClient(doer, api.SetEndpoint("https://"+mock.Address+"/v1/"))
 
 	t.Run("List", func(t *testing.T) {
-		t.Run("Pagination", func(t *testing.T) {
-			defer mock.ClearTestCases()
+		defer mock.ClearTestCases()
 
-			client.FollowPagination = true
-			sgs := []dhcp.ScopeGroup{
-				{Name: "a"},
-				{Name: "b"},
-				{Name: "c"},
-				{Name: "d"},
-			}
-			err := mock.AddTestCase(http.MethodGet, "/dhcp/scopegroup", http.StatusOK, nil, nil, "", sgs)
-			if err != nil {
-				t.Fatalf("error adding test case: %v", err)
-			}
+		client.FollowPagination = true
+		sgs := []dhcp.ScopeGroup{
+			{Name: "a"},
+			{Name: "b"},
+			{Name: "c"},
+			{Name: "d"},
+		}
+		err := mock.AddTestCase(http.MethodGet, "/dhcp/scopegroup", http.StatusOK, nil, nil, "", sgs)
+		if err != nil {
+			t.Fatalf("error adding test case: %v", err)
+		}
 
-			respSgs, _, err := client.ScopeGroup.List()
-			if err != nil {
-				t.Fatalf("error listing IPAM addresses: %v", err)
-			}
-			if len(respSgs) != len(sgs) {
-				t.Errorf("wrong length: want=%d, got=%d", len(sgs), len(respSgs))
-			}
+		respSgs, _, err := client.ScopeGroup.List()
+		if err != nil {
+			t.Fatalf("error listing IPAM addresses: %v", err)
+		}
+		if len(respSgs) != len(sgs) {
+			t.Errorf("wrong length: want=%d, got=%d", len(sgs), len(respSgs))
+		}
 
-			for i, sg := range respSgs {
-				if sg.Name != sgs[i].Name {
-					t.Errorf("Incorrect name for scope group %d: want=%q, got=%q", i, sgs[i].Name, sg.Name)
-				}
+		for i, sg := range respSgs {
+			if sg.Name != sgs[i].Name {
+				t.Errorf("Incorrect name for scope group %d: want=%q, got=%q", i, sgs[i].Name, sg.Name)
 			}
-		})
+		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
