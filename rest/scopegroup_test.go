@@ -85,7 +85,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 		enabled := true
 		sg := &dhcp.ScopeGroup{
 			Name: "a",
-			DHCP4: &dhcp.SettingsV4{
+			DHCP4: dhcp.SettingsV4{
 				Settings: dhcp.Settings{
 					Enabled:           &enabled,
 					ValidLifetimeSecs: &validSecs,
@@ -121,7 +121,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 		sg := &dhcp.ScopeGroup{
 			ID:   1,
 			Name: "a",
-			DHCP4: &dhcp.SettingsV4{
+			DHCP4: dhcp.SettingsV4{
 				Settings: dhcp.Settings{
 					Enabled:           &enabled,
 					ValidLifetimeSecs: &validSecs,
