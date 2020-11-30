@@ -85,28 +85,29 @@ const (
 // PingCheckConf represents config for a ping check in a scope group
 type PingCheckConf struct {
 	Enabled         bool   `json:"enabled,omitempty"`
-	NumPings        int    `json:"num_pings,omitempty"`
-	ProbationPeriod int    `json:"probation_period,omitempty"`
+	NumPings        *int   `json:"num_pings,omitempty"`
+	ProbationPeriod *int   `json:"probation_period,omitempty"`
 	Type            string `json:"type,omitempty"`
-	WaitTime        int    `json:"wait_time,omitempty"`
+	WaitTime        *int   `json:"wait_time,omitempty"`
 }
 
 // ScopeGroup wraps an NS1 /dhcp/scopegroup resource.
 type ScopeGroup struct {
-	ID             int         `json:"id,omitempty"`
-	Name           string      `json:"name,omitempty"`
-	IDDHCPService  *int        `json:"dhcp_service_id,omitempty"`
-	DHCP4          *SettingsV4 `json:"dhcpv4,omitempty"`
-	DHCP6          *SettingsV6 `json:"dhcpv6,omitempty"`
-	NetworkID      int         `json:"network_id,omitempty"`
-	ReverseDNS     *bool       `json:"reverse_dns,omitempty"`
-	ClientClassIds []int
-	Tags           map[string]string `json:"tags,omitempty"`
-	LocalTags      []string          `json:"local_tags"`
-	BlockedTags    []string          `json:"blocked_tags"`
-	IsTemplate     bool              `json:"-"`
-	TemplateName   *string           `json:"-"`
-	TemplateID     *int              `json:"-"`
-	Retain         bool              `json:"-"`
-	PingCheck      *PingCheckConf    `json:"ping_check,omitempty"`
+	ID             int            `json:"id,omitempty"`
+	Name           string         `json:"name,omitempty"`
+	IDDHCPService  *int           `json:"dhcp_service_id,omitempty"`
+	DHCP4          SettingsV4     `json:"dhcpv4,omitempty"`
+	DHCP6          SettingsV6     `json:"dhcpv6,omitempty"`
+	NetworkID      *int           `json:"network_id,omitempty"`
+	ReverseDNS     *bool          `json:"reverse_dns,omitempty"`
+	ClientClassIds []int          `json:"client_class_ids,omitempty"`
+	PingCheck      *PingCheckConf `json:"ping_check,omitempty"`
+
+	Tags        map[string]string `json:"tags,omitempty"`
+	LocalTags   []string          `json:"local_tags"`
+	BlockedTags []string          `json:"blocked_tags"`
+
+	// TemplateConfig is read-only field
+	TemplateConfig []string `json:"template_config,omitempty"`
+	Template       *string  `json:"template,omitempty"`
 }
