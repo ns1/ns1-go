@@ -76,10 +76,10 @@ type OptionDefSchema struct {
 // OptionDef configures a custom option definition
 // https://ftp.isc.org/isc/kea/1.4.0/doc/kea-guide.html#dhcp4-custom-options
 type OptionDef struct {
-	Space        string          `json:"space,omitempty"`
+	Space        *string         `json:"space,omitempty"`
 	FriendlyName string          `json:"friendly_name"`
 	Description  string          `json:"description"`
 	Code         int             `json:"code"`
-	Encapsulate  string          `json:"encapsulate,omitempty"`
+	Encapsulate  *string         `json:"encapsulate,omitempty"`
 	Schema       OptionDefSchema `json:"schema"`
 }
