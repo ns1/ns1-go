@@ -74,6 +74,7 @@ type Client struct {
 	IPAM          *IPAMService
 	ScopeGroup    *ScopeGroupService
 	Scope         *ScopeService
+	Reservation   *ReservationService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -109,6 +110,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.IPAM = (*IPAMService)(&c.common)
 	c.ScopeGroup = (*ScopeGroupService)(&c.common)
 	c.Scope = (*ScopeService)(&c.common)
+	c.Reservation = (*ReservationService)(&c.common)
 
 	for _, option := range options {
 		option(c)
