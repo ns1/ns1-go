@@ -78,7 +78,7 @@ func (s *ScopeGroupService) Edit(sg *dhcp.ScopeGroup) (*dhcp.ScopeGroup, *http.R
 		return nil, nil, errors.New("the ID field is required")
 	}
 
-	reqPath := fmt.Sprintf("dhcp/scopegroup/%d", sg.ID)
+	reqPath := fmt.Sprintf("dhcp/scopegroup/%d", *sg.ID)
 	req, err := s.client.NewRequest(http.MethodPost, reqPath, sg)
 	if err != nil {
 		return nil, nil, err
