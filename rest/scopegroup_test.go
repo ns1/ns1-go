@@ -115,9 +115,10 @@ func TestDHCPScopeGroup(t *testing.T) {
 		defer mock.ClearTestCases()
 
 		enabled := true
+		id := 1
 		validSecs := 123
 		sg := &dhcp.ScopeGroup{
-			ID:   1,
+			ID:   &id,
 			Name: "a",
 			DHCP4: dhcp.SettingsV4{
 				Settings: dhcp.Settings{

@@ -93,7 +93,7 @@ type PingCheckConf struct {
 
 // ScopeGroup wraps an NS1 /dhcp/scopegroup resource.
 type ScopeGroup struct {
-	ID             int            `json:"id,omitempty"`
+	ID             *int           `json:"id,omitempty"`
 	Name           string         `json:"name,omitempty"`
 	IDDHCPService  *int           `json:"dhcp_service_id,omitempty"`
 	DHCP4          SettingsV4     `json:"dhcpv4,omitempty"`
