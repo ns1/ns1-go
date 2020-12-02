@@ -74,7 +74,7 @@ func (s *ScopeGroupService) Create(sg *dhcp.ScopeGroup) (*dhcp.ScopeGroup, *http
 //
 // NS1 API docs: https://ns1.com/api#postedit-scope-group
 func (s *ScopeGroupService) Edit(sg *dhcp.ScopeGroup) (*dhcp.ScopeGroup, *http.Response, error) {
-	if sg.ID == 0 {
+	if sg.ID == nil {
 		return nil, nil, errors.New("the ID field is required")
 	}
 
