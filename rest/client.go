@@ -73,7 +73,7 @@ type Client struct {
 	DNSSEC        *DNSSECService
 	IPAM          *IPAMService
 	ScopeGroup    *ScopeGroupService
-  Scope         *ScopeService
+  	Scope         *ScopeService
 	Reservation   *ReservationService
 	OptionDef     *OptionDefService
 }
