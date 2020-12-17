@@ -10,7 +10,7 @@ import (
 // ScopeGroupService handles the 'scope group' endpoints.
 type ScopeGroupService service
 
-// ListScopeGroups returns a list of all scope groups.
+// List returns a list of all scope groups.
 //
 // NS1 API docs: https://ns1.com/api#getlist-scope-groups
 func (s *ScopeGroupService) List() ([]dhcp.ScopeGroup, *http.Response, error) {
@@ -24,7 +24,7 @@ func (s *ScopeGroupService) List() ([]dhcp.ScopeGroup, *http.Response, error) {
 	return sgs, resp, err
 }
 
-// GetScopeGroup returns the Scope Group corresponding to the provided scope group ID.
+// Get returns the Scope Group corresponding to the provided scope group ID.
 //
 // NS1 API docs: https://ns1.com/api#getview-scope-group
 func (s *ScopeGroupService) Get(sgID int) (*dhcp.ScopeGroup, *http.Response, error) {

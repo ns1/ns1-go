@@ -83,6 +83,7 @@ func TestDHCPReservation(t *testing.T) {
 		idAddr := 123
 		sg := &dhcp.Reservation{
 			IDAddress: &idAddr,
+			Options:   make([]dhcp.Option, 0),
 		}
 		err := mock.AddTestCase(http.MethodPut, "/dhcp/reservation", http.StatusCreated, nil, nil, sg, sg)
 		if err != nil {
@@ -100,7 +101,10 @@ func TestDHCPReservation(t *testing.T) {
 	t.Run("Edit", func(t *testing.T) {
 		t.Run("RequiredParams", func(t *testing.T) {
 			idAddr := 123
-			sg := &dhcp.Reservation{IDAddress: &idAddr}
+			sg := &dhcp.Reservation{
+				IDAddress: &idAddr,
+				Options:   make([]dhcp.Option, 0),
+			}
 			_, _, err = client.Reservation.Edit(sg)
 			if err == nil {
 				t.Errorf("expected a missing ID to result in an error")
@@ -120,6 +124,7 @@ func TestDHCPReservation(t *testing.T) {
 		sg := &dhcp.Reservation{
 			ID:        &id,
 			IDAddress: &idAddr,
+			Options:   make([]dhcp.Option, 0),
 		}
 		err := mock.AddTestCase(http.MethodPost, "/dhcp/reservation/1", http.StatusOK, nil, nil, sg, sg)
 		if err != nil {

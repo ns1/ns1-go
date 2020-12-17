@@ -20,6 +20,7 @@ type Reservation struct {
 	BlockedTags []string          `json:"blocked_tags,omitempty"`
 }
 
+// IdentifierType is a type of the reservation identifier
 type IdentifierType string
 
 const (
@@ -29,6 +30,7 @@ const (
 	ClientIDType  IdentifierType = "client-id"
 )
 
+// Identifier is a reservation identifier
 type Identifier struct {
 	Type  IdentifierType `json:"type,omitempty"`
 	Value string         `json:"value,omitempty"`

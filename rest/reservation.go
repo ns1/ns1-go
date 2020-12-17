@@ -86,7 +86,7 @@ func (s *ReservationService) Edit(sc *dhcp.Reservation) (*dhcp.Reservation, *htt
 		return nil, nil, errors.New("the Options field is required")
 	}
 
-	reqPath := fmt.Sprintf("dhcp/reservation/%d", sc.ID)
+	reqPath := fmt.Sprintf("dhcp/reservation/%d", *sc.ID)
 	req, err := s.client.NewRequest(http.MethodPost, reqPath, sc)
 	if err != nil {
 		return nil, nil, err
