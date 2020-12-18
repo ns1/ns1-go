@@ -73,6 +73,7 @@ type Client struct {
 	DNSSEC        *DNSSECService
 	IPAM          *IPAMService
 	ScopeGroup    *ScopeGroupService
+	Scope         *ScopeService
 	OptionDef     *OptionDefService
 }
 
@@ -108,6 +109,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.DNSSEC = (*DNSSECService)(&c.common)
 	c.IPAM = (*IPAMService)(&c.common)
 	c.ScopeGroup = (*ScopeGroupService)(&c.common)
+	c.Scope = (*ScopeService)(&c.common)
 	c.OptionDef = (*OptionDefService)(&c.common)
 
 	for _, option := range options {
