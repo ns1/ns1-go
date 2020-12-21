@@ -74,6 +74,7 @@ type Client struct {
 	IPAM          *IPAMService
 	ScopeGroup    *ScopeGroupService
 	Scope         *ScopeService
+	Reservation   *ReservationService
 	OptionDef     *OptionDefService
 }
 
@@ -110,6 +111,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.IPAM = (*IPAMService)(&c.common)
 	c.ScopeGroup = (*ScopeGroupService)(&c.common)
 	c.Scope = (*ScopeService)(&c.common)
+	c.Reservation = (*ReservationService)(&c.common)
 	c.OptionDef = (*OptionDefService)(&c.common)
 
 	for _, option := range options {

@@ -129,7 +129,7 @@ type Meta struct {
 	// Values between 0 and 100 are recommended for simplicity's sake.
 	// float64 or FeedPtr.
 	Weight interface{} `json:"weight,omitempty"`
-	
+
 	// Indicates a cost.
 	// Filters that use costs normalize them.
 	// Any positive values are allowed.

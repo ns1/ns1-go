@@ -66,6 +66,7 @@ const (
 	SchemaTypeUint8                  = "uint8"
 )
 
+// OptionDefSchema is a schema of the option def which describes the value that option can hold
 type OptionDefSchema struct {
 	Fields             []OptionDefSchemaItems `json:"fields"`
 	Items              *string                `json:"items,omitempty"`
