@@ -1,7 +1,10 @@
 package dns
 
-import "encoding/json"
-import "gopkg.in/ns1/ns1-go.v2/rest/model/data"
+import (
+	"encoding/json"
+
+	"gopkg.in/ns1/ns1-go.v2/rest/model/data"
+)
 
 // Zone wraps an NS1 /zone resource
 type Zone struct {
@@ -41,6 +44,16 @@ type Zone struct {
 	// Whether or not DNSSEC is enabled on the zone. Note we use a pointer so
 	// leaving this unset will not change a previous setting.
 	DNSSEC *bool `json:"dnssec,omitempty"`
+
+	// Contains the key/value tag information associated to the zone
+	Tags map[string]string `json:"tags,omitempty"`
+
+	// List of tag key names that should not inherit from the parent object
+	BlockedTags []string `json:"blocked_tags,omitempty"`
+
+	// List of tag key namess set directly on this zone. Any other Tag entries
+	// are inherited from a higher level
+	LocalTags []string `json:"local_tags,omitempty"`
 }
 
 func (z Zone) String() string {
@@ -56,6 +69,16 @@ type ZoneRecord struct {
 	Tier     json.Number `json:"tier,omitempty"`
 	TTL      int         `json:"ttl,omitempty"`
 	Type     string      `json:"type,omitempty"`
+
+	// Contains the key/value tag information associated to the record
+	Tags map[string]string `json:"tags,omitempty"`
+
+	// List of tag key names that should not inherit from the parent zone
+	BlockedTags []string `json:"blocked_tags,omitempty"`
+
+	// List of tag key namess set directly on this record. Any other Tag entries
+	// are inherited from the zone
+	LocalTags []string `json:"local_tags,omitempty"`
 }
 
 // ZonePrimary wraps a Zone's "primary" attribute
@@ -110,7 +133,10 @@ type TSIG struct {
 // NewZone takes a zone domain name and creates a new zone.
 func NewZone(zone string) *Zone {
 	z := Zone{
-		Zone: zone,
+		Zone:        zone,
+		Tags:        map[string]string{},
+		BlockedTags: []string{},
+		LocalTags:   []string{},
 	}
 	return &z
 }

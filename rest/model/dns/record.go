@@ -27,6 +27,16 @@ type Record struct {
 	Filters []*filter.Filter `json:"filters"`
 	// The records' regions.
 	Regions data.Regions `json:"regions,omitempty"`
+
+	// Contains the key/value tag information associated to the record
+	Tags map[string]string `json:"tags,omitempty"`
+
+	// List of tag key names that should not inherit from the parent zone
+	BlockedTags []string `json:"blocked_tags,omitempty"`
+
+	// List of tag key namess set directly on this record. Any other Tag entries
+	// are inherited from the parent zone
+	LocalTags []string `json:"local_tags,omitempty"`
 }
 
 func (r Record) String() string {
@@ -40,13 +50,16 @@ func NewRecord(zone string, domain string, t string) *Record {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
 	return &Record{
-		Meta:    &data.Meta{},
-		Zone:    zone,
-		Domain:  domain,
-		Type:    t,
-		Answers: []*Answer{},
-		Filters: []*filter.Filter{},
-		Regions: data.Regions{},
+		Meta:        &data.Meta{},
+		Zone:        zone,
+		Domain:      domain,
+		Type:        t,
+		Answers:     []*Answer{},
+		Filters:     []*filter.Filter{},
+		Regions:     data.Regions{},
+		Tags:        map[string]string{},
+		BlockedTags: []string{},
+		LocalTags:   []string{},
 	}
 }
 
