@@ -128,7 +128,6 @@ type TSIG struct {
 func NewZone(zone string) *Zone {
 	z := Zone{
 		Zone: zone,
-		Tags: map[string]string{},
 	}
 	return &z
 }

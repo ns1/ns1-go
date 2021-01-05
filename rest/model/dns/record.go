@@ -49,15 +49,13 @@ func NewRecord(zone string, domain string, t string) *Record {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
 	return &Record{
-		Meta:        &data.Meta{},
-		Zone:        zone,
-		Domain:      domain,
-		Type:        t,
-		Answers:     []*Answer{},
-		Filters:     []*filter.Filter{},
-		Regions:     data.Regions{},
-		Tags:        map[string]string{},
-		BlockedTags: []string{},
+		Meta:    &data.Meta{},
+		Zone:    zone,
+		Domain:  domain,
+		Type:    t,
+		Answers: []*Answer{},
+		Filters: []*filter.Filter{},
+		Regions: data.Regions{},
 	}
 }
 
