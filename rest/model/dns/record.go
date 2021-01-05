@@ -29,14 +29,13 @@ type Record struct {
 	Regions data.Regions `json:"regions,omitempty"`
 
 	// Contains the key/value tag information associated to the record
-	Tags map[string]string `json:"tags,omitempty"`
+	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 
 	// List of tag key names that should not inherit from the parent zone
-	BlockedTags []string `json:"blocked_tags,omitempty"`
+	BlockedTags []string `json:"blocked_tags,omitempty"` //Only relevant for DDI
 
-	// List of tag key namess set directly on this record. Any other Tag entries
-	// are inherited from the parent zone
-	LocalTags []string `json:"local_tags,omitempty"`
+	// Read-only fields
+	LocalTags []string `json:"local_tags,omitempty"` // Only relevant for DDI
 }
 
 func (r Record) String() string {
@@ -59,7 +58,6 @@ func NewRecord(zone string, domain string, t string) *Record {
 		Regions:     data.Regions{},
 		Tags:        map[string]string{},
 		BlockedTags: []string{},
-		LocalTags:   []string{},
 	}
 }
 

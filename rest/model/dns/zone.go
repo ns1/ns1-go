@@ -14,7 +14,8 @@ type Zone struct {
 	// Read-only fields
 	DNSServers   []string `json:"dns_servers,omitempty"`
 	NetworkPools []string `json:"network_pools,omitempty"`
-	Pool         string   `json:"pool,omitempty"` // Deprecated
+	Pool         string   `json:"pool,omitempty"`       // Deprecated
+	LocalTags    []string `json:"local_tags,omitempty"` // Only relevant for DDI
 
 	ID   string `json:"id,omitempty"`
 	Zone string `json:"zone,omitempty"`
@@ -46,14 +47,7 @@ type Zone struct {
 	DNSSEC *bool `json:"dnssec,omitempty"`
 
 	// Contains the key/value tag information associated to the zone
-	Tags map[string]string `json:"tags,omitempty"`
-
-	// List of tag key names that should not inherit from the parent object
-	BlockedTags []string `json:"blocked_tags,omitempty"`
-
-	// List of tag key namess set directly on this zone. Any other Tag entries
-	// are inherited from a higher level
-	LocalTags []string `json:"local_tags,omitempty"`
+	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 }
 
 func (z Zone) String() string {
@@ -133,10 +127,8 @@ type TSIG struct {
 // NewZone takes a zone domain name and creates a new zone.
 func NewZone(zone string) *Zone {
 	z := Zone{
-		Zone:        zone,
-		Tags:        map[string]string{},
-		BlockedTags: []string{},
-		LocalTags:   []string{},
+		Zone: zone,
+		Tags: map[string]string{},
 	}
 	return &z
 }
