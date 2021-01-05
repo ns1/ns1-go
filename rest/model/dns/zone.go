@@ -64,15 +64,11 @@ type ZoneRecord struct {
 	TTL      int         `json:"ttl,omitempty"`
 	Type     string      `json:"type,omitempty"`
 
-	// Contains the key/value tag information associated to the record
-	Tags map[string]string `json:"tags,omitempty"`
+	// Contains the key/value tag information associated to the zone
+	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 
-	// List of tag key names that should not inherit from the parent zone
-	BlockedTags []string `json:"blocked_tags,omitempty"`
-
-	// List of tag key namess set directly on this record. Any other Tag entries
-	// are inherited from the zone
-	LocalTags []string `json:"local_tags,omitempty"`
+	// Read-only fields
+	LocalTags []string `json:"local_tags,omitempty"` // Only relevant for DDI
 }
 
 // ZonePrimary wraps a Zone's "primary" attribute
