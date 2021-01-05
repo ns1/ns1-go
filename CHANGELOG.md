@@ -1,5 +1,9 @@
 ## 2.5.0 (Unreleased)
 
+## 2.4.3
+FEATURES:
+* Added support for tagging in DDI on records and zones
+
 ## 2.4.2
 FEATURES:
 * Added support for "cost" meta option on records
