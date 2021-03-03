@@ -39,6 +39,7 @@ type PermissionsAccount struct {
 	ManageAccountSettings bool `json:"manage_account_settings"`
 	ViewActivityLog       bool `json:"view_activity_log"`
 	ViewInvoices          bool `json:"view_invoices"`
+	ManageIPWhitelist     bool `json:"manage_ip_whitelist"`
 }
 
 // PermissionsSecurity wraps a User's "permissions.security" attribute.
