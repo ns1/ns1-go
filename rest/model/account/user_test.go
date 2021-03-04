@@ -89,7 +89,8 @@ func TestUnmarshalUsers(t *testing.T) {
         "manage_account_settings": false,
         "view_activity_log": false,
         "view_invoices": false,
-        "manage_users": false
+        "manage_users": false,
+        "manage_ip_whitelist": true
       },
       "monitoring": {
         "manage_lists": false,
@@ -135,6 +136,7 @@ func TestUnmarshalUsers(t *testing.T) {
 						ViewActivityLog:       false,
 						ViewInvoices:          false,
 						ManageUsers:           false,
+						ManageIPWhitelist:     true,
 					},
 					Monitoring: PermissionsMonitoring{
 						ManageLists: false,
