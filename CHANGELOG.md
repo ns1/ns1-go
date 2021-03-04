@@ -1,5 +1,9 @@
 ## 2.5.0 (Unreleased)
 
+## 2.4.4
+FEATURES:
+* Added missing manage_ip_whitelist permission to the account permissions section
+
 ## 2.4.3
 FEATURES:
 * Added support for tagging in DDI on records and zones
