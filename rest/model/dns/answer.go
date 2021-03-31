@@ -143,7 +143,7 @@ func NewSRVAnswer(priority, weight, port int, target string) *Answer {
 
 // NewDSAnswer creates an Answer for DS record.
 func NewDSAnswer(key string, algorithm string, t string, digest string) *Answer {
-	return &dns.Answer{
+	return &.Answer{
 		Meta: &data.Meta{},
 		Rdata: []string{
 			key,
