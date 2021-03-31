@@ -1,5 +1,9 @@
 ## 2.5.0 (Unreleased)
 
+## 2.4.5 (March 31, 2020)
+FEATURES:
+* Adds support for DS record type
+
 ## 2.4.4
 FEATURES:
 * Added missing manage_ip_whitelist permission to the account permissions section
