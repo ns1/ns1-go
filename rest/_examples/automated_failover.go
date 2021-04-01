@@ -15,7 +15,7 @@ import (
 	"gopkg.in/ns1/ns1-go.v2/rest/model/filter"
 )
 
-var client *api.Client
+//var client *api.Client
 
 // Helper that initializes rest api client from environment variable.
 func init() {
