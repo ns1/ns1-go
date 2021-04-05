@@ -23,7 +23,8 @@ func TestCreateAPIKey(t *testing.T) {
 		assert.Nil(t, k.Permissions.DHCP)
 		assert.Nil(t, k.Permissions.IPAM)
 
-		w.Write(b)
+		_, err = w.Write(b)
+		require.NoError(t, err)
 	}))
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL))
@@ -53,7 +54,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 			assert.NotNil(t, k.Permissions.IPAM)
 			assert.NotNil(t, k.IPWhitelist)
 			assert.True(t, k.IPWhitelistStrict)
-			// ensure tags permissions are not included by default to maintain backwards compatibility
+			// ensure auth tag permissions are not included by default to maintain backwards compatibility
 			assert.Nil(t, k.Permissions.DHCP.TagsAllow)
 			assert.Nil(t, k.Permissions.DHCP.TagsDeny)
 			assert.Nil(t, k.Permissions.IPAM.TagsAllow)
@@ -69,9 +70,17 @@ func TestCreateDDIAPIKey(t *testing.T) {
 			assert.Equal(t, "", (*k.Permissions.IPAM.TagsAllow)[0].Value)
 			assert.Equal(t, "auth:ipamdeny", (*k.Permissions.IPAM.TagsDeny)[0].Name)
 			assert.Equal(t, "denyme", (*k.Permissions.IPAM.TagsDeny)[0].Value)
+		case "ddi-empty-authtags":
+			assert.NotNil(t, k.Permissions.DHCP)
+			assert.NotNil(t, k.Permissions.IPAM)
+			assert.Equal(t, []account.AuthTag{}, *k.Permissions.DHCP.TagsAllow)
+			assert.Equal(t, []account.AuthTag{}, *k.Permissions.DHCP.TagsDeny)
+			assert.Equal(t, []account.AuthTag{}, *k.Permissions.IPAM.TagsAllow)
+			assert.Equal(t, []account.AuthTag{}, *k.Permissions.IPAM.TagsDeny)
 		}
 
-		w.Write(b)
+		_, err = w.Write(b)
+		require.NoError(t, err)
 	}))
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL), SetDDIAPI())
@@ -90,10 +99,10 @@ func TestCreateDDIAPIKey(t *testing.T) {
 	require.NoError(t, err)
 	// Create a key with auth tags
 	k = &account.APIKey{
-		ID:                "ddi-authtags",
-		Key:               "key-2",
-		Name:              "name-2",
-		Permissions:       account.PermissionsMap{
+		ID:   "ddi-authtags",
+		Key:  "key-2",
+		Name: "name-2",
+		Permissions: account.PermissionsMap{
 			DHCP: &account.PermissionsDHCP{
 				TagsAllow: &[]account.AuthTag{
 					{
@@ -101,7 +110,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 						Value: "",
 					},
 				},
-				TagsDeny:  &[]account.AuthTag{
+				TagsDeny: &[]account.AuthTag{
 					{
 						Name:  "auth:dhcpdeny",
 						Value: "denyme",
@@ -115,12 +124,28 @@ func TestCreateDDIAPIKey(t *testing.T) {
 						Value: "",
 					},
 				},
-				TagsDeny:  &[]account.AuthTag{
+				TagsDeny: &[]account.AuthTag{
 					{
 						Name:  "auth:ipamdeny",
 						Value: "denyme",
 					},
 				},
+			},
+		},
+	}
+	// Create a key with empty auth tags
+	k = &account.APIKey{
+		ID:   "ddi-empty-authtags",
+		Key:  "key-3",
+		Name: "name-3",
+		Permissions: account.PermissionsMap{
+			DHCP: &account.PermissionsDHCP{
+				TagsAllow: &[]account.AuthTag{},
+				TagsDeny:  &[]account.AuthTag{},
+			},
+			IPAM: &account.PermissionsIPAM{
+				TagsAllow: &[]account.AuthTag{},
+				TagsDeny:  &[]account.AuthTag{},
 			},
 		},
 	}
