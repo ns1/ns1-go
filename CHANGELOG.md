@@ -1,4 +1,6 @@
-## 2.5.0 (Unreleased)
+## 2.5.0 (April 5, 2020)
+FEATURES:
+* Adds support for `tags_allow` and `tags_deny` fields in IPAM and DHCP DDI permissions.
 
 ## 2.4.5 (March 31, 2020)
 FEATURES:
