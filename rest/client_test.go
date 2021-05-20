@@ -89,6 +89,34 @@ func TestClient_DoWithHTTPClientError(t *testing.T) {
 	assert.Equal(t, mockError, err)
 }
 
+func TestClient_DoWithHTTPClientErrorRateLimit(t *testing.T) {
+	// It should return nil response and the error, also should run the rate limit func
+	httpClient := mockHTTPClient{}
+	client := NewClient(&httpClient, SetEndpoint(""))
+	var rateLimit *RateLimit = nil
+	client.RateLimitFunc = func(r RateLimit) {
+		rateLimit = &r
+	}
+	req, _ := http.NewRequest("GET", "http://example.com", new(bytes.Buffer))
+
+	headerResponse := make(http.Header)
+	headerResponse.Add(headerRateLimit, "10")
+	headerResponse.Add(headerRateRemaining, "10")
+	headerResponse.Add(headerRatePeriod, "10")
+	mockResp := http.Response{
+		Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+		Header:     headerResponse,
+		StatusCode: 400,
+	}
+	httpClient.On("Do", req).Return(&mockResp, nil)
+
+	client.Do(req, "")
+
+	httpClient.AssertExpectations(t)
+
+	assert.NotNil(t, rateLimit)
+}
+
 func TestClient_DoWithNon2XXResponse(t *testing.T) {
 	// It should return a pointer to the response, and a pointer to Error (with
 	// the response)
