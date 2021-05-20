@@ -164,6 +164,12 @@ func SetDDIAPI() func(*Client) {
 // non-2XX response.
 func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
+
+	if resp != nil {
+		rl := parseRate(resp)
+		c.RateLimitFunc(rl)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -173,9 +179,6 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	if err != nil {
 		return resp, err
 	}
-
-	rl := parseRate(resp)
-	c.RateLimitFunc(rl)
 
 	if v != nil {
 		// Try to unmarshal body into given type using streaming decoder.
