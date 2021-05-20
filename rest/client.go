@@ -164,16 +164,13 @@ func SetDDIAPI() func(*Client) {
 // non-2XX response.
 func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
-
-	if resp != nil {
-		rl := parseRate(resp)
-		c.RateLimitFunc(rl)
-	}
-
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	rl := parseRate(resp)
+	c.RateLimitFunc(rl)
 
 	err = CheckResponse(resp)
 	if err != nil {

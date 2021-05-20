@@ -108,16 +108,13 @@ func TestClient_DoWithHTTPClientErrorRateLimit(t *testing.T) {
 		Header:     headerResponse,
 		StatusCode: 400,
 	}
-	mockError := errors.New("Some Error")
-	httpClient.On("Do", req).Return(&mockResp, mockError)
+	httpClient.On("Do", req).Return(&mockResp, nil)
 
-	resp, err := client.Do(req, "")
+	client.Do(req, "")
 
 	httpClient.AssertExpectations(t)
 
-	assert.Nil(t, resp)
 	assert.NotNil(t, rateLimit)
-	assert.Equal(t, mockError, err)
 }
 
 func TestClient_DoWithNon2XXResponse(t *testing.T) {
