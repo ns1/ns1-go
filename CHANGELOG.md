@@ -1,8 +1,12 @@
-## 2.5.0 (April 5, 2020)
+## 2.5.1 (May 20, 2021)
+BUG FIXES:
+* Handle rate limit despite HTTP error returned from API [#127](https://github.com/ns1/ns1-go/pull/127)
+
+## 2.5.0 (April 5, 2021)
 FEATURES:
 * Adds support for `tags_allow` and `tags_deny` fields in IPAM and DHCP DDI permissions.
 
-## 2.4.5 (March 31, 2020)
+## 2.4.5 (March 31, 2021)
 FEATURES:
 * Adds support for DS record type
 
