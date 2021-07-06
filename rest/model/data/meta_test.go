@@ -88,23 +88,19 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("up should be", expected, "was", m["up"].(string))
 	}
 
-	// Verify panic if passed deserialized json other than feed
-	meta.Up = map[string]interface{}{"badKey": "12345678"}
-	verifyStringMapPanic(t, meta)
+	meta.Subdivisions = map[string]interface{}{"BR": []string{"SP", "MG"}}
+	stra := meta.StringMap()
+	str_expected := "{\"BR\":[\"SP\",\"MG\"]}"
+	if stra["subdivisions"] != str_expected {
+		t.Fatal("expected:", str_expected, "got: ", stra["subdivisions"])
+	}
 
-	meta.Up = struct{}{}
-	verifyStringMapPanic(t, meta)
-
-}
-
-func verifyStringMapPanic(t *testing.T, meta *Meta) (r interface{}) {
-	defer func(t *testing.T) {
-		if r := recover(); r == nil {
-			t.Fatal("meta should have panicked but did not")
-		}
-	}(t)
-	meta.StringMap()
-	return
+	meta.Up = map[string]interface{}{"key": "12345678"}
+	stra = meta.StringMap()
+	str_expected = "{\"key\":\"12345678\"}"
+	if stra["up"] != str_expected {
+		t.Fatal("expected:", str_expected, "got: ", stra["up"])
+	}
 }
 
 func TestParseType(t *testing.T) {
@@ -226,6 +222,15 @@ func TestMetaFromMap(t *testing.T) {
 	expected = []string{"1", "2", "3"}
 	if !reflect.DeepEqual(meta.ASN.([]string), expected) {
 		t.Fatal("meta.ASN should be a slice containing elements `1`, `2`, and `3`")
+	}
+
+	sub := make(map[string]interface{})
+	sub["BR"] = []string{"SP", "MG"}
+	sub["DZ"] = []string{"01"}
+	m["Subdivisions"] = sub
+	meta = MetaFromMap(m)
+	if !reflect.DeepEqual(meta.Subdivisions.(map[string]interface{}), sub) {
+		t.Fatal("meta.Subdivisions should be a map[string]interface{} containing elements \"BR\":[\"SP\",\"MG\"],\"DZ\":[\"01\"] ")
 	}
 }
 
