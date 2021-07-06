@@ -1,3 +1,7 @@
+## 2.6.0 (July 6, 2021)
+FEATURES:
+* Adds support for subdivision metadata
+
 ## 2.5.1 (May 20, 2021)
 BUG FIXES:
 * Handle rate limit despite HTTP error returned from API [#127](https://github.com/ns1/ns1-go/pull/127)
