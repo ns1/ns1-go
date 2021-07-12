@@ -1,4 +1,5 @@
 ## 2.6.1 (July 12, 2021)
+FEATURES:
 * Adds missing `records_allow` and `records_deny` fields to account permissions
 
 ## 2.6.0 (July 6, 2021)
