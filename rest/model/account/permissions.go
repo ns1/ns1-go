@@ -15,13 +15,13 @@ type PermissionsMap struct {
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
 type PermissionsDNS struct {
-	ViewZones           bool     `json:"view_zones"`
-	ManageZones         bool     `json:"manage_zones"`
-	ZonesAllowByDefault bool     `json:"zones_allow_by_default"`
-	ZonesDeny           []string `json:"zones_deny"`
-	ZonesAllow          []string `json:"zones_allow"`
-	RecordsAllow        []Record `json:"records_allow"`
-	RecordsDeny         []Record `json:"records_deny"`
+	ViewZones           bool                `json:"view_zones"`
+	ManageZones         bool                `json:"manage_zones"`
+	ZonesAllowByDefault bool                `json:"zones_allow_by_default"`
+	ZonesDeny           []string            `json:"zones_deny"`
+	ZonesAllow          []string            `json:"zones_allow"`
+	RecordsAllow        []PermissionsRecord `json:"records_allow"`
+	RecordsDeny         []PermissionsRecord `json:"records_deny"`
 }
 
 // PermissionsData wraps a User's "permissions.data" attribute
@@ -85,7 +85,7 @@ type AuthTag struct {
 	Value string `json:"value"`
 }
 
-type Record struct {
+type PermissionsRecord struct {
 	Domain     string `json:"domain"`
 	Subdomains bool   `json:"include_subdomains"`
 	Zone       string `json:"zone"`
