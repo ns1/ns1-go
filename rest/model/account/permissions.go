@@ -85,7 +85,7 @@ type AuthTag struct {
 	Value string `json:"value"`
 }
 
-type Record struct {
+type PermissionsRecord struct {
 	Domain     string `json:"domain"`
 	Subdomains bool   `json:"include_subdomains"`
 	Zone       string `json:"zone"`
