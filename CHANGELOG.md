@@ -1,3 +1,6 @@
+## 2.6.1 (July 12, 2021)
+* Adds missing `records_allow` and `records_deny` fields to account permissions
+
 ## 2.6.0 (July 6, 2021)
 FEATURES:
 * Adds support for subdivision metadata
@@ -16,7 +19,7 @@ FEATURES:
 
 ## 2.4.4
 FEATURES:
-* Added missing manage_ip_whitelist permission to the account permissions section
+* Added missing `manage_ip_whitelist` permission to the account permissions section
 
 ## 2.4.3
 FEATURES:
