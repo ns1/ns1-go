@@ -155,7 +155,7 @@ func TestClient_DoWithNonJSONResponse(t *testing.T) {
 	httpClient.AssertExpectations(t)
 
 	assert.Nil(t, resp)
-	assert.IsType(t, &json.SyntaxError{}, err)
+	assert.IsType(t, &json.SyntaxError{}, errors.Unwrap(err))
 }
 
 func TestClient_DoWithPagination(t *testing.T) {

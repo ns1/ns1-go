@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -179,8 +180,12 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 	if v != nil {
 		// Try to unmarshal body into given type using streaming decoder.
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return nil, err
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading response body: %w", err)
+		}
+		if err := json.NewDecoder(strings.NewReader(string(body))).Decode(&v); err != nil {
+			return nil, fmt.Errorf("error decoding json response body. error: %w \nBody was: %s\nheaders were %+v", err, string(body), resp.Header)
 		}
 	}
 
