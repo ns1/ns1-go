@@ -1,3 +1,7 @@
+## 2.6.2 (July 23, 2021)
+FEATURES:
+* Adds missing `mute` field to monitoring jobs
+
 ## 2.6.1 (July 12, 2021)
 FEATURES:
 * Adds missing `records_allow` and `records_deny` fields to account permissions
