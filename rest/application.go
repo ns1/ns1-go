@@ -11,6 +11,25 @@ import (
 // ApplicationsService handles 'pulsar/apps/' endpoint.
 type ApplicationsService service
 
+// List returns all pulsar Applications
+//
+// NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
+func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, error) {
+	req, err := s.client.NewRequest("GET", "pulsar/apps", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	al := []*pulsar.Application{}
+	var resp *http.Response
+		resp, err = s.client.Do(req, &al)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return al, resp, nil
+}
+
 // Get takes a application id and returns application struct.
 //
 // NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
@@ -47,15 +66,8 @@ func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, err
 	if err != nil {
 		return nil, err
 	}
-
 	resp, err := s.client.Do(req, &a)
-
-	if err != nil {
-		panic(err)
-		return resp, err
-	}
-
-	return resp, nil
+	return resp, err
 }
 
 // Update takes a *pulsar.Application and updates the application with same id on Ns1.
