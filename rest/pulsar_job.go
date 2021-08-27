@@ -27,7 +27,7 @@ func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Respo
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			if errorType.Message == "pulsar app not found" {
+			if errorType.Resp.StatusCode == 404 {
 				return nil, resp, ErrAppMissing
 			}
 		}
@@ -49,14 +49,14 @@ func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, 
 	}
 
 	var job pulsar.PulsarJob
-	resp, err := s.client.Do(req, &job)
 
+	resp, err := s.client.Do(req, &job)
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			job_not_found := fmt.Sprintf("pulsar job %s not found for appid %s", jobId, appId)
+			jobNotFound := fmt.Sprintf("pulsar job %s not found for appid %s", jobId, appId)
 			switch errorType.Message {
-			case job_not_found:
+			case jobNotFound:
 				return nil, resp, ErrJobMissing
 
 			case "pulsar app not found":
@@ -75,17 +75,17 @@ func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, 
 func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", j.AppID)
 
-	req, err := s.client.NewRequest("PUT", path, &j)
+	req, err := s.client.NewRequest("PUT", path, j)
 	if err != nil {
 		return nil, err
 	}
 
 	// Update job fields with data from api(ensure consistent)
-	resp, err := s.client.Do(req, &j)
+	resp, err := s.client.Do(req, j)
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			if errorType.Message == "pulsar app not found" {
+			if errorType.Resp.StatusCode == 404 {
 				return resp, ErrAppMissing
 			}
 		}
@@ -102,21 +102,21 @@ func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) 
 func (s *PulsarJobsService) Update(j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", j.AppID, j.JobID)
 
-	req, err := s.client.NewRequest("POST", path, &j)
+	req, err := s.client.NewRequest("POST", path, j)
 	if err != nil {
 		return nil, err
 	}
 
 	// Update jobs fields with data from api(ensure consistent)
-	resp, err := s.client.Do(req, &j)
+	resp, err := s.client.Do(req, j)
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			job_not_found := fmt.Sprintf("pulsar job %s not found for appid %s", j.JobID, j.AppID)
+			jobNotFound := fmt.Sprintf("pulsar job %s not found for appid %s", j.JobID, j.AppID)
 			switch errorType.Message {
 			case "pulsar app not found":
 				return resp, ErrAppMissing
-			case job_not_found:
+			case jobNotFound:
 				return resp, ErrJobMissing
 			}
 		}
@@ -141,9 +141,9 @@ func (s *PulsarJobsService) Delete(pulsarJob *pulsar.PulsarJob) (*http.Response,
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			job_not_found := fmt.Sprintf("pulsar job %s not found for appid %s", pulsarJob.JobID, pulsarJob.AppID)
+			jobNotFound := fmt.Sprintf("pulsar job %s not found for appid %s", pulsarJob.JobID, pulsarJob.AppID)
 			switch errorType.Message {
-			case job_not_found:
+			case jobNotFound:
 				return resp, ErrJobMissing
 
 			case "pulsar app not found":

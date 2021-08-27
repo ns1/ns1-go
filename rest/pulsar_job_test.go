@@ -26,13 +26,18 @@ func TestPulsarJob(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
+			var (
+				myhost    = "myHost1"
+				myURLPATH = "/myURLPath1"
+			)
+
 			pulsarJobs := []*pulsar.PulsarJob{
 				{
 					Name:   "PulsarJob1",
 					TypeID: "latency",
-					Config: pulsar.JobConfig{
-						Host:     "myHost1",
-						URL_Path: "/myURLPath1",
+					Config: &pulsar.JobConfig{
+						Host:     &myhost,
+						URL_Path: &myURLPATH,
 					},
 				},
 				{
@@ -98,6 +103,17 @@ func TestPulsarJob(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
+			var (
+				testHost           = "myHost"
+				testUrlPath        = "/myURLPath"
+				testHttp           = false
+				testHttps          = true
+				testRequestTimeout = 1234
+				testJobTimeout     = 4321
+				testXHR            = true
+				testStaticValues   = true
+			)
+
 			pulsarJob := &pulsar.PulsarJob{
 				Customer:  2156,
 				TypeID:    "latency",
@@ -107,27 +123,27 @@ func TestPulsarJob(t *testing.T) {
 				AppID:     myAppID,
 				Active:    false,
 				Shared:    true,
-				Config: pulsar.JobConfig{
-					Host:                 "myHost",
-					URL_Path:             "/myURLPath",
-					Http:                 false,
-					Https:                true,
-					RequestTimeoutMillis: 1234,
-					JobTimeoutMillis:     4321,
-					UseXHR:               true,
-					StaticValues:         true,
+				Config: &pulsar.JobConfig{
+					Host:                 &testHost,
+					URL_Path:             &testUrlPath,
+					Http:                 &testHttp,
+					Https:                &testHttps,
+					RequestTimeoutMillis: &testRequestTimeout,
+					JobTimeoutMillis:     &testJobTimeout,
+					UseXHR:               &testXHR,
+					StaticValues:         &testStaticValues,
 					BlendMetricWeights: &pulsar.BlendMetricWeights{
 						Timestamp: 567,
 						Weights: []*pulsar.Weights{
 							{
 								Name:         "myWeight2",
-								Weight:       12.3,
+								Weight:       12,
 								DefaultValue: 32.1,
 								Maximize:     true,
 							},
 							{
 								Name:         "myWeight1",
-								Weight:       12.3,
+								Weight:       12,
 								DefaultValue: 32.1,
 								Maximize:     false,
 							},
@@ -229,7 +245,7 @@ func TestPulsarJob(t *testing.T) {
 				defer mock.ClearTestCases()
 
 				require.Nil(t, mock.AddTestCase(
-					http.MethodPut, fmt.Sprintf("pulsar/apps/%s/jobs", myAppID), http.StatusNotFound,
+					http.MethodPut, fmt.Sprintf("pulsar/apps/%s/jobs", myAppID), http.StatusBadRequest,
 					nil, nil, pulsarJob, `{"message": "test error"}`,
 				))
 

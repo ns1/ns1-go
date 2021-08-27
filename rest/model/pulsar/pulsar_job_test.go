@@ -14,10 +14,14 @@ func TestNewBBPulsarJob(t *testing.T) {
 }
 
 func TestNewJSPulsarJob(t *testing.T) {
-	j := NewJSPulsarJob("myJSPulsarJob", "myAppId", "myHost", "myURLPath")
+	var (
+		myHost    = "myHost"
+		myURLPath = "myURLPath"
+	)
+	j := NewJSPulsarJob("myJSPulsarJob", "myAppId", myHost, myURLPath)
 	assert.Equal(t, "latency", j.TypeID, "Wrong typeid")
 	assert.Equal(t, "myJSPulsarJob", j.Name, "Wrong name")
 	assert.Equal(t, "myAppId", j.AppID, "Wrong appid")
-	assert.Equal(t, "myHost", j.Config.Host, "Wrong host")
-	assert.Equal(t, "myURLPath", j.Config.URL_Path, "Wrong url_path")
+	assert.Equal(t, &myHost, j.Config.Host, "Wrong host")
+	assert.Equal(t, &myURLPath, j.Config.URL_Path, "Wrong url_path")
 }
