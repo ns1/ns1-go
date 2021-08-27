@@ -20,9 +20,8 @@ func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, err
 		return nil, nil, err
 	}
 
-	al := []*pulsar.Application{}
-	var resp *http.Response
-		resp, err = s.client.Do(req, &al)
+	var al []*pulsar.Application
+	resp, err := s.client.Do(req, &al)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -43,11 +42,10 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 
 	var a pulsar.Application
 	resp, err := s.client.Do(req, &a)
-
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if err.(*Error).Message == "pulsar app not found" {
+			if err.(*Error).Resp.StatusCode == 404 {
 				return nil, resp, ErrApplicationMissing
 			}
 		}
@@ -62,11 +60,11 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 // The given application must have at least the name
 // NS1 API docs: https://ns1.com/api#put-create-a-pulsar-application
 func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, error) {
-	req, err := s.client.NewRequest("PUT", "pulsar/apps", &a)
+	req, err := s.client.NewRequest("PUT", "pulsar/apps", a)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.client.Do(req, &a)
+	resp, err := s.client.Do(req, a)
 	return resp, err
 }
 
@@ -82,7 +80,6 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 	}
 
 	resp, err := s.client.Do(req, &a)
-
 	if err != nil {
 		switch err.(type) {
 		case *Error:
