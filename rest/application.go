@@ -83,7 +83,7 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if err.(*Error).Message == "pulsar app not found" {
+			if err.(*Error).Resp.StatusCode == 404 {
 				return resp, ErrApplicationMissing
 			}
 		}
@@ -108,7 +108,7 @@ func (s *ApplicationsService) Delete(id string) (*http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if err.(*Error).Message == "pulsar app not found" {
+			if err.(*Error).Resp.StatusCode == 404 {
 				return resp, ErrApplicationMissing
 			}
 		}
