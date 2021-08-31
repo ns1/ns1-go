@@ -1,3 +1,7 @@
+## 2.6.3 (August 31, 2021)
+FEATURES:
+* Adds support for Pulsar applications and jobs
+
 ## 2.6.2 (July 23, 2021)
 FEATURES:
 * Adds missing `mute` field to monitoring jobs
