@@ -303,6 +303,9 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 				}
 			case "Subdivisions":
 				fv.Set(reflect.ValueOf(v.(map[string]interface{})))
+			case "Note":
+				// If it's a Note, just pass the string without any type of parse.
+				fv.Set(reflect.ValueOf(v.(string)))
 			default:
 				fv.Set(reflect.ValueOf(ParseType(v.(string))))
 			}
