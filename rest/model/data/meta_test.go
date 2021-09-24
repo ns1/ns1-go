@@ -9,7 +9,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta := &Meta{}
 	meta.Up = true
 	meta.Latitude = 0.50
-	meta.Note = "hello!"
+	meta.Note = "Hello, World!"
 	meta.Longitude = FeedPtr{FeedID: "12345678"}
 	meta.Georegion = []interface{}{"US-EAST"}
 	meta.Priority = 10
@@ -37,8 +37,8 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("georegion should be 'US-EAST")
 	}
 
-	if m["note"].(string) != "hello!" {
-		t.Fatal("note should be 'hello!'")
+	if m["note"].(string) != "Hello, World!" {
+		t.Fatal("note should be 'Hello, World!'")
 	}
 
 	if m["priority"].(string) != "10" {
@@ -252,7 +252,7 @@ func TestMeta_Validate(t *testing.T) {
 	m.Country = "US"
 	m.USState = "MA"
 	m.CAProvince = "ON"
-	m.Note = "Testing out this cool meta validation"
+	m.Note = "Hello, just testing out this cool meta validation"
 	m.LoadAvg = 3.14
 	m.Weight = 40.0
 	m.Cost = 60.0
