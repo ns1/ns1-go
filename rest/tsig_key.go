@@ -84,6 +84,32 @@ func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
 	return resp, nil
 }
 
+// Update takes a *Tsug_key and modifies basic details of a TSIG key.
+//
+// NS1 API docs: https://ns1.com/api/#postmodify-a-tsig-key
+func (s *TsigService) Update(tk *dns.Tsig_key) (*http.Response, error) {
+	path := fmt.Sprintf("tsig/%s", tk.Name)
+
+	req, err := s.client.NewRequest("POST", path, &tk)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update TSIG key fields with data from api(ensure consistent)
+	resp, err := s.client.Do(req, &tk)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Message == fmt.Sprintf("TSIG %s. was not found", tk.Name) {
+				return resp, ErrTsigKeyMissing
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
 	// ErrTsigKeyExists bundles PUT create error.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
