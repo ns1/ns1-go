@@ -103,4 +103,37 @@ func TestTsigKey(t *testing.T) {
 			require.Equal(t, http.StatusNotFound, resp.StatusCode)
 		})
 	})
+
+	t.Run("Create", func(t *testing.T) {
+		tsigKey := &dns.Tsig_key{
+			Name:      "TsigKey1",
+			Algorithm: "hmac-sha256",
+			Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",
+		}
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTsigKeyCreateTestCase(nil, nil, tsigKey, tsigKey))
+
+			_, err := client.TSIG.Create(tsigKey)
+			require.Nil(t, err)
+		})
+
+		t.Run("Error", func(t *testing.T) {
+			// TSIG key already exists
+			t.Run("TSIG key already exists", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodPut, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusNotFound,
+					nil, nil, tsigKey, `{"message": "TSIG key already exists"}`,
+				))
+
+				_, err = client.TSIG.Create(tsigKey)
+
+				require.Contains(t, err.Error(), api.ErrTsigKeyExists.Error())
+			})
+		})
+	})
 }
