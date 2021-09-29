@@ -43,3 +43,15 @@ func (s *Service) AddTsigKeyCreateTestCase(
 		responseHeaders, tsigKey, response,
 	)
 }
+
+// AddTsigKeyUpdateTestCase sets up a test case for the api.Client.TSIG.Update()
+// function
+func (s *Service) AddTsigKeyUpdateTestCase(
+	requestHeaders, responseHeaders http.Header,
+	tsigKey, response *dns.Tsig_key,
+) error {
+	return s.AddTestCase(
+		http.MethodPost, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusOK, requestHeaders,
+		responseHeaders, tsigKey, response,
+	)
+}
