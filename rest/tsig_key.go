@@ -110,6 +110,31 @@ func (s *TsigService) Update(tk *dns.Tsig_key) (*http.Response, error) {
 	return resp, nil
 }
 
+// Delete takes a TSIG key name and destroys an existing TSIG key.
+//
+// NS1 API docs: https://ns1.com/api/#deleteremove-a-tsig-key
+func (s *TsigService) Delete(name string) (*http.Response, error) {
+	path := fmt.Sprintf("tsig/%s", name)
+
+	req, err := s.client.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Message == fmt.Sprintf("TSIG %s. was not found", name) {
+				return resp, ErrTsigKeyMissing
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
 	// ErrTsigKeyExists bundles PUT create error.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
