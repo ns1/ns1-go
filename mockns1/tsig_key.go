@@ -55,3 +55,15 @@ func (s *Service) AddTsigKeyUpdateTestCase(
 		responseHeaders, tsigKey, response,
 	)
 }
+
+// AddTsigKeyDeleteTestCase sets up a test case for the api.Client.TSIG.Delete()
+// function
+func (s *Service) AddTsigKeyDeleteTestCase(
+	requestHeaders, responseHeaders http.Header,
+	tsigKey, response *dns.Tsig_key,
+) error {
+	return s.AddTestCase(
+		http.MethodDelete, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusOK, requestHeaders,
+		responseHeaders, "", "",
+	)
+}
