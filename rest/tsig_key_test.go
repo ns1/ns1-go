@@ -1,7 +1,9 @@
 package rest_test
 
 import (
+	"fmt"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -63,6 +65,41 @@ func TestTsigKey(t *testing.T) {
 			require.Nil(t, tsigKeys)
 			require.NotNil(t, err)
 			require.Contains(t, err.Error(), "test error")
+			require.Equal(t, http.StatusNotFound, resp.StatusCode)
+		})
+	})
+
+	// Tests for api.Client.TSIG.Get()
+	t.Run("Get", func(t *testing.T) {
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			tsigKey := &dns.Tsig_key{
+				Name:      "TsigKey1",
+				Algorithm: "hmac-sha256",
+				Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",
+			}
+
+			require.Nil(t, mock.AddTsigKeyGetTestCase("TsigKey1", nil, nil, tsigKey))
+
+			respTsigKey, _, err := client.TSIG.Get("TsigKey1")
+
+			require.Nil(t, err)
+			require.True(t, reflect.DeepEqual(tsigKey, respTsigKey))
+		})
+
+		// Error TSIG key does not exist
+		t.Run("TSIG key does not exist", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, fmt.Sprintf("/tsig/%s", "TsigKey1"), http.StatusNotFound,
+				nil, nil, "", `{"message": "TSIG key does not exist"}`,
+			))
+			tsigKey, resp, err := client.TSIG.Get("TsigKey1")
+			require.Nil(t, tsigKey)
+			require.NotNil(t, err)
+			require.Contains(t, err.Error(), api.ErrTsigKeyMissing.Error())
 			require.Equal(t, http.StatusNotFound, resp.StatusCode)
 		})
 	})
