@@ -58,7 +58,35 @@ func (s *TsigService) Get(name string) (*dns.Tsig_key, *http.Response, error) {
 	return &tk, resp, nil
 }
 
+// Create takes a *Tsig_key and creates a new TSIG key.
+//
+// NS1 API docs: https://ns1.com/api/#putcreate-a-tsig-key
+func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
+	path := fmt.Sprintf("tsig/%s", tk.Name)
+
+	req, err := s.client.NewRequest("PUT", path, &tk)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update TSIG key fields with data from api(ensure consistent)
+	resp, err := s.client.Do(req, &tk)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Message == fmt.Sprintf("TSIG %s. already exists", tk.Name) {
+				return resp, ErrTsigKeyExists
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
+	// ErrTsigKeyExists bundles PUT create error.
+	ErrTsigKeyExists = errors.New("TSIG key already exists")
 	// ErrTsigKeyMissing bundles GET/POST/DELETE error.
 	ErrTsigKeyMissing = errors.New("TSIG key does not exist")
 )
