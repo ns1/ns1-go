@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
 )
@@ -48,7 +49,7 @@ func (s *TsigService) Get(name string) (*dns.Tsig_key, *http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Message == fmt.Sprintf("TSIG %s. was not found", name) {
+			if strings.HasSuffix(errType.Message, "was not found") {
 				return nil, resp, ErrTsigKeyMissing
 			}
 		}
@@ -74,7 +75,7 @@ func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Message == fmt.Sprintf("TSIG %s. already exists", tk.Name) {
+			if strings.HasSuffix(errType.Message, "already exists") {
 				return resp, ErrTsigKeyExists
 			}
 		}
@@ -100,7 +101,7 @@ func (s *TsigService) Update(tk *dns.Tsig_key) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Message == fmt.Sprintf("TSIG %s. was not found", tk.Name) {
+			if strings.HasSuffix(errType.Message, "was not found") {
 				return resp, ErrTsigKeyMissing
 			}
 		}
@@ -125,7 +126,7 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Message == fmt.Sprintf("TSIG %s. was not found", name) {
+			if strings.HasSuffix(errType.Message, "was not found") {
 				return resp, ErrTsigKeyMissing
 			}
 		}
