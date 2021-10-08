@@ -26,7 +26,7 @@ func TestTsigKey(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
-			tsigKeys := []*dns.Tsig_key{
+			tsigKeys := []*dns.TSIGKey{
 				{
 					Name:      "TsigKey1",
 					Algorithm: "hmac-sha256",
@@ -74,7 +74,7 @@ func TestTsigKey(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
-			tsigKey := &dns.Tsig_key{
+			tsigKey := &dns.TSIGKey{
 				Name:      "TsigKey1",
 				Algorithm: "hmac-sha256",
 				Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",
@@ -105,7 +105,7 @@ func TestTsigKey(t *testing.T) {
 	})
 
 	t.Run("Create", func(t *testing.T) {
-		tsigKey := &dns.Tsig_key{
+		tsigKey := &dns.TSIGKey{
 			Name:      "TsigKey1",
 			Algorithm: "hmac-sha256",
 			Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",
@@ -138,7 +138,7 @@ func TestTsigKey(t *testing.T) {
 	})
 
 	t.Run("Update", func(t *testing.T) {
-		tsigKey := &dns.Tsig_key{
+		tsigKey := &dns.TSIGKey{
 			Name:      "TsigKey1",
 			Algorithm: "hmac-sha256",
 			Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",
@@ -172,7 +172,7 @@ func TestTsigKey(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		tsigKey := &dns.Tsig_key{
+		tsigKey := &dns.TSIGKey{
 			Name:      "TsigKey1",
 			Algorithm: "hmac-sha256",
 			Secret:    "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA==",

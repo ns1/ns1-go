@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
 )
@@ -15,13 +14,13 @@ type TsigService service
 // List returns all tsig keys and basic tsig keys configuration details for each.
 //
 // NS1 API docs: https://ns1.com/api/#getlist-tsig-keys
-func (s *TsigService) List() ([]*dns.Tsig_key, *http.Response, error) {
+func (s *TsigService) List() ([]*dns.TSIGKey, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "tsig", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	tsigKeyList := []*dns.Tsig_key{}
+	tsigKeyList := []*dns.TSIGKey{}
 	var resp *http.Response
 	resp, err = s.client.Do(req, &tsigKeyList)
 	if err != nil {
@@ -34,7 +33,7 @@ func (s *TsigService) List() ([]*dns.Tsig_key, *http.Response, error) {
 // Get takes a TSIG key name and returns a single TSIG key and its basic configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#getview-tsig-key-details
-func (s *TsigService) Get(name string) (*dns.Tsig_key, *http.Response, error) {
+func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", name)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -42,14 +41,13 @@ func (s *TsigService) Get(name string) (*dns.Tsig_key, *http.Response, error) {
 		return nil, nil, err
 	}
 
-	var tk dns.Tsig_key
+	var tk dns.TSIGKey
 	var resp *http.Response
 	resp, err = s.client.Do(req, &tk)
-
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if strings.HasSuffix(errType.Message, "was not found") {
+			if errType.Resp.StatusCode == NotFoundStatusCode {
 				return nil, resp, ErrTsigKeyMissing
 			}
 		}
@@ -59,10 +57,10 @@ func (s *TsigService) Get(name string) (*dns.Tsig_key, *http.Response, error) {
 	return &tk, resp, nil
 }
 
-// Create takes a *Tsig_key and creates a new TSIG key.
+// Create takes a *TSIGkey and creates a new TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#putcreate-a-tsig-key
-func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
+func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
 	req, err := s.client.NewRequest("PUT", path, &tk)
@@ -75,7 +73,7 @@ func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if strings.HasSuffix(errType.Message, "already exists") {
+			if errType.Resp.StatusCode == AlreadyExistsStatusCode {
 				return resp, ErrTsigKeyExists
 			}
 		}
@@ -88,7 +86,7 @@ func (s *TsigService) Create(tk *dns.Tsig_key) (*http.Response, error) {
 // Update takes a *Tsug_key and modifies basic details of a TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#postmodify-a-tsig-key
-func (s *TsigService) Update(tk *dns.Tsig_key) (*http.Response, error) {
+func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
 	req, err := s.client.NewRequest("POST", path, &tk)
@@ -101,7 +99,7 @@ func (s *TsigService) Update(tk *dns.Tsig_key) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if strings.HasSuffix(errType.Message, "was not found") {
+			if errType.Resp.StatusCode == NotFoundStatusCode {
 				return resp, ErrTsigKeyMissing
 			}
 		}
@@ -126,7 +124,7 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if strings.HasSuffix(errType.Message, "was not found") {
+			if errType.Resp.StatusCode == NotFoundStatusCode {
 				return resp, ErrTsigKeyMissing
 			}
 		}
@@ -137,6 +135,10 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 }
 
 var (
+	// Status Codes used
+	NotFoundStatusCode      = 404
+	AlreadyExistsStatusCode = 409
+
 	// ErrTsigKeyExists bundles PUT create error.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
 	// ErrTsigKeyMissing bundles GET/POST/DELETE error.

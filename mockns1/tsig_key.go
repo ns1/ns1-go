@@ -11,7 +11,7 @@ import (
 // function
 func (s *Service) AddTsigKeyListTestCase(
 	requestHeaders, responseHeaders http.Header,
-	response []*dns.Tsig_key,
+	response []*dns.TSIGKey,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, "tsig", http.StatusOK, requestHeaders,
@@ -24,7 +24,7 @@ func (s *Service) AddTsigKeyListTestCase(
 func (s *Service) AddTsigKeyGetTestCase(
 	name string,
 	requestHeaders, responseHeaders http.Header,
-	response *dns.Tsig_key,
+	response *dns.TSIGKey,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, fmt.Sprintf("/tsig/%s", name), http.StatusOK, requestHeaders,
@@ -36,7 +36,7 @@ func (s *Service) AddTsigKeyGetTestCase(
 // function
 func (s *Service) AddTsigKeyCreateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	tsigKey, response *dns.Tsig_key,
+	tsigKey, response *dns.TSIGKey,
 ) error {
 	return s.AddTestCase(
 		http.MethodPut, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusOK, requestHeaders,
@@ -48,7 +48,7 @@ func (s *Service) AddTsigKeyCreateTestCase(
 // function
 func (s *Service) AddTsigKeyUpdateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	tsigKey, response *dns.Tsig_key,
+	tsigKey, response *dns.TSIGKey,
 ) error {
 	return s.AddTestCase(
 		http.MethodPost, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusOK, requestHeaders,
@@ -60,7 +60,7 @@ func (s *Service) AddTsigKeyUpdateTestCase(
 // function
 func (s *Service) AddTsigKeyDeleteTestCase(
 	requestHeaders, responseHeaders http.Header,
-	tsigKey, response *dns.Tsig_key,
+	tsigKey, response *dns.TSIGKey,
 ) error {
 	return s.AddTestCase(
 		http.MethodDelete, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusOK, requestHeaders,
