@@ -105,6 +105,31 @@ func (s *DNSViewService) Update(v *dns.DNSView) (*http.Response, error) {
 	return resp, nil
 }
 
+// Delete takes a DNS view name, and removes an existing DNS view
+//
+// NS1 API docs: https://ns1.com/api#deletedelete-a-dns-view
+func (s *DNSViewService) Delete(view_name string) (*http.Response, error) {
+	path := fmt.Sprintf("views/%s", view_name)
+
+	req, err := s.client.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Resp.StatusCode == 404 {
+				return resp, ErrViewMissing
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
