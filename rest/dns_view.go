@@ -130,6 +130,26 @@ func (s *DNSViewService) Delete(view_name string) (*http.Response, error) {
 	return resp, nil
 }
 
+// GetPreference returns a map[string]int of preferences.
+//
+// NS1 API docs: https://ns1.com/api#getget-dns-view-preference
+func (s *DNSViewService) GetPreferences() (map[string]int, *http.Response, error) {
+	path := "config/views/preference"
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	m := make(map[string]int)
+	resp, err := s.client.Do(req, &m)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return m, resp, nil
+}
+
 var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
