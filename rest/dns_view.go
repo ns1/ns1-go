@@ -80,6 +80,31 @@ func (s *DNSViewService) Get(view_name string) (*dns.DNSView, *http.Response, er
 	return &v, resp, nil
 }
 
+// Update takes a *dns.DNSView and updates the DNS view with same name on NS1.
+//
+// NS1 API docs: https://ns1.com/api#postedit-a-dns-view
+func (s *DNSViewService) Update(v *dns.DNSView) (*http.Response, error) {
+	path := fmt.Sprintf("views/%s", v.Name)
+
+	req, err := s.client.NewRequest("POST", path, &v)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, &v)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Resp.StatusCode == 404 {
+				return resp, ErrViewMissing
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
