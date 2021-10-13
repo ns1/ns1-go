@@ -54,7 +54,36 @@ func (s *DNSViewService) Create(v *dns.DNSView) (*http.Response, error) {
 	return resp, nil
 }
 
+// Get takes a DNS view name and returns DNSView struct.
+//
+// NS1 API docs: https://ns1.com/api#getview-dns-view-details
+func (s *DNSViewService) Get(view_name string) (*dns.DNSView, *http.Response, error) {
+	path := fmt.Sprintf("views/%s", view_name)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var v dns.DNSView
+	resp, err := s.client.Do(req, &v)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Resp.StatusCode == 404 {
+				return nil, resp, ErrViewMissing
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &v, resp, nil
+}
+
 var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
+
+	// ErrViewExists bundles GET error.
+	ErrViewMissing = errors.New("DNS view not found")
 )
