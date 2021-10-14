@@ -150,6 +150,32 @@ func (s *DNSViewService) GetPreferences() (map[string]int, *http.Response, error
 	return m, resp, nil
 }
 
+// UpdatePreference takes a map[string]int and returns a map[string]int of preferences.
+//
+// NS1 API docs: https://ns1.com/api#postedit-dns-view-preference
+func (s *DNSViewService) UpdatePreferences(m map[string]int) (map[string]int, *http.Response, error) {
+	path := "config/views/preference"
+
+	req, err := s.client.NewRequest("POST", path, m)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	m_updated := make(map[string]int)
+	resp, err := s.client.Do(req, &m_updated)
+	if err != nil {
+		switch errType := err.(type) {
+		case *Error:
+			if errType.Resp.StatusCode == 404 {
+				return nil, resp, ErrViewMissing
+			}
+		}
+		return nil, resp, err
+	}
+
+	return m_updated, resp, nil
+}
+
 var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
