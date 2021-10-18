@@ -43,7 +43,7 @@ func (s *DNSViewService) Create(v *dns.DNSView) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == 409 {
+			if errType.Resp.StatusCode == http.StatusConflict {
 				return nil, ErrViewExists
 			}
 		}
@@ -70,7 +70,7 @@ func (s *DNSViewService) Get(view_name string) (*dns.DNSView, *http.Response, er
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == 404 {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return nil, resp, ErrViewMissing
 			}
 		}
@@ -95,7 +95,7 @@ func (s *DNSViewService) Update(v *dns.DNSView) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == 404 {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return resp, ErrViewMissing
 			}
 		}
@@ -120,7 +120,7 @@ func (s *DNSViewService) Delete(view_name string) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == 404 {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return resp, ErrViewMissing
 			}
 		}
@@ -166,7 +166,7 @@ func (s *DNSViewService) UpdatePreferences(m map[string]int) (map[string]int, *h
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == 404 {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return nil, resp, ErrViewMissing
 			}
 		}
