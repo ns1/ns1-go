@@ -76,6 +76,9 @@ func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 			if errType.Resp.StatusCode == AlreadyExistsStatusCode {
 				return resp, ErrTsigKeyExists
 			}
+			if errType.Resp.StatusCode == BadRequestCode {
+				return resp, ErrTsigBadRequest
+			}
 		}
 		return resp, err
 	}
@@ -136,9 +139,12 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 
 var (
 	// Status Codes used
+	BadRequestCode          = 400
 	NotFoundStatusCode      = 404
 	AlreadyExistsStatusCode = 409
 
+	// ErrTsigBadRequest
+	ErrTsigBadRequest = errors.New("bad request error, expected in S1 (18/10/2021)")
 	// ErrTsigKeyExists bundles PUT create error.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
 	// ErrTsigKeyMissing bundles GET/POST/DELETE error.
