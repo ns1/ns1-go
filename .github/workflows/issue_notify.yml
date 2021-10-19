@@ -1,0 +1,25 @@
+# This workflow is triggered by github issue and creates a jira ticket in the respective configured account
+#
+name: issue_notify
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+jobs:
+  jira_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@v2.0.0
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL}}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL}}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN}}
+      - name: Jira Create issue
+        id: jira_ticket
+        uses: atlassian/gajira-create@v2.0.1
+        with:
+          project: ${{secrets.JIRA_PROJECT_KEY}}
+          issuetype: Bug
+          summary: '[ns1-go] ${{github.event.issue.title}}'
+          description: ${{github.event.issue.body}} see more at ${{github.event.issue.html_url}}
