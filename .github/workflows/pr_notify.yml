@@ -1,0 +1,33 @@
+# This workflow is triggered by pull request and creates an jira ticket if the ticket does not exist in jira
+#
+name: pr_notify
+on:
+  pull_request:
+    branches: [v2]
+jobs:
+  jira_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@v2.0.0
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      # try to find jira key in the PR title
+      - name: Find jirakey in title
+        id: jira_founded_ticket
+        uses: atlassian/gajira-find-issue-key@master
+        continue-on-error: true
+        with:
+          string: ${{ github.event.pull_request.title }}
+      # if there is no ticket associated then create a new one
+      - name: Jira Create issue
+        id: jira_ticket
+        if: ${{!steps.jira_founded_ticket.outputs.issue}}
+        uses: atlassian/gajira-create@v2.0.1
+        with:
+          project: ${{secrets.JIRA_PROJECT_KEY}}
+          issuetype: Task
+          summary: '[ns1-go] ${{github.event.pull_request.title}}'
+          description: ${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}
