@@ -41,33 +41,33 @@ type ddiAPIKey struct {
 	IPWhitelist       []string `json:"ip_whitelist"`
 	IPWhitelistStrict bool     `json:"ip_whitelist_strict"`
 
-	Permissions ddiPermissionsMap `json:"permissions"`
+	Permissions *ddiPermissionsMap `json:"permissions,omitempty"`
 }
 
 // ddiPermissionsMap wraps a User's "permissions" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
 type ddiPermissionsMap struct {
-	DNS      account.PermissionsDNS  `json:"dns"`
-	Data     account.PermissionsData `json:"data"`
-	Account  permissionsDDIAccount   `json:"account"`
-	Security permissionsDDISecurity  `json:"security"`
-	DHCP     account.PermissionsDHCP `json:"dhcp"`
-	IPAM     account.PermissionsIPAM `json:"ipam"`
+	DNS      *account.PermissionsDNS  `json:"dns,omitempty"`
+	Data     *account.PermissionsData `json:"data,omitempty"`
+	Account  *permissionsDDIAccount   `json:"account,omitempty"`
+	Security *permissionsDDISecurity  `json:"security,omitempty"`
+	DHCP     *account.PermissionsDHCP `json:"dhcp,omitempty"`
+	IPAM     *account.PermissionsIPAM `json:"ipam,omitempty"`
 }
 
 // permissionsDDIAccount wraps a User's "permissions.account" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
 type permissionsDDIAccount struct {
-	ManageUsers           bool `json:"manage_users"`
-	ManageTeams           bool `json:"manage_teams"`
-	ManageApikeys         bool `json:"manage_apikeys"`
-	ManageAccountSettings bool `json:"manage_account_settings"`
-	ViewActivityLog       bool `json:"view_activity_log"`
+	ManageUsers           *bool `json:"manage_users"`
+	ManageTeams           *bool `json:"manage_teams"`
+	ManageApikeys         *bool `json:"manage_apikeys"`
+	ManageAccountSettings *bool `json:"manage_account_settings"`
+	ViewActivityLog       *bool `json:"view_activity_log"`
 }
 
 // permissionsDDISecurity wraps a User's "permissions.security" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
 type permissionsDDISecurity struct {
-	ManageGlobal2FA       bool `json:"manage_global_2fa"`
-	ManageActiveDirectory bool `json:"manage_active_directory"`
+	ManageGlobal2FA       *bool `json:"manage_global_2fa"`
+	ManageActiveDirectory *bool `json:"manage_active_directory"`
 }

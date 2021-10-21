@@ -64,6 +64,11 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 		err error
 	)
 
+	// If user u is in a team, its permissions are invalid and will use the team's permissions
+	if len(u.TeamIDs) != 0 {
+		u.Permissions = nil
+	}
+
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && u != nil {
 		ddiUser := userToDDIUser(u)
@@ -178,7 +183,7 @@ func userToDDIUser(u *account.User) *ddiUser {
 		Permissions: ddiPermissionsMap{
 			DNS:  u.Permissions.DNS,
 			Data: u.Permissions.Data,
-			Account: permissionsDDIAccount{
+			Account: &permissionsDDIAccount{
 				ManageUsers:           u.Permissions.Account.ManageUsers,
 				ManageTeams:           u.Permissions.Account.ManageTeams,
 				ManageApikeys:         u.Permissions.Account.ManageApikeys,
@@ -189,15 +194,18 @@ func userToDDIUser(u *account.User) *ddiUser {
 	}
 
 	if u.Permissions.Security != nil {
-		ddiUser.Permissions.Security = permissionsDDISecurity(*u.Permissions.Security)
+		ddiUser.Permissions.Security = &permissionsDDISecurity{
+			ManageGlobal2FA:       u.Permissions.Security.ManageGlobal2FA,
+			ManageActiveDirectory: u.Permissions.Security.ManageActiveDirectory,
+		}
 	}
 
 	if u.Permissions.DHCP != nil {
-		ddiUser.Permissions.DHCP = *u.Permissions.DHCP
+		ddiUser.Permissions.DHCP = u.Permissions.DHCP
 	}
 
 	if u.Permissions.IPAM != nil {
-		ddiUser.Permissions.IPAM = *u.Permissions.IPAM
+		ddiUser.Permissions.IPAM = u.Permissions.IPAM
 	}
 
 	return ddiUser

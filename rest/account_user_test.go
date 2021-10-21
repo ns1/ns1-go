@@ -19,9 +19,7 @@ func TestCreateUser(t *testing.T) {
 
 		var u account.User
 		require.NoError(t, json.Unmarshal(b, &u))
-		assert.Nil(t, u.Permissions.Security)
-		assert.Nil(t, u.Permissions.DHCP)
-		assert.Nil(t, u.Permissions.IPAM)
+		assert.Nil(t, u.Permissions)
 
 		w.Write(b)
 	}))
@@ -29,10 +27,9 @@ func TestCreateUser(t *testing.T) {
 	c := NewClient(nil, SetEndpoint(ts.URL))
 
 	u := &account.User{
-		Name:        "name-1",
-		Username:    "user-1",
-		Email:       "email-1",
-		Permissions: account.PermissionsMap{},
+		Name:     "name-1",
+		Username: "user-1",
+		Email:    "email-1",
 	}
 
 	_, err := c.Users.Create(u)
@@ -63,7 +60,7 @@ func TestCreateDDIUser(t *testing.T) {
 		Email:             "email-1",
 		IPWhitelist:       []string{"1.1.1.1"},
 		IPWhitelistStrict: true,
-		Permissions:       account.PermissionsMap{},
+		Permissions:       &account.PermissionsMap{},
 	}
 
 	_, err := c.Users.Create(u)

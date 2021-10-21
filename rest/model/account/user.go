@@ -11,7 +11,7 @@ type User struct {
 	Email                string               `json:"email"`
 	TeamIDs              []string             `json:"teams"`
 	Notify               NotificationSettings `json:"notify"`
-	Permissions          PermissionsMap       `json:"permissions"`
+	Permissions          *PermissionsMap      `json:"permissions,omitempty"`
 	IPWhitelist          []string             `json:"ip_whitelist"`
 	IPWhitelistStrict    bool                 `json:"ip_whitelist_strict"`
 	TwoFactorAuthEnabled bool                 `json:"2fa_enabled"`
