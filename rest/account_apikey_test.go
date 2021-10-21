@@ -33,7 +33,7 @@ func TestCreateAPIKey(t *testing.T) {
 		ID:          "id-1",
 		Key:         "key-1",
 		Name:        "name-1",
-		Permissions: account.PermissionsMap{},
+		Permissions: &account.PermissionsMap{},
 	}
 
 	_, err := c.APIKeys.Create(k)
@@ -92,7 +92,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		Name:              "name-1",
 		IPWhitelist:       []string{"1.1.1.1"},
 		IPWhitelistStrict: true,
-		Permissions:       account.PermissionsMap{},
+		Permissions:       &account.PermissionsMap{},
 	}
 
 	_, err := c.APIKeys.Create(k)
@@ -102,7 +102,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		ID:   "ddi-authtags",
 		Key:  "key-2",
 		Name: "name-2",
-		Permissions: account.PermissionsMap{
+		Permissions: &account.PermissionsMap{
 			DHCP: &account.PermissionsDHCP{
 				TagsAllow: &[]account.AuthTag{
 					{
@@ -138,7 +138,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		ID:   "ddi-empty-authtags",
 		Key:  "key-3",
 		Name: "name-3",
-		Permissions: account.PermissionsMap{
+		Permissions: &account.PermissionsMap{
 			DHCP: &account.PermissionsDHCP{
 				TagsAllow: &[]account.AuthTag{},
 				TagsDeny:  &[]account.AuthTag{},

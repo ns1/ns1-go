@@ -176,10 +176,10 @@ func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
 		TeamIDs:           k.TeamIDs,
 		IPWhitelist:       k.IPWhitelist,
 		IPWhitelistStrict: k.IPWhitelistStrict,
-		Permissions: ddiPermissionsMap{
+		Permissions: &ddiPermissionsMap{
 			DNS:  k.Permissions.DNS,
 			Data: k.Permissions.Data,
-			Account: permissionsDDIAccount{
+			Account: &permissionsDDIAccount{
 				ManageUsers:           k.Permissions.Account.ManageUsers,
 				ManageTeams:           k.Permissions.Account.ManageTeams,
 				ManageApikeys:         k.Permissions.Account.ManageApikeys,
@@ -190,15 +190,18 @@ func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
 	}
 
 	if k.Permissions.Security != nil {
-		ddiAPIKey.Permissions.Security = permissionsDDISecurity(*k.Permissions.Security)
+		ddiAPIKey.Permissions.Security = &permissionsDDISecurity{
+			ManageGlobal2FA:       k.Permissions.Security.ManageGlobal2FA,
+			ManageActiveDirectory: k.Permissions.Security.ManageActiveDirectory,
+		}
 	}
 
 	if k.Permissions.DHCP != nil {
-		ddiAPIKey.Permissions.DHCP = *k.Permissions.DHCP
+		ddiAPIKey.Permissions.DHCP = k.Permissions.DHCP
 	}
 
 	if k.Permissions.IPAM != nil {
-		ddiAPIKey.Permissions.IPAM = *k.Permissions.IPAM
+		ddiAPIKey.Permissions.IPAM = k.Permissions.IPAM
 	}
 
 	return ddiAPIKey
