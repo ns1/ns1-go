@@ -169,11 +169,11 @@ func teamToDDITeam(t *account.Team) *ddiTeam {
 	ddiTeam := &ddiTeam{
 		ID:          t.ID,
 		Name:        t.Name,
-		IPWhitelist: t.IPWhitelist,
+		IPWhitelist: *t.IPWhitelist,
 		Permissions: ddiPermissionsMap{
 			DNS:  t.Permissions.DNS,
 			Data: t.Permissions.Data,
-			Account: permissionsDDIAccount{
+			Account: &permissionsDDIAccount{
 				ManageUsers:           t.Permissions.Account.ManageUsers,
 				ManageTeams:           t.Permissions.Account.ManageTeams,
 				ManageApikeys:         t.Permissions.Account.ManageApikeys,
@@ -184,15 +184,18 @@ func teamToDDITeam(t *account.Team) *ddiTeam {
 	}
 
 	if t.Permissions.Security != nil {
-		ddiTeam.Permissions.Security = permissionsDDISecurity(*t.Permissions.Security)
+		ddiTeam.Permissions.Security = &permissionsDDISecurity{
+			ManageGlobal2FA:       t.Permissions.Security.ManageGlobal2FA,
+			ManageActiveDirectory: t.Permissions.Security.ManageActiveDirectory,
+		}
 	}
 
 	if t.Permissions.DHCP != nil {
-		ddiTeam.Permissions.DHCP = *t.Permissions.DHCP
+		ddiTeam.Permissions.DHCP = t.Permissions.DHCP
 	}
 
 	if t.Permissions.IPAM != nil {
-		ddiTeam.Permissions.IPAM = *t.Permissions.IPAM
+		ddiTeam.Permissions.IPAM = t.Permissions.IPAM
 	}
 
 	return ddiTeam

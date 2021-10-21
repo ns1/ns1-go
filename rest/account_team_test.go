@@ -31,7 +31,7 @@ func TestCreateTeam(t *testing.T) {
 	tm := &account.Team{
 		ID:          "id-1",
 		Name:        "team-1",
-		Permissions: account.PermissionsMap{},
+		Permissions: &account.PermissionsMap{},
 	}
 
 	_, err := c.Teams.Create(tm)
@@ -58,10 +58,10 @@ func TestCreateDDITeam(t *testing.T) {
 	tm := &account.Team{
 		ID:   "id-1",
 		Name: "team-1",
-		IPWhitelist: []account.IPWhitelist{
+		IPWhitelist: &[]account.IPWhitelist{
 			{Name: "whitelist", Values: []string{"1.1.1.1"}},
 		},
-		Permissions: account.PermissionsMap{},
+		Permissions: &account.PermissionsMap{},
 	}
 
 	_, err := c.Teams.Create(tm)

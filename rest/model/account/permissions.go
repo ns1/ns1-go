@@ -18,10 +18,10 @@ type PermissionsDNS struct {
 	ViewZones           *bool               `json:"view_zones,omitempty"`
 	ManageZones         *bool               `json:"manage_zones,omitempty"`
 	ZonesAllowByDefault *bool               `json:"zones_allow_by_default,omitempty"`
-	ZonesDeny           []string            `json:"zones_deny"`
-	ZonesAllow          []string            `json:"zones_allow"`
-	RecordsAllow        []PermissionsRecord `json:"records_allow"`
-	RecordsDeny         []PermissionsRecord `json:"records_deny"`
+	ZonesDeny           []string            `json:"zones_deny,omitempty"`
+	ZonesAllow          []string            `json:"zones_allow,omitempty"`
+	RecordsAllow        []PermissionsRecord `json:"records_allow,omitempty"`
+	RecordsDeny         []PermissionsRecord `json:"records_deny,omitempty"`
 }
 
 // PermissionsData wraps a User's "permissions.data" attribute
