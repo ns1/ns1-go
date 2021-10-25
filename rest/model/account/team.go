@@ -1,11 +1,13 @@
 package account
 
 // Team wraps an NS1 /accounts/teams resource
+//
+// Note: TeamV2 has updated default permission handling
 type Team struct {
-	ID          string          `json:"id,omitempty"`
-	Name        string          `json:"name"`
-	Permissions *PermissionsMap `json:"permissions,omitempty"`
-	IPWhitelist *[]IPWhitelist  `json:"ip_whitelist,omitempty"`
+	ID          string         `json:"id,omitempty"`
+	Name        string         `json:"name"`
+	Permissions PermissionsMap `json:"permissions"`
+	IPWhitelist []IPWhitelist  `json:"ip_whitelist"`
 }
 
 // IPWhitelist wraps the IP whitelist for Teams.

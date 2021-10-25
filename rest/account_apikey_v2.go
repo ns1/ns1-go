@@ -1,26 +1,25 @@
 package rest
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
-// APIKeysService handles 'account/apikeys' endpoint.
-type APIKeysService service
+// APIKeysServiceV2 handles 'account/apikeys' endpoint.
+type APIKeysServiceV2 service
 
 // List returns all api keys in the account.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-get
-func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
+func (s *APIKeysServiceV2) List() ([]*account.APIKeyV2, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/apikeys", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	kl := []*account.APIKey{}
+	kl := []*account.APIKeyV2{}
 	resp, err := s.client.Do(req, &kl)
 	if err != nil {
 		return nil, resp, err
@@ -33,7 +32,7 @@ func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 // Note: do not use the API Key itself as the keyid in the URL — use the id of the key.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-get
-func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, error) {
+func (s *APIKeysServiceV2) Get(keyID string) (*account.APIKeyV2, *http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -41,7 +40,7 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 		return nil, nil, err
 	}
 
-	var a account.APIKey
+	var a account.APIKeyV2
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
 		switch err.(type) {
@@ -57,10 +56,10 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 	return &a, resp, nil
 }
 
-// Create takes a *APIKey and creates a new account apikey.
+// Create takes a *APIKeyV2 and creates a new account apikey.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-put
-func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
+func (s *APIKeysServiceV2) Create(a *account.APIKeyV2) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -68,7 +67,7 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && a != nil {
-		ddiAPIKey := apiKeyToDDIAPIKey(a)
+		ddiAPIKey := apiKeyToDDIAPIKeyV2(a)
 		req, err = s.client.NewRequest("PUT", "account/apikeys", ddiAPIKey)
 		if err != nil {
 			return nil, err
@@ -98,7 +97,7 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 // Update changes the name or access rights for an API Key.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-post
-func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
+func (s *APIKeysServiceV2) Update(a *account.APIKeyV2) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", a.ID)
 
 	var (
@@ -108,7 +107,7 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && a != nil {
-		ddiAPIKey := apiKeyToDDIAPIKey(a)
+		ddiAPIKey := apiKeyToDDIAPIKeyV2(a)
 		req, err = s.client.NewRequest("POST", path, ddiAPIKey)
 		if err != nil {
 			return nil, err
@@ -138,7 +137,7 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 // Delete deletes an apikey.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-delete
-func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
+func (s *APIKeysServiceV2) Delete(keyID string) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
@@ -160,15 +159,16 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 	return resp, nil
 }
 
-var (
-	// ErrKeyExists bundles PUT create error.
-	ErrKeyExists = errors.New("key already exists")
-	// ErrKeyMissing bundles GET/POST/DELETE error.
-	ErrKeyMissing = errors.New("key does not exist")
-)
+// Same as v1
+// var (
+// 	// ErrKeyExists bundles PUT create error.
+// 	ErrKeyExists = errors.New("key already exists")
+// 	// ErrKeyMissing bundles GET/POST/DELETE error.
+// 	ErrKeyMissing = errors.New("key does not exist")
+// )
 
-func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
-	ddiAPIKey := &ddiAPIKey{
+func apiKeyToDDIAPIKeyV2(k *account.APIKeyV2) *ddiAPIKeyV2 {
+	ddiAPIKey := &ddiAPIKeyV2{
 		ID:                k.ID,
 		Key:               k.Key,
 		LastAccess:        k.LastAccess,
@@ -176,30 +176,9 @@ func apiKeyToDDIAPIKey(k *account.APIKey) *ddiAPIKey {
 		TeamIDs:           k.TeamIDs,
 		IPWhitelist:       k.IPWhitelist,
 		IPWhitelistStrict: k.IPWhitelistStrict,
-		Permissions: ddiPermissionsMap{
-			DNS:  k.Permissions.DNS,
-			Data: k.Permissions.Data,
-			Account: permissionsDDIAccount{
-				ManageUsers:           k.Permissions.Account.ManageUsers,
-				ManageTeams:           k.Permissions.Account.ManageTeams,
-				ManageApikeys:         k.Permissions.Account.ManageApikeys,
-				ManageAccountSettings: k.Permissions.Account.ManageAccountSettings,
-				ViewActivityLog:       k.Permissions.Account.ViewActivityLog,
-			},
-		},
 	}
 
-	if k.Permissions.Security != nil {
-		ddiAPIKey.Permissions.Security = permissionsDDISecurity(*k.Permissions.Security)
-	}
-
-	if k.Permissions.DHCP != nil {
-		ddiAPIKey.Permissions.DHCP = *k.Permissions.DHCP
-	}
-
-	if k.Permissions.IPAM != nil {
-		ddiAPIKey.Permissions.IPAM = *k.Permissions.IPAM
-	}
+	ddiAPIKey.Permissions = convertDDIPermissionsV2(k.Permissions)
 
 	return ddiAPIKey
 }

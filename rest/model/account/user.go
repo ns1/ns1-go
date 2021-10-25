@@ -1,6 +1,8 @@
 package account
 
 // User wraps an NS1 /account/users resource
+//
+// Note: UserV2 has updated default permission handling
 type User struct {
 	// Read-only fields
 	LastAccess float64 `json:"last_access"`
@@ -11,7 +13,7 @@ type User struct {
 	Email                string               `json:"email"`
 	TeamIDs              []string             `json:"teams"`
 	Notify               NotificationSettings `json:"notify"`
-	Permissions          *PermissionsMap      `json:"permissions,omitempty"`
+	Permissions          PermissionsMap       `json:"permissions"`
 	IPWhitelist          []string             `json:"ip_whitelist"`
 	IPWhitelistStrict    bool                 `json:"ip_whitelist_strict"`
 	TwoFactorAuthEnabled bool                 `json:"2fa_enabled"`

@@ -9,15 +9,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/ns1/ns1-go.v2/common/conv"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
-func TestCreateAPIKey(t *testing.T) {
+func TestCreateAPIKeyV2(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
-		var k account.APIKey
+		var k account.APIKeyV2
 		require.NoError(t, json.Unmarshal(b, &k))
 		assert.Nil(t, k.Permissions.Security)
 		assert.Nil(t, k.Permissions.DHCP)
@@ -29,23 +30,23 @@ func TestCreateAPIKey(t *testing.T) {
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL))
 
-	k := &account.APIKey{
+	k := &account.APIKeyV2{
 		ID:          "id-1",
 		Key:         "key-1",
 		Name:        "name-1",
-		Permissions: account.PermissionsMap{},
+		Permissions: &account.PermissionsMapV2{},
 	}
 
-	_, err := c.APIKeys.Create(k)
+	_, err := c.APIKeysV2.Create(k)
 	require.NoError(t, err)
 }
 
-func TestCreateDDIAPIKey(t *testing.T) {
+func TestCreateDDIAPIKeyV2(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
-		var k account.APIKey
+		var k account.APIKeyV2
 		require.NoError(t, json.Unmarshal(b, &k))
 		switch k.ID {
 		case "ddi-no-authtags":
@@ -86,24 +87,34 @@ func TestCreateDDIAPIKey(t *testing.T) {
 	c := NewClient(nil, SetEndpoint(ts.URL), SetDDIAPI())
 
 	// Create a key without auth tags
-	k := &account.APIKey{
+	k := &account.APIKeyV2{
 		ID:                "ddi-no-authtags",
 		Key:               "key-1",
 		Name:              "name-1",
 		IPWhitelist:       []string{"1.1.1.1"},
 		IPWhitelistStrict: true,
-		Permissions:       account.PermissionsMap{},
+		Permissions: &account.PermissionsMapV2{
+			Security: &account.PermissionsSecurityV2{
+				ManageGlobal2FA: conv.BoolPtrFrom(true),
+			},
+			IPAM: &account.PermissionsIPAMV2{
+				ManageIPAM: conv.BoolPtrFrom(false),
+			},
+			DHCP: &account.PermissionsDHCPV2{
+				ManageDHCP: conv.BoolPtrFrom(false),
+			},
+		},
 	}
 
-	_, err := c.APIKeys.Create(k)
+	_, err := c.APIKeysV2.Create(k)
 	require.NoError(t, err)
 	// Create a key with auth tags
-	k = &account.APIKey{
+	k = &account.APIKeyV2{
 		ID:   "ddi-authtags",
 		Key:  "key-2",
 		Name: "name-2",
-		Permissions: account.PermissionsMap{
-			DHCP: &account.PermissionsDHCP{
+		Permissions: &account.PermissionsMapV2{
+			DHCP: &account.PermissionsDHCPV2{
 				TagsAllow: &[]account.AuthTag{
 					{
 						Name:  "auth:dhcpallow",
@@ -117,7 +128,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 					},
 				},
 			},
-			IPAM: &account.PermissionsIPAM{
+			IPAM: &account.PermissionsIPAMV2{
 				TagsAllow: &[]account.AuthTag{
 					{
 						Name:  "auth:ipamallow",
@@ -134,22 +145,22 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		},
 	}
 	// Create a key with empty auth tags
-	k = &account.APIKey{
+	k = &account.APIKeyV2{
 		ID:   "ddi-empty-authtags",
 		Key:  "key-3",
 		Name: "name-3",
-		Permissions: account.PermissionsMap{
-			DHCP: &account.PermissionsDHCP{
+		Permissions: &account.PermissionsMapV2{
+			DHCP: &account.PermissionsDHCPV2{
 				TagsAllow: &[]account.AuthTag{},
 				TagsDeny:  &[]account.AuthTag{},
 			},
-			IPAM: &account.PermissionsIPAM{
+			IPAM: &account.PermissionsIPAMV2{
 				TagsAllow: &[]account.AuthTag{},
 				TagsDeny:  &[]account.AuthTag{},
 			},
 		},
 	}
 
-	_, err = c.APIKeys.Create(k)
+	_, err = c.APIKeysV2.Create(k)
 	require.NoError(t, err)
 }

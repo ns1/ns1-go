@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/ns1/ns1-go.v2/common/conv"
 )
 
 func TestUnmarshalUsers(t *testing.T) {
@@ -17,36 +16,7 @@ func TestUnmarshalUsers(t *testing.T) {
 		{
 			"basic",
 			[]byte(`{
-"permissions": {
-	"dns": {
-		"view_zones": true,
-		"manage_zones": true,
-		"zones_allow_by_default": false,
-		"zones_deny": [],
-		"zones_allow": ["example.com"]
-	},
-	"data": {
-		"push_to_datafeeds": false,
-		"manage_datasources": false,
-		"manage_datafeeds": false
-	},
-	"account": {
-		"manage_payment_methods": false,
-		"manage_plan": false,
-		"manage_teams": false,
-		"manage_apikeys": false,
-		"manage_account_settings": false,
-		"view_activity_log": false,
-		"view_invoices": false,
-		"manage_users": false,
-		"manage_ip_whitelist": true
-	},
-	"monitoring": {
-		"manage_lists": false,
-		"manage_jobs": false,
-		"view_jobs": false
-	}
-	},
+    "permissions": {},
     "teams": [],
     "email": "support@nsone.net",
     "last_access": 1376325771.0,
@@ -91,36 +61,6 @@ func TestUnmarshalUsers(t *testing.T) {
 							MetadataFile:   nil,
 							Provider:       pointerString("okta"),
 						},
-					},
-				},
-				Permissions: &PermissionsMap{
-					DNS: &PermissionsDNS{
-						ViewZones:           conv.BoolPtrFrom(true),
-						ManageZones:         conv.BoolPtrFrom(true),
-						ZonesAllowByDefault: conv.BoolPtrFrom(false),
-						ZonesDeny:           []string{},
-						ZonesAllow:          []string{"example.com"},
-					},
-					Data: &PermissionsData{
-						PushToDatafeeds:   conv.BoolPtrFrom(false),
-						ManageDatasources: conv.BoolPtrFrom(false),
-						ManageDatafeeds:   conv.BoolPtrFrom(false),
-					},
-					Account: &PermissionsAccount{
-						ManagePaymentMethods:  conv.BoolPtrFrom(false),
-						ManagePlan:            conv.BoolPtrFrom(false),
-						ManageTeams:           conv.BoolPtrFrom(false),
-						ManageApikeys:         conv.BoolPtrFrom(false),
-						ManageAccountSettings: conv.BoolPtrFrom(false),
-						ViewActivityLog:       conv.BoolPtrFrom(false),
-						ViewInvoices:          conv.BoolPtrFrom(false),
-						ManageUsers:           conv.BoolPtrFrom(false),
-						ManageIPWhitelist:     conv.BoolPtrFrom(true),
-					},
-					Monitoring: &PermissionsMonitoring{
-						ManageLists: conv.BoolPtrFrom(false),
-						ManageJobs:  conv.BoolPtrFrom(false),
-						ViewJobs:    conv.BoolPtrFrom(false),
 					},
 				},
 			},
@@ -174,34 +114,34 @@ func TestUnmarshalUsers(t *testing.T) {
 				TeamIDs:    []string{"520422919f782d37dffb588a"},
 				LastAccess: 0.0,
 				Notify:     NotificationSettings{true},
-				Permissions: &PermissionsMap{
-					DNS: &PermissionsDNS{
-						ViewZones:           conv.BoolPtrFrom(true),
-						ManageZones:         conv.BoolPtrFrom(true),
-						ZonesAllowByDefault: conv.BoolPtrFrom(false),
+				Permissions: PermissionsMap{
+					DNS: PermissionsDNS{
+						ViewZones:           true,
+						ManageZones:         true,
+						ZonesAllowByDefault: false,
 						ZonesDeny:           []string{},
 						ZonesAllow:          []string{"example.com"},
 					},
-					Data: &PermissionsData{
-						PushToDatafeeds:   conv.BoolPtrFrom(false),
-						ManageDatasources: conv.BoolPtrFrom(false),
-						ManageDatafeeds:   conv.BoolPtrFrom(false),
+					Data: PermissionsData{
+						PushToDatafeeds:   false,
+						ManageDatasources: false,
+						ManageDatafeeds:   false,
 					},
-					Account: &PermissionsAccount{
-						ManagePaymentMethods:  conv.BoolPtrFrom(false),
-						ManagePlan:            conv.BoolPtrFrom(false),
-						ManageTeams:           conv.BoolPtrFrom(false),
-						ManageApikeys:         conv.BoolPtrFrom(false),
-						ManageAccountSettings: conv.BoolPtrFrom(false),
-						ViewActivityLog:       conv.BoolPtrFrom(false),
-						ViewInvoices:          conv.BoolPtrFrom(false),
-						ManageUsers:           conv.BoolPtrFrom(false),
-						ManageIPWhitelist:     conv.BoolPtrFrom(true),
+					Account: PermissionsAccount{
+						ManagePaymentMethods:  false,
+						ManagePlan:            false,
+						ManageTeams:           false,
+						ManageApikeys:         false,
+						ManageAccountSettings: false,
+						ViewActivityLog:       false,
+						ViewInvoices:          false,
+						ManageUsers:           false,
+						ManageIPWhitelist:     true,
 					},
-					Monitoring: &PermissionsMonitoring{
-						ManageLists: conv.BoolPtrFrom(false),
-						ManageJobs:  conv.BoolPtrFrom(false),
-						ViewJobs:    conv.BoolPtrFrom(false),
+					Monitoring: PermissionsMonitoring{
+						ManageLists: false,
+						ManageJobs:  false,
+						ViewJobs:    false,
 					},
 				},
 			},

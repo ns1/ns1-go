@@ -1,12 +1,14 @@
 package account
 
 // PermissionsMap wraps a User's "permissions" attribute
+//
+// Note: PermissionsMapV2 has updated default permission handling
 type PermissionsMap struct {
-	DNS        *PermissionsDNS        `json:"dns,omitempty"`
-	Data       *PermissionsData       `json:"data,omitempty"`
-	Account    *PermissionsAccount    `json:"account,omitempty"`
-	Monitoring *PermissionsMonitoring `json:"monitoring,omitempty"`
-	Security   *PermissionsSecurity   `json:"security,omitempty"`
+	DNS        PermissionsDNS        `json:"dns"`
+	Data       PermissionsData       `json:"data"`
+	Account    PermissionsAccount    `json:"account"`
+	Monitoring PermissionsMonitoring `json:"monitoring"`
+	Security   *PermissionsSecurity  `json:"security,omitempty"`
 
 	// DHCP and IPAM are only relevant for DDI and should not be provided in managed.
 	DHCP *PermissionsDHCP `json:"dhcp,omitempty"`
@@ -14,65 +16,79 @@ type PermissionsMap struct {
 }
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
+//
+// Note: PermissionsDNSV2 has updated default permission handling
 type PermissionsDNS struct {
-	ViewZones           *bool               `json:"view_zones,omitempty"`
-	ManageZones         *bool               `json:"manage_zones,omitempty"`
-	ZonesAllowByDefault *bool               `json:"zones_allow_by_default,omitempty"`
-	ZonesDeny           []string            `json:"zones_deny,omitempty"`
-	ZonesAllow          []string            `json:"zones_allow,omitempty"`
-	RecordsAllow        []PermissionsRecord `json:"records_allow,omitempty"`
-	RecordsDeny         []PermissionsRecord `json:"records_deny,omitempty"`
+	ViewZones           bool                `json:"view_zones"`
+	ManageZones         bool                `json:"manage_zones"`
+	ZonesAllowByDefault bool                `json:"zones_allow_by_default"`
+	ZonesDeny           []string            `json:"zones_deny"`
+	ZonesAllow          []string            `json:"zones_allow"`
+	RecordsAllow        []PermissionsRecord `json:"records_allow"`
+	RecordsDeny         []PermissionsRecord `json:"records_deny"`
 }
 
 // PermissionsData wraps a User's "permissions.data" attribute
+//
+// Note: PermissionsDataV2 has updated default permission handling
 type PermissionsData struct {
-	PushToDatafeeds   *bool `json:"push_to_datafeeds,omitempty"`
-	ManageDatasources *bool `json:"manage_datasources,omitempty"`
-	ManageDatafeeds   *bool `json:"manage_datafeeds,omitempty"`
+	PushToDatafeeds   bool `json:"push_to_datafeeds"`
+	ManageDatasources bool `json:"manage_datasources"`
+	ManageDatafeeds   bool `json:"manage_datafeeds"`
 }
 
 // PermissionsAccount wraps a User's "permissions.account" attribute
+//
+// Note: PermissionsAccountV2 has updated default permission handling
 type PermissionsAccount struct {
-	ManageUsers           *bool `json:"manage_users,omitempty"`
-	ManagePaymentMethods  *bool `json:"manage_payment_methods,omitempty"`
-	ManagePlan            *bool `json:"manage_plan,omitempty"`
-	ManageTeams           *bool `json:"manage_teams,omitempty"`
-	ManageApikeys         *bool `json:"manage_apikeys,omitempty"`
-	ManageAccountSettings *bool `json:"manage_account_settings,omitempty"`
-	ViewActivityLog       *bool `json:"view_activity_log,omitempty"`
-	ViewInvoices          *bool `json:"view_invoices,omitempty"`
-	ManageIPWhitelist     *bool `json:"manage_ip_whitelist,omitempty"`
+	ManageUsers           bool `json:"manage_users"`
+	ManagePaymentMethods  bool `json:"manage_payment_methods"`
+	ManagePlan            bool `json:"manage_plan"`
+	ManageTeams           bool `json:"manage_teams"`
+	ManageApikeys         bool `json:"manage_apikeys"`
+	ManageAccountSettings bool `json:"manage_account_settings"`
+	ViewActivityLog       bool `json:"view_activity_log"`
+	ViewInvoices          bool `json:"view_invoices"`
+	ManageIPWhitelist     bool `json:"manage_ip_whitelist"`
 }
 
 // PermissionsSecurity wraps a User's "permissions.security" attribute.
+//
+// Note: PermissionsSecurityV2 has updated default permission handling
 type PermissionsSecurity struct {
-	ManageGlobal2FA *bool `json:"manage_global_2fa,omitempty"`
+	ManageGlobal2FA bool `json:"manage_global_2fa"`
 
 	// This field is only relevant for DDI and should not be set to true for managed.
-	ManageActiveDirectory *bool `json:"manage_active_directory,omitempty"`
+	ManageActiveDirectory bool `json:"manage_active_directory,omitempty"`
 }
 
 // PermissionsMonitoring wraps a User's "permissions.monitoring" attribute
 // Only relevant for the managed product.
+//
+// Note: PermissionsMonitoringV2 has updated default permission handling
 type PermissionsMonitoring struct {
-	ManageLists *bool `json:"manage_lists,omitempty"`
-	ManageJobs  *bool `json:"manage_jobs,omitempty"`
-	ViewJobs    *bool `json:"view_jobs,omitempty"`
+	ManageLists bool `json:"manage_lists"`
+	ManageJobs  bool `json:"manage_jobs"`
+	ViewJobs    bool `json:"view_jobs"`
 }
 
 // PermissionsDHCP wraps a User's "permissions.dhcp" attribute for DDI.
+//
+// Note: PermissionsDHCPV2 has updated default permission handling
 type PermissionsDHCP struct {
-	ManageDHCP *bool `json:"manage_dhcp,omitempty"`
-	ViewDHCP   *bool `json:"view_dhcp,omitempty"`
+	ManageDHCP bool `json:"manage_dhcp"`
+	ViewDHCP   bool `json:"view_dhcp"`
 	// The fields below are only relevant in DDI v2.5+
 	TagsAllow *[]AuthTag `json:"tags_allow,omitempty"`
 	TagsDeny  *[]AuthTag `json:"tags_deny,omitempty"`
 }
 
 // PermissionsIPAM wraps a User's "permissions.ipam" attribute for DDI.
+//
+// Note: PermissionsIPAMV2 has updated default permission handling
 type PermissionsIPAM struct {
-	ManageIPAM *bool `json:"manage_ipam,omitempty"`
-	ViewIPAM   *bool `json:"view_ipam,omitempty"`
+	ManageIPAM bool `json:"manage_ipam"`
+	ViewIPAM   bool `json:"view_ipam"`
 	// The fields below are only relevant in DDI v2.5+
 	TagsAllow *[]AuthTag `json:"tags_allow,omitempty"`
 	TagsDeny  *[]AuthTag `json:"tags_deny,omitempty"`

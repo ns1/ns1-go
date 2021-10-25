@@ -4,6 +4,8 @@ import "gopkg.in/ns1/ns1-go.v2/rest/model/account"
 
 // ddiTeam wraps an NS1 /accounts/teams resource for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: ddiTeamV2 has updated default permission handling
 type ddiTeam struct {
 	ID          string                `json:"id,omitempty"`
 	Name        string                `json:"name"`
@@ -13,6 +15,8 @@ type ddiTeam struct {
 
 // ddiUser wraps an NS1 /account/users resource for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: ddiUserV2 has updated default permission handling
 type ddiUser struct {
 	// Read-only fields
 	LastAccess float64 `json:"last_access"`
@@ -30,6 +34,8 @@ type ddiUser struct {
 
 // ddiAPIKey wraps an NS1 /account/apikeys resource for DDI specifically.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: ddiAPIKeyV2 has updated default permission handling
 type ddiAPIKey struct {
 	// Read-only fields
 	ID         string `json:"id,omitempty"`
@@ -41,33 +47,39 @@ type ddiAPIKey struct {
 	IPWhitelist       []string `json:"ip_whitelist"`
 	IPWhitelistStrict bool     `json:"ip_whitelist_strict"`
 
-	Permissions *ddiPermissionsMap `json:"permissions,omitempty"`
+	Permissions ddiPermissionsMap `json:"permissions"`
 }
 
 // ddiPermissionsMap wraps a User's "permissions" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: ddiPermissionsMapV2 has updated default permission handling
 type ddiPermissionsMap struct {
-	DNS      *account.PermissionsDNS  `json:"dns,omitempty"`
-	Data     *account.PermissionsData `json:"data,omitempty"`
-	Account  *permissionsDDIAccount   `json:"account,omitempty"`
-	Security *permissionsDDISecurity  `json:"security,omitempty"`
-	DHCP     *account.PermissionsDHCP `json:"dhcp,omitempty"`
-	IPAM     *account.PermissionsIPAM `json:"ipam,omitempty"`
+	DNS      account.PermissionsDNS  `json:"dns"`
+	Data     account.PermissionsData `json:"data"`
+	Account  permissionsDDIAccount   `json:"account"`
+	Security permissionsDDISecurity  `json:"security"`
+	DHCP     account.PermissionsDHCP `json:"dhcp"`
+	IPAM     account.PermissionsIPAM `json:"ipam"`
 }
 
 // permissionsDDIAccount wraps a User's "permissions.account" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: permissionsDDIAccountV2 has updated default permission handling
 type permissionsDDIAccount struct {
-	ManageUsers           *bool `json:"manage_users"`
-	ManageTeams           *bool `json:"manage_teams"`
-	ManageApikeys         *bool `json:"manage_apikeys"`
-	ManageAccountSettings *bool `json:"manage_account_settings"`
-	ViewActivityLog       *bool `json:"view_activity_log"`
+	ManageUsers           bool `json:"manage_users"`
+	ManageTeams           bool `json:"manage_teams"`
+	ManageApikeys         bool `json:"manage_apikeys"`
+	ManageAccountSettings bool `json:"manage_account_settings"`
+	ViewActivityLog       bool `json:"view_activity_log"`
 }
 
 // permissionsDDISecurity wraps a User's "permissions.security" attribute for DDI.
 // Used for internally mapping between DDI permissions to maintain backwards compatibility.
+//
+// Note: permissionsDDISecurityV2 has updated default permission handling
 type permissionsDDISecurity struct {
-	ManageGlobal2FA       *bool `json:"manage_global_2fa"`
-	ManageActiveDirectory *bool `json:"manage_active_directory"`
+	ManageGlobal2FA       bool `json:"manage_global_2fa"`
+	ManageActiveDirectory bool `json:"manage_active_directory"`
 }
