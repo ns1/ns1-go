@@ -47,7 +47,7 @@ func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == NotFoundStatusCode {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return nil, resp, ErrTsigKeyMissing
 			}
 		}
@@ -73,11 +73,8 @@ func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == AlreadyExistsStatusCode {
+			if errType.Resp.StatusCode == http.StatusConflict {
 				return resp, ErrTsigKeyExists
-			}
-			if errType.Resp.StatusCode == BadRequestCode {
-				return resp, ErrTsigBadRequest
 			}
 		}
 		return resp, err
@@ -86,7 +83,7 @@ func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 	return resp, nil
 }
 
-// Update takes a *Tsug_key and modifies basic details of a TSIG key.
+// Update takes a *TSIGKey and modifies basic details of a TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#postmodify-a-tsig-key
 func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
@@ -102,7 +99,7 @@ func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == NotFoundStatusCode {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return resp, ErrTsigKeyMissing
 			}
 		}
@@ -127,7 +124,7 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
-			if errType.Resp.StatusCode == NotFoundStatusCode {
+			if errType.Resp.StatusCode == http.StatusNotFound {
 				return resp, ErrTsigKeyMissing
 			}
 		}
@@ -138,13 +135,6 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 }
 
 var (
-	// Status Codes used
-	BadRequestCode          = 400
-	NotFoundStatusCode      = 404
-	AlreadyExistsStatusCode = 409
-
-	// ErrTsigBadRequest
-	ErrTsigBadRequest = errors.New("bad request error, expected in S1 (18/10/2021)")
 	// ErrTsigKeyExists bundles PUT create error.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
 	// ErrTsigKeyMissing bundles GET/POST/DELETE error.
