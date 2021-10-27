@@ -12,9 +12,9 @@ type DNSView struct {
 	Preference  int      `json:"preference,omitempty"`
 }
 
-// NewDNSView takes a view_name and creates a *DNSView
-func NewDNSView(view_name string) *DNSView {
+// NewDNSView takes a viewName and creates a *DNSView
+func NewDNSView(viewName string) *DNSView {
 	return &DNSView{
-		Name: view_name,
+		Name: viewName,
 	}
 }

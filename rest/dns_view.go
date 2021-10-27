@@ -57,8 +57,8 @@ func (s *DNSViewService) Create(v *dns.DNSView) (*http.Response, error) {
 // Get takes a DNS view name and returns DNSView struct.
 //
 // NS1 API docs: https://ns1.com/api#getview-dns-view-details
-func (s *DNSViewService) Get(view_name string) (*dns.DNSView, *http.Response, error) {
-	path := fmt.Sprintf("views/%s", view_name)
+func (s *DNSViewService) Get(viewName string) (*dns.DNSView, *http.Response, error) {
+	path := fmt.Sprintf("views/%s", viewName)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
@@ -108,8 +108,8 @@ func (s *DNSViewService) Update(v *dns.DNSView) (*http.Response, error) {
 // Delete takes a DNS view name, and removes an existing DNS view
 //
 // NS1 API docs: https://ns1.com/api#deletedelete-a-dns-view
-func (s *DNSViewService) Delete(view_name string) (*http.Response, error) {
-	path := fmt.Sprintf("views/%s", view_name)
+func (s *DNSViewService) Delete(viewName string) (*http.Response, error) {
+	path := fmt.Sprintf("views/%s", viewName)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
@@ -161,8 +161,8 @@ func (s *DNSViewService) UpdatePreferences(m map[string]int) (map[string]int, *h
 		return nil, nil, err
 	}
 
-	m_updated := make(map[string]int)
-	resp, err := s.client.Do(req, &m_updated)
+	mapUpdated := make(map[string]int)
+	resp, err := s.client.Do(req, &mapUpdated)
 	if err != nil {
 		switch errType := err.(type) {
 		case *Error:
@@ -173,7 +173,7 @@ func (s *DNSViewService) UpdatePreferences(m map[string]int) (map[string]int, *h
 		return nil, resp, err
 	}
 
-	return m_updated, resp, nil
+	return mapUpdated, resp, nil
 }
 
 var (
