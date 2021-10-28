@@ -59,7 +59,6 @@ type Client struct {
 
 	// Services used for communicating with different components of the NS1 API.
 	APIKeys       *APIKeysService
-	APIKeysV2     *APIKeysServiceV2
 	DataFeeds     *DataFeedsService
 	DataSources   *DataSourcesService
 	Jobs          *JobsService
@@ -70,9 +69,7 @@ type Client struct {
 	Settings      *SettingsService
 	Stats         *StatsService
 	Teams         *TeamsService
-	TeamsV2       *TeamsServiceV2
 	Users         *UsersService
-	UsersV2       *UsersServiceV2
 	Warnings      *WarningsService
 	Zones         *ZonesService
 	DNSSEC        *DNSSECService
@@ -101,7 +98,6 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 
 	c.common.client = c
 	c.APIKeys = (*APIKeysService)(&c.common)
-	c.APIKeysV2 = (*APIKeysServiceV2)(&c.common)
 	c.DataFeeds = (*DataFeedsService)(&c.common)
 	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Jobs = (*JobsService)(&c.common)
@@ -112,9 +108,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Settings = (*SettingsService)(&c.common)
 	c.Stats = (*StatsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
-	c.TeamsV2 = (*TeamsServiceV2)(&c.common)
 	c.Users = (*UsersService)(&c.common)
-	c.UsersV2 = (*UsersServiceV2)(&c.common)
 	c.Warnings = (*WarningsService)(&c.common)
 	c.Zones = (*ZonesService)(&c.common)
 	c.DNSSEC = (*DNSSECService)(&c.common)

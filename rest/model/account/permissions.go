@@ -107,3 +107,38 @@ type PermissionsRecord struct {
 	Zone       string `json:"zone"`
 	RecordType string `json:"type"`
 }
+
+func DefaultPermissions() PermissionsMap {
+	return PermissionsMap{
+		DNS: PermissionsDNS{
+			ViewZones:           true,
+			ManageZones:         true,
+			ZonesAllowByDefault: true,
+			ZonesDeny:           []string{},
+			ZonesAllow:          []string{},
+			RecordsAllow:        []PermissionsRecord{},
+			RecordsDeny:         []PermissionsRecord{},
+		},
+		Data: PermissionsData{
+			PushToDatafeeds:   true,
+			ManageDatasources: true,
+			ManageDatafeeds:   true,
+		},
+		Account: PermissionsAccount{
+			ManageUsers:           true,
+			ManagePaymentMethods:  true,
+			ManagePlan:            true,
+			ManageTeams:           true,
+			ManageApikeys:         true,
+			ManageAccountSettings: true,
+			ViewActivityLog:       true,
+			ViewInvoices:          true,
+			ManageIPWhitelist:     true,
+		},
+		Monitoring: PermissionsMonitoring{
+			ManageLists: true,
+			ManageJobs:  true,
+			ViewJobs:    true,
+		},
+	}
+}
