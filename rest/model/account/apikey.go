@@ -1,8 +1,6 @@
 package account
 
 // APIKey wraps an NS1 /account/apikeys resource
-//
-// Note: APIKeyV2 has updated default permission handling
 type APIKey struct {
 	// Read-only fields
 	ID         string `json:"id,omitempty"`

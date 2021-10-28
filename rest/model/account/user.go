@@ -1,8 +1,6 @@
 package account
 
 // User wraps an NS1 /account/users resource
-//
-// Note: UserV2 has updated default permission handling
 type User struct {
 	// Read-only fields
 	LastAccess float64 `json:"last_access"`

@@ -1,8 +1,6 @@
 package account
 
 // Team wraps an NS1 /accounts/teams resource
-//
-// Note: TeamV2 has updated default permission handling
 type Team struct {
 	ID          string         `json:"id,omitempty"`
 	Name        string         `json:"name"`

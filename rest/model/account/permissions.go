@@ -1,8 +1,6 @@
 package account
 
 // PermissionsMap wraps a User's "permissions" attribute
-//
-// Note: PermissionsMapV2 has updated default permission handling
 type PermissionsMap struct {
 	DNS        PermissionsDNS        `json:"dns"`
 	Data       PermissionsData       `json:"data"`
@@ -16,8 +14,6 @@ type PermissionsMap struct {
 }
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
-//
-// Note: PermissionsDNSV2 has updated default permission handling
 type PermissionsDNS struct {
 	ViewZones           bool                `json:"view_zones"`
 	ManageZones         bool                `json:"manage_zones"`
@@ -29,8 +25,6 @@ type PermissionsDNS struct {
 }
 
 // PermissionsData wraps a User's "permissions.data" attribute
-//
-// Note: PermissionsDataV2 has updated default permission handling
 type PermissionsData struct {
 	PushToDatafeeds   bool `json:"push_to_datafeeds"`
 	ManageDatasources bool `json:"manage_datasources"`
@@ -38,8 +32,6 @@ type PermissionsData struct {
 }
 
 // PermissionsAccount wraps a User's "permissions.account" attribute
-//
-// Note: PermissionsAccountV2 has updated default permission handling
 type PermissionsAccount struct {
 	ManageUsers           bool `json:"manage_users"`
 	ManagePaymentMethods  bool `json:"manage_payment_methods"`
@@ -53,8 +45,6 @@ type PermissionsAccount struct {
 }
 
 // PermissionsSecurity wraps a User's "permissions.security" attribute.
-//
-// Note: PermissionsSecurityV2 has updated default permission handling
 type PermissionsSecurity struct {
 	ManageGlobal2FA bool `json:"manage_global_2fa"`
 
@@ -64,8 +54,6 @@ type PermissionsSecurity struct {
 
 // PermissionsMonitoring wraps a User's "permissions.monitoring" attribute
 // Only relevant for the managed product.
-//
-// Note: PermissionsMonitoringV2 has updated default permission handling
 type PermissionsMonitoring struct {
 	ManageLists bool `json:"manage_lists"`
 	ManageJobs  bool `json:"manage_jobs"`
@@ -73,8 +61,6 @@ type PermissionsMonitoring struct {
 }
 
 // PermissionsDHCP wraps a User's "permissions.dhcp" attribute for DDI.
-//
-// Note: PermissionsDHCPV2 has updated default permission handling
 type PermissionsDHCP struct {
 	ManageDHCP bool `json:"manage_dhcp"`
 	ViewDHCP   bool `json:"view_dhcp"`
@@ -84,8 +70,6 @@ type PermissionsDHCP struct {
 }
 
 // PermissionsIPAM wraps a User's "permissions.ipam" attribute for DDI.
-//
-// Note: PermissionsIPAMV2 has updated default permission handling
 type PermissionsIPAM struct {
 	ManageIPAM bool `json:"manage_ipam"`
 	ViewIPAM   bool `json:"view_ipam"`
