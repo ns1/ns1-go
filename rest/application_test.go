@@ -188,7 +188,7 @@ func TestApplication(t *testing.T) {
 			defer mock.ClearTestCases()
 
 			require.Nil(t, mock.AddTestCase(
-				http.MethodDelete, "/pulsar/apps/"+ id, http.StatusNotFound,
+				http.MethodDelete, "/pulsar/apps/"+id, http.StatusNotFound,
 				nil, nil, "", `{"message": "pulsar app not found"}`,
 			))
 
