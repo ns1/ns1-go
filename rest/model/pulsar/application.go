@@ -20,6 +20,6 @@ type DefaultConfig struct {
 }
 
 // NewApplication takes a application name and creates a *Application
-func NewApplication (name string) *Application {
+func NewApplication(name string) *Application {
 	return &Application{Name: name}
 }

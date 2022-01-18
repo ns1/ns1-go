@@ -225,12 +225,19 @@ func TestMetaFromMap(t *testing.T) {
 	}
 
 	sub := make(map[string]interface{})
-	sub["BR"] = []string{"SP", "MG"}
-	sub["DZ"] = []string{"01"}
+	sub["BR"] = []interface{}{"SP", "MG"}
+	sub["DZ"] = []interface{}{"01"}
 	m["Subdivisions"] = sub
 	meta = MetaFromMap(m)
 	if !reflect.DeepEqual(meta.Subdivisions.(map[string]interface{}), sub) {
 		t.Fatal("meta.Subdivisions should be a map[string]interface{} containing elements \"BR\":[\"SP\",\"MG\"],\"DZ\":[\"01\"] ")
+	}
+
+	subStr := "{\"BR\":[\"SP\",\"MG\"], \"DZ\": [\"01\"]}"
+	m["Subdivisions"] = subStr
+	meta = MetaFromMap(m)
+	if !reflect.DeepEqual(meta.Subdivisions.(map[string]interface{}), sub) {
+		t.Fatal(meta.Subdivisions.(map[string]interface{})["DZ"], sub)
 	}
 }
 
