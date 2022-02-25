@@ -120,10 +120,10 @@ func TestUnmarshalZones(t *testing.T) {
       ],
         "enabled":true,
         "tsig":{
-     "enabled":false,
-     "hash":null,
-     "name":null,
-     "key":null
+     "enabled":true,
+     "hash":"hmac-sha256",
+     "name":"tsig_key_test",
+     "key":"Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA=="
         },
         "error":null,
         "expired":false
@@ -246,7 +246,7 @@ func TestUnmarshalZones(t *testing.T) {
 	}
 	assert.Equal(t, z.Primary, primary, "Wrong zone primary")
 
-	// Check zone with secondaries and DNSSEC
+	// Check zone with secondaries, DNSSEC and TSIG
 	secZ := zl[1]
 	assert.Nil(t, secZ.Link)
 	assert.Equal(t, *secZ.DNSSEC, true, "Zone DNSSEC should be true")
@@ -267,9 +267,9 @@ func TestUnmarshalZones(t *testing.T) {
 
 	assert.Equal(t, secondary.TSIG, &TSIG{
 		Enabled: false,
-		Hash:    "",
-		Name:    "",
-		Key:     ""}, "Wrong zone secondary tsig")
+		Hash:    "hmac-sha256",
+		Name:    "tsig_key_test",
+		Key:     "Ok1qR5IW1ajVka5cHPEJQIXfLyx5V3PSkFBROAzOn21JumDq6nIpoj6H8rfj5Uo+Ok55ZWQ0Wgrf302fDscHLA=="}, "Wrong zone secondary tsig")
 
 	// check last zone with DNSSEC explicitly false
 	failoverZ := zl[2]
