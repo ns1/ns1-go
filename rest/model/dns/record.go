@@ -45,7 +45,7 @@ func (r Record) String() string {
 // NewRecord takes a zone, domain and record type t and creates a *Record with
 // UseClientSubnet: true & empty Answers.
 func NewRecord(zone string, domain string, t string) *Record {
-	if !strings.HasSuffix(domain, zone) {
+	if !strings.HasSuffix(strings.ToLower(domain), strings.ToLower(zone)) {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
 	return &Record{
