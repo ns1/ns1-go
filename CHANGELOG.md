@@ -1,3 +1,7 @@
+## 2.6.4 (March 25, 2022)
+FEATURES:
+* Adds support for TSIG
+
 ## 2.6.3 (August 31, 2021)
 FEATURES:
 * Adds support for Pulsar applications and jobs
