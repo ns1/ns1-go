@@ -47,6 +47,47 @@ func TestMarshalRecords(t *testing.T) {
 		})
 	}
 }
+func TestMarshalRecordsOverrideTTL(t *testing.T) {
+	trueb := true
+	falseb := false
+	var marshalALIASRecordCases = []struct {
+		name         string
+		record       *Record
+		override_ttl *bool
+		out          []byte
+	}{
+		{
+			"marshalOverrideTTLNil",
+			NewRecord("example.com", "example.com", "ALIAS"),
+			nil,
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
+		},
+		{
+			"marshalOverrideTTLTrue",
+			NewRecord("example.com", "example.com", "ALIAS"),
+			&trueb,
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"answers":[],"filters":[]}`),
+		},
+		{
+			"marshalOverrideTTLFalse",
+			NewRecord("example.com", "example.com", "ALIAS"),
+			&falseb,
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"answers":[],"filters":[]}`),
+		},
+	}
+	for _, tt := range marshalALIASRecordCases {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.record.Override_TTL = tt.override_ttl
+			result, err := json.Marshal(tt.record)
+			if err != nil {
+				t.Error(err)
+			}
+			if bytes.Compare(result, tt.out) != 0 {
+				t.Errorf("got %q, want %q", result, tt.out)
+			}
+		})
+	}
+}
 
 func TestNewRecord(t *testing.T) {
 	var CapitalLettersCases = []struct {
