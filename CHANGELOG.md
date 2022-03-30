@@ -1,3 +1,8 @@
+## 2.6.5 (March 30, 2022)
+FEATURES:
+* Added override_ttl for records
+* Fixed case sensitivity on records
+
 ## 2.6.4 (March 25, 2022)
 FEATURES:
 * Adds support for TSIG
