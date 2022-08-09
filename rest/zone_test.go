@@ -195,7 +195,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddTestCase(
 				http.MethodPut, "/zones/create.zone", http.StatusNotFound,
-				nil, nil, zone, `{"message": "zone already exists"}`,
+				nil, nil, zone, `{"message":"invalid: FQDN already exists in the view"}`,
 			))
 
 			_, err := client.Zones.Create(zone)
