@@ -60,7 +60,7 @@ func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
 				return 0, nil, ErrRecordMissing
 			}
 		}
-		return 0, nil, err
+		return 0, resp, err
 	}
 	return value.Qps, resp, nil
 }
