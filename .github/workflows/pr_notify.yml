@@ -4,6 +4,11 @@ name: pr_notify
 on:
   pull_request:
     branches: [v2]
+permissions:
+  issues: write
+  contents: write
+  pull-requests: write
+  repository-projects: write
 jobs:
   jira_job:
     runs-on: ubuntu-latest
