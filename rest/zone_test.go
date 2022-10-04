@@ -190,12 +190,36 @@ func TestZone(t *testing.T) {
 			require.Nil(t, err)
 		})
 
-		t.Run("Error", func(t *testing.T) {
+		t.Run("Error - zone already exists", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
 			require.Nil(t, mock.AddTestCase(
 				http.MethodPut, "/zones/create.zone", http.StatusNotFound,
 				nil, nil, zone, `{"message": "zone already exists"}`,
+			))
+
+			_, err := client.Zones.Create(zone)
+			require.Equal(t, api.ErrZoneExists, err)
+		})
+
+		t.Run("Error - invalid: FQDN already exists", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodPut, "/zones/create.zone", http.StatusNotFound,
+				nil, nil, zone, `{"message": "invalid: FQDN already exists"}`,
+			))
+
+			_, err := client.Zones.Create(zone)
+			require.Equal(t, api.ErrZoneExists, err)
+		})
+
+		t.Run("Error - invalid: FQDN already exists in the view", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodPut, "/zones/create.zone", http.StatusNotFound,
+				nil, nil, zone, `{"message": "invalid: FQDN already exists in the view"}`,
 			))
 
 			_, err := client.Zones.Create(zone)
