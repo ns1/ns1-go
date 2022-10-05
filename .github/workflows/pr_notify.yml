@@ -2,7 +2,7 @@
 #
 name: pr_notify
 on:
-  pull_request:
+  pull_request_target:
     branches: [v2]
 permissions:
   issues: read
