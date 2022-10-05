@@ -5,6 +5,11 @@ on:
   issues:
     types: [opened]
   workflow_dispatch:
+permissions:
+  issues: read
+  contents: read
+  pull-requests: read
+  repository-projects: read
 jobs:
   jira_job:
     runs-on: ubuntu-latest
