@@ -1,9 +1,10 @@
 package rest_test
 
 import (
-	"gopkg.in/ns1/ns1-go.v2/rest/model/pulsar"
 	"net/http"
 	"testing"
+
+	"gopkg.in/ns1/ns1-go.v2/rest/model/pulsar"
 
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ns1/ns1-go.v2/mockns1"
@@ -98,13 +99,13 @@ func TestApplication(t *testing.T) {
 
 				require.Nil(t, mock.AddTestCase(
 					http.MethodGet, "/pulsar/apps/"+id, http.StatusNotFound,
-					nil, nil, "", `{"message": "test error"}`,
+					nil, nil, "", `{"message": "error text that will be ignored by API"}`,
 				))
 
 				respApplications, resp, err := client.Applications.Get(id)
 				require.Nil(t, respApplications)
 				require.NotNil(t, err)
-				require.Contains(t, err.Error(), "test error")
+				require.Contains(t, err.Error(), "does not exist")
 				require.Equal(t, http.StatusNotFound, resp.StatusCode)
 			})
 
