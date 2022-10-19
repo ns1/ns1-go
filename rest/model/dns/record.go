@@ -14,8 +14,7 @@ type Record struct {
 	Meta *data.Meta `json:"meta,omitempty"`
 
 	ID              string `json:"id,omitempty"`
-	ZoneName        string `json:"zone_name"` // Name of the zone (may == FQDN)
-	Zone            string `json:"zone"`      // FQDN of the zone
+	Zone            string `json:"zone"`
 	Domain          string `json:"domain"`
 	Type            string `json:"type"`
 	Link            string `json:"link,omitempty"`
@@ -41,18 +40,7 @@ type Record struct {
 }
 
 func (r Record) String() string {
-	if r.ZoneName != "" {
-		return fmt.Sprintf("[%s] %s %s", r.ZoneName, r.Domain, r.Type)
-	}
 	return fmt.Sprintf("%s %s", r.Domain, r.Type)
-}
-
-// GetZoneName returns the Name if present, otherwise FQDN is the Name
-func (r Record) GetZoneName() string {
-	if r.ZoneName == "" {
-		return r.Zone
-	}
-	return r.ZoneName
 }
 
 // NewRecord takes a zone, domain and record type t and creates a *Record with
@@ -62,39 +50,19 @@ func NewRecord(zone string, domain string, t string) *Record {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
 	return &Record{
-		Meta:     &data.Meta{},
-		Zone:     zone,
-		ZoneName: zone,
-		Domain:   domain,
-		Type:     t,
-		Answers:  []*Answer{},
-		Filters:  []*filter.Filter{},
-		Regions:  data.Regions{},
-	}
-}
-
-// NewNamedRecord takes a zone name, zone FQDN, domain and record type t and
-// creates a *Record with ZoneName distinct from Zone
-func NewNamedRecord(zoneName string, zoneFQDN string, domain string, t string) *Record {
-	if !strings.HasSuffix(domain, zoneFQDN) {
-		domain = fmt.Sprintf("%s.%s", domain, zoneFQDN)
-	}
-	return &Record{
-		Meta:     &data.Meta{},
-		Zone:     zoneFQDN,
-		ZoneName: zoneName,
-		Domain:   domain,
-		Type:     t,
-		Answers:  []*Answer{},
-		Filters:  []*filter.Filter{},
-		Regions:  data.Regions{},
+		Meta:    &data.Meta{},
+		Zone:    zone,
+		Domain:  domain,
+		Type:    t,
+		Answers: []*Answer{},
+		Filters: []*filter.Filter{},
+		Regions: data.Regions{},
 	}
 }
 
 // LinkTo sets a Record Link to an FQDN.
 // to is the FQDN of the target record whose config should be used. Does
 // not have to be in the same zone.
-// Note: this may not be compatible with DNS views
 func (r *Record) LinkTo(to string) {
 	r.Meta = nil
 	r.Answers = []*Answer{}

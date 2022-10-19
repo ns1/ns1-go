@@ -18,10 +18,7 @@ type Zone struct {
 	LocalTags    []string `json:"local_tags,omitempty"` // Only relevant for DDI
 
 	ID   string `json:"id,omitempty"`
-	Zone string `json:"zone,omitempty"` // FQDN
-	// Unique identifier for the zone within account. In most cases, it is best
-	// to also use the zone FQDN for this.
-	Name string `json:"name,omitempty"`
+	Zone string `json:"zone,omitempty"`
 
 	TTL           int    `json:"ttl,omitempty"`
 	NxTTL         int    `json:"nx_ttl,omitempty"`
@@ -52,13 +49,10 @@ type Zone struct {
 
 	// Contains the key/value tag information associated to the zone
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
-
-	// Array of view names
-	Views []string `json:"views,omitempty"`
 }
 
 func (z Zone) String() string {
-	return z.GetName()
+	return z.Zone
 }
 
 // ZoneRecord wraps Zone's "records" attribute
@@ -130,27 +124,9 @@ type TSIG struct {
 // NewZone takes a zone domain name and creates a new zone.
 func NewZone(zone string) *Zone {
 	z := Zone{
-		Name: zone,
 		Zone: zone,
 	}
 	return &z
-}
-
-// NewNamedZone takes a zone name and FQDN and creates a new zone.
-func NewNamedZone(name string, zone string) *Zone {
-	z := Zone{
-		Zone: zone,
-		Name: name,
-	}
-	return &z
-}
-
-// GetName returns the Name, if present, other FQDN is the name
-func (z *Zone) GetName() string {
-	if z.Name != "" {
-		return z.Name
-	}
-	return z.Zone
 }
 
 // MakePrimary enables Primary, disables Secondary, and sets primary's

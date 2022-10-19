@@ -38,7 +38,6 @@ func ExampleZone_MakePrimary() {
 	// Output:
 	// {
 	//   "zone": "masterzone.example",
-	//   "name": "masterzone.example",
 	//   "primary": {
 	//     "enabled": true,
 	//     "secondaries": [
@@ -104,7 +103,7 @@ func ExampleRecord() {
 	fmt.Println(record.Regions["test"].Meta.Up)
 
 	// Output:
-	// [test.com] a.test.com A
+	// a.test.com A
 	// 300
 	// Primary answer:
 	// 1.1.1.1
@@ -136,7 +135,7 @@ func ExampleRecord_LinkTo() {
 	fmt.Println(linkedRecord.Meta)
 	fmt.Println(linkedRecord.Answers)
 	// Output:
-	// [test.com] l.test.com A
+	// l.test.com A
 	// <nil>
 	// []
 }
