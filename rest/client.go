@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	clientVersion = "2.4.2"
+	clientVersion = "2.6.5"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -62,8 +62,10 @@ type Client struct {
 	DataFeeds     *DataFeedsService
 	DataSources   *DataSourcesService
 	Jobs          *JobsService
+	PulsarJobs    *PulsarJobsService
 	Notifications *NotificationsService
 	Records       *RecordsService
+	Applications  *ApplicationsService
 	Settings      *SettingsService
 	Stats         *StatsService
 	Teams         *TeamsService
@@ -72,6 +74,11 @@ type Client struct {
 	Zones         *ZonesService
 	DNSSEC        *DNSSECService
 	IPAM          *IPAMService
+	ScopeGroup    *ScopeGroupService
+	Scope         *ScopeService
+	Reservation   *ReservationService
+	OptionDef     *OptionDefService
+	TSIG          *TsigService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -95,8 +102,10 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.DataFeeds = (*DataFeedsService)(&c.common)
 	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Jobs = (*JobsService)(&c.common)
+	c.PulsarJobs = (*PulsarJobsService)(&c.common)
 	c.Notifications = (*NotificationsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
+	c.Applications = (*ApplicationsService)(&c.common)
 	c.Settings = (*SettingsService)(&c.common)
 	c.Stats = (*StatsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
@@ -105,6 +114,11 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Zones = (*ZonesService)(&c.common)
 	c.DNSSEC = (*DNSSECService)(&c.common)
 	c.IPAM = (*IPAMService)(&c.common)
+	c.ScopeGroup = (*ScopeGroupService)(&c.common)
+	c.Scope = (*ScopeService)(&c.common)
+	c.Reservation = (*ReservationService)(&c.common)
+	c.OptionDef = (*OptionDefService)(&c.common)
+	c.TSIG = (*TsigService)(&c.common)
 
 	for _, option := range options {
 		option(c)
@@ -161,13 +175,13 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 	defer resp.Body.Close()
 
+	rl := parseRate(resp)
+	c.RateLimitFunc(rl)
+
 	err = CheckResponse(resp)
 	if err != nil {
 		return resp, err
 	}
-
-	rl := parseRate(resp)
-	c.RateLimitFunc(rl)
 
 	if v != nil {
 		// Try to unmarshal body into given type using streaming decoder.

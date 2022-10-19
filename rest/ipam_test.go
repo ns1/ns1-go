@@ -44,7 +44,7 @@ func TestIPAMAddrs(t *testing.T) {
 
 			for i, addr := range respAddrs {
 				if addr.Name != addrs[i].Name {
-					t.Errorf("Incorrect name for zone %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
+					t.Errorf("Incorrect name for address %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
 				}
 			}
 		})
@@ -79,7 +79,7 @@ func TestIPAMAddrs(t *testing.T) {
 
 			for i, addr := range respAddrs {
 				if addr.Name != addrs[i].Name {
-					t.Errorf("Incorrect name for zone %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
+					t.Errorf("Incorrect name for address %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
 				}
 			}
 		})
@@ -131,7 +131,7 @@ func TestIPAMAddrs(t *testing.T) {
 
 			for i, addr := range respAddrs {
 				if addr.Name != addrs[i].Name {
-					t.Errorf("Incorrect name for zone %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
+					t.Errorf("Incorrect name for address %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
 				}
 			}
 		})
@@ -166,7 +166,7 @@ func TestIPAMAddrs(t *testing.T) {
 
 			for i, addr := range respAddrs {
 				if addr.Name != addrs[i].Name {
-					t.Errorf("Incorrect name for zone %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
+					t.Errorf("Incorrect name for address %d: want=%q, got=%q", i, addrs[i].Name, addr.Name)
 				}
 			}
 		})
@@ -339,7 +339,7 @@ func TestIPAMAddrs(t *testing.T) {
 		}
 		_, err = client.IPAM.DeleteSubnet(1)
 		if err != nil {
-			t.Fatalf("error creating subnet: %v", err)
+			t.Fatalf("error deleting subnet: %v", err)
 		}
 	})
 }

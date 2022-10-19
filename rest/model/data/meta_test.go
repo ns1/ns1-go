@@ -9,7 +9,7 @@ func TestMeta_StringMap(t *testing.T) {
 	meta := &Meta{}
 	meta.Up = true
 	meta.Latitude = 0.50
-	meta.Note = "hello!"
+	meta.Note = "Hello, World!"
 	meta.Longitude = FeedPtr{FeedID: "12345678"}
 	meta.Georegion = []interface{}{"US-EAST"}
 	meta.Priority = 10
@@ -37,8 +37,8 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("georegion should be 'US-EAST")
 	}
 
-	if m["note"].(string) != "hello!" {
-		t.Fatal("note should be 'hello!'")
+	if m["note"].(string) != "Hello, World!" {
+		t.Fatal("note should be 'Hello, World!'")
 	}
 
 	if m["priority"].(string) != "10" {
@@ -88,23 +88,19 @@ func TestMeta_StringMap(t *testing.T) {
 		t.Fatal("up should be", expected, "was", m["up"].(string))
 	}
 
-	// Verify panic if passed deserialized json other than feed
-	meta.Up = map[string]interface{}{"badKey": "12345678"}
-	verifyStringMapPanic(t, meta)
+	meta.Subdivisions = map[string]interface{}{"BR": []string{"SP", "MG"}}
+	stra := meta.StringMap()
+	str_expected := "{\"BR\":[\"SP\",\"MG\"]}"
+	if stra["subdivisions"] != str_expected {
+		t.Fatal("expected:", str_expected, "got: ", stra["subdivisions"])
+	}
 
-	meta.Up = struct{}{}
-	verifyStringMapPanic(t, meta)
-
-}
-
-func verifyStringMapPanic(t *testing.T, meta *Meta) (r interface{}) {
-	defer func(t *testing.T) {
-		if r := recover(); r == nil {
-			t.Fatal("meta should have panicked but did not")
-		}
-	}(t)
-	meta.StringMap()
-	return
+	meta.Up = map[string]interface{}{"key": "12345678"}
+	stra = meta.StringMap()
+	str_expected = "{\"key\":\"12345678\"}"
+	if stra["up"] != str_expected {
+		t.Fatal("expected:", str_expected, "got: ", stra["up"])
+	}
 }
 
 func TestParseType(t *testing.T) {
@@ -227,6 +223,22 @@ func TestMetaFromMap(t *testing.T) {
 	if !reflect.DeepEqual(meta.ASN.([]string), expected) {
 		t.Fatal("meta.ASN should be a slice containing elements `1`, `2`, and `3`")
 	}
+
+	sub := make(map[string]interface{})
+	sub["BR"] = []interface{}{"SP", "MG"}
+	sub["DZ"] = []interface{}{"01"}
+	m["Subdivisions"] = sub
+	meta = MetaFromMap(m)
+	if !reflect.DeepEqual(meta.Subdivisions.(map[string]interface{}), sub) {
+		t.Fatal("meta.Subdivisions should be a map[string]interface{} containing elements \"BR\":[\"SP\",\"MG\"],\"DZ\":[\"01\"] ")
+	}
+
+	subStr := "{\"BR\":[\"SP\",\"MG\"], \"DZ\": [\"01\"]}"
+	m["Subdivisions"] = subStr
+	meta = MetaFromMap(m)
+	if !reflect.DeepEqual(meta.Subdivisions.(map[string]interface{}), sub) {
+		t.Fatal(meta.Subdivisions.(map[string]interface{})["DZ"], sub)
+	}
 }
 
 func TestGeokeyString(t *testing.T) {
@@ -247,7 +259,7 @@ func TestMeta_Validate(t *testing.T) {
 	m.Country = "US"
 	m.USState = "MA"
 	m.CAProvince = "ON"
-	m.Note = "Testing out this cool meta validation"
+	m.Note = "Hello, just testing out this cool meta validation"
 	m.LoadAvg = 3.14
 	m.Weight = 40.0
 	m.Cost = 60.0
