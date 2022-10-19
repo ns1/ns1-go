@@ -23,13 +23,14 @@ type Zone struct {
 	// to also use the zone FQDN for this.
 	Name string `json:"name,omitempty"`
 
-	TTL        int    `json:"ttl,omitempty"`
-	NxTTL      int    `json:"nx_ttl,omitempty"`
-	Retry      int    `json:"retry,omitempty"`
-	Serial     int    `json:"serial,omitempty"`
-	Refresh    int    `json:"refresh,omitempty"`
-	Expiry     int    `json:"expiry,omitempty"`
-	Hostmaster string `json:"hostmaster,omitempty"`
+	TTL           int    `json:"ttl,omitempty"`
+	NxTTL         int    `json:"nx_ttl,omitempty"`
+	Retry         int    `json:"retry,omitempty"`
+	Serial        int    `json:"serial,omitempty"`
+	Refresh       int    `json:"refresh,omitempty"`
+	Expiry        int    `json:"expiry,omitempty"`
+	Hostmaster    string `json:"hostmaster,omitempty"`
+	PrimaryMaster string `json:"primary_master,omitempty"`
 
 	// If this is a linked zone, Link points to an existing standard zone,
 	// reusing its configuration and records. Link is a zones' domain name.

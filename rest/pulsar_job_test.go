@@ -86,13 +86,13 @@ func TestPulsarJob(t *testing.T) {
 
 				require.Nil(t, mock.AddTestCase(
 					http.MethodGet, fmt.Sprintf("/pulsar/apps/%s/jobs", myAppID), http.StatusNotFound,
-					nil, nil, "", `{"message": "test error"}`,
+					nil, nil, "", `{"message": "error text that will be ignored by API"}`,
 				))
 
 				pulsarJobs, resp, err := client.PulsarJobs.List(myAppID)
 				require.Nil(t, pulsarJobs)
 				require.NotNil(t, err)
-				require.Contains(t, err.Error(), "test error")
+				require.Contains(t, err.Error(), "does not exist")
 				require.Equal(t, http.StatusNotFound, resp.StatusCode)
 			})
 		})
