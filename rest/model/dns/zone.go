@@ -101,8 +101,9 @@ type ZoneSecondary struct {
 	PrimaryPort int    `json:"primary_port,omitempty"`
 	Enabled     bool   `json:"enabled"`
 
-	OtherIPs   []string `json:"other_ips,omitempty"`
-	OtherPorts []int    `json:"other_ports,omitempty"`
+	OtherIPs      []string `json:"other_ips,omitempty"`
+	OtherPorts    []int    `json:"other_ports,omitempty"`
+	OtherNetworks []int    `json:"other_networks,omitempty"`
 
 	TSIG *TSIG `json:"tsig,omitempty"`
 }
