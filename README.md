@@ -53,85 +53,28 @@ func main() {
 }
 ```
 
-DNS views and compatibility
-===========================
+DNS views and compatibility with pre-2.6.6 SDK versions
+=======================================================
 
-DNS views is a means for NS1 to serve one set of data to one group of clients
-(e.g. internal employees), and different sets of data to other groups of
-clients (e.g. public internet). This has been largely exposed by allowing zones
-in the NS1 system to share the same FQDN, and allowing propagation to be
-controlled via ACLs and "views". For existing zones, and users that have no
-need for the added complexity of views, the default behavior is unchanged.
-However, it is important to understand that the requirement that an FQDN be
-unique within the network is removed in v3.x, and the ramifications of that.
+DNS views allow NS1 to serve one set of data to one group of clients
+(e.g. internal employees), and different results to other groups of
+clients (e.g. public internet). Multiple zones can now have the same
+fully-qualified domain name (FQDN), with propagation controlled via ACLs
+and the Views feature. For more information, please refer to this
+[NS1 documentation page](https://help.ns1.com/hc/en-us/articles/360054071374).
 
-Views are available in API v3.x. For more information, see:
-https://help.ns1.com/hc/en-us/articles/360054071374
+Users who do not need views can ignore this feature. Users who do
+use views must now use the user-supplied `name` field in the API
+to uniquely identify a zone. More than one zone can have the same
+FQDN, but their `name` fields must be unique.
 
-COMPATIBILITY
+For compatibility, the `zone` field is unchanged in existing functions.
+When `name` and FQDN differ, and you are calling a func that takes `zone`,
+you must add the `name` identifier as well. The zone's FQDN is only
+required during zone or record creation.
 
-Since an FQDN can now appear in more than one "zone", it can no longer uniquely
-identify a zone. Instead, a user-supplied "name", unique within an account,
-is used to uniquely identify the zone.
-
-The zone name can be the same as its FQDN, existing zones transfer to the new
-schema this way. And if not using views, it does serve as a good identifier.
-However, if a second zone is created pointing to same FQDN, it cannot reuse
-the FQDN as an identifier, and queries for the zone FQDN (as an identfier)
-will return the first zone. The following example should help illustrate:
-
-In general, for API requests, the identifier for a zone will appear in the URL.
-They can also be passed or received as fields on an object. In the following
-request to a v2.x system, we use ZONE as an identifier in the URL, and may
-pass the `zone` field as an indicator of the FQDN for the zone.
-
-$ENDPOINT/v1/zones/example.com -d '{zone: example.com}'
-                   ^                ^
-                   L___ ZONE (id)   L____ ZONE (fqdn)
-
-Note also that it has been an ERROR if the values in the URL and `zone` field
-do not match, and the API would reject.
-
-Going forward, the unique identifier and FQDN of the zone are decoupled. The
-reference in the URL is user-assignable, and is passed and returned using the
-`name` field for zones (and the `zone_name` field for records). In the new
-paradigm, the previous call would look more like:
-
-$ENDPOINT/v1/zones/example.com -d '{zone: example.com, name: example.com}'
-                   ^                ^                  ^
-                   L___ NAME        L____ ZONE         L____ NAME
-
-For compatibility, if `name` isn't present, the API will use the FQDN, so the
-2.x call above should continue to work, and have the same result.
-
-However, in 3.x we are now allowed to make new zones with the same FQDN:
-
-$ENDPOINT/v1/zones/example-internal -d '{zone: example.com, name: example-internal}'
-                   ^                     ^                  ^
-                   L___ NAME             L____ ZONE         L____ NAME
-
-`example-internal` shares the FQDN with `example.com`. API calls using
-`example.com` as the identifier will uniquely identify the first zone. To
-address the second zone, `example-internal` must be used in the identifier
-
-So, you can continue to use the FQDN as an identifier - in fact, if you
-are not using "views", it is recommended that you do so, but other zones using
-the same FQDN will have to choose different names.
-
-Note also that both the example-internal and example.com "zones" can coexist.
-How they are propagated relies on how they are organized with regard to views,
-acls, and networks.
-
-SUMMARY OF CHANGES TO THE SDK FOR VIEWS
-
-For compatibility, we've left the `zone` variable alone in existing functions.
-When name and FQDN differ, and you are calling a func that takes `zone`, you
-want to pass the identifier, `name`. The only time you need to be sure to pass
-the zone's FQDN is on zone or record creation, where we need to know it.
-Otherwise, we're doing lookups, and the `name` is the unambiguous field.
-
-For those using views, the NewNamedZone and NewNamedRecord funcs are provided
-to create zones and records. If not using views, you can opt to continue using
+When using views, the NewNamedZone and NewNamedRecord funcs are provided
+to create zones and records. If not using views, you can continue using
 the older functions.
 
 Contributing
@@ -144,8 +87,9 @@ Run tests:
 make test
 ```
 
-Local dev: use `go mod replace` in client code to point to local checkout of
-this repository.
+Local dev: use the `go.mod` `replace` directive or
+[`go work use`](https://go.dev/ref/mod#go-work-use)
+in client code to point to the local checkout of this repository.
 
 Consider running `./script/install-git-hooks` to install local git hooks for this
 project.
