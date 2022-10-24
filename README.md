@@ -53,6 +53,30 @@ func main() {
 }
 ```
 
+DNS views and compatibility with pre-2.6.6 SDK versions
+=======================================================
+
+DNS views allow NS1 to serve one set of data to one group of clients
+(e.g. internal employees), and different results to other groups of
+clients (e.g. public internet). Multiple zones can now have the same
+fully-qualified domain name (FQDN), with propagation controlled via ACLs
+and the Views feature. For more information, please refer to this
+[NS1 documentation page](https://help.ns1.com/hc/en-us/articles/360054071374).
+
+Users who do not need views can ignore this feature. Users who do
+use views must now use the user-supplied `name` field in the API
+to uniquely identify a zone. More than one zone can have the same
+FQDN, but their `name` fields must be unique.
+
+For compatibility, the `zone` field is unchanged in existing functions.
+When `name` and FQDN differ, and you are calling a func that takes `zone`,
+you must add the `name` identifier as well. The zone's FQDN is only
+required during zone or record creation.
+
+When using views, the NewNamedZone and NewNamedRecord funcs are provided
+to create zones and records. If not using views, you can continue using
+the older functions.
+
 Contributing
 ============
 Pull Requests and issues are welcome. See the [NS1 Contribution Guidelines](https://github.com/ns1/community) for more information.
@@ -63,8 +87,9 @@ Run tests:
 make test
 ```
 
-Local dev: use `go mod replace` in client code to point to local checkout of
-this repository.
+Local dev: use the `go.mod` `replace` directive or
+[`go work use`](https://go.dev/ref/mod#go-work-use)
+in client code to point to the local checkout of this repository.
 
 Consider running `./script/install-git-hooks` to install local git hooks for this
 project.
