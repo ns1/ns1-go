@@ -1,4 +1,4 @@
-## 2.6.6 (October ??, 2022)
+## 2.7.0 (October 25, 2022)
 NOTES:
 Previously, when updating monitoring jobs, if the `Rules` field
 in the request was empty, it was silently removed from the API
