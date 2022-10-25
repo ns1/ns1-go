@@ -1,3 +1,23 @@
+## 2.7.0 (October 25, 2022)
+NOTES:
+Previously, when updating monitoring jobs, if the `Rules` field
+in the request was empty, it was silently removed from the API
+call, making it effectively a no-op. As of version 2.7.0, specifying
+an empty `Rules` field on a monitoring job update will delete all
+rules from the job. Before upgrading to this version, users are advised
+to check their monitoring job code for use of the `Rules` field to make
+sure it will not accidentally delete rules.
+
+FEATURES:
+* Adds support for DNS views. See new section in README.md for details.
+* Adds support for `OtherNetworks` secondary zone attribute.
+* Adds support for deleting monitoring job rules.
+
+BUG FIXES:
+* Adjusted license file to be recognizable by automated parsers.
+* Fixed handling of "Zone already exists" error.
+* QPS function fixes.
+
 ## 2.6.5 (March 30, 2022)
 FEATURES:
 * Added override_ttl for records
