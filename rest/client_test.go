@@ -15,6 +15,15 @@ import (
 
 func TestClient_RateLimit(t *testing.T) {
 	r := RateLimit{
+		Limit:     0,
+		Remaining: 0,
+		Period:    0,
+	}
+	if r.WaitTime() != defaultRateLimitWaitTime {
+		t.Errorf("WaitTime({limit=0}) result: got %v, wanted %v", r.WaitTime(), defaultRateLimitWaitTime)
+	}
+
+	r = RateLimit{
 		Limit:     10,
 		Remaining: 10,
 		Period:    10,

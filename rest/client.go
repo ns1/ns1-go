@@ -22,6 +22,8 @@ const (
 	headerRateLimit     = "X-Ratelimit-Limit"
 	headerRateRemaining = "X-Ratelimit-Remaining"
 	headerRatePeriod    = "X-Ratelimit-Period"
+
+	defaultRateLimitWaitTime = time.Millisecond * 100
 )
 
 // Doer is a single method interface that allows a user to extend/augment an http.Client instance.
@@ -309,6 +311,10 @@ func (rl RateLimit) PercentageLeft() int {
 
 // WaitTime returns the time.Duration ratio of Period to Limit
 func (rl RateLimit) WaitTime() time.Duration {
+	if rl.Limit == 0 || rl.Period == 0 {
+		// rate-limit headers missing or corrupt, punt
+		return defaultRateLimitWaitTime
+	}
 	return (time.Second * time.Duration(rl.Period)) / time.Duration(rl.Limit)
 }
 
