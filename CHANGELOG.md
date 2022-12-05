@@ -1,3 +1,9 @@
+## 2.7.1 (December 5, 2022)
+BUG FIXES:
+
+* Prevent a divide-by-zero error when the expected rate-limit headers
+in the API response are corrupt or missing.
+
 ## 2.7.0 (October 25, 2022)
 NOTES:
 Previously, when updating monitoring jobs, if the `Rules` field
