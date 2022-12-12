@@ -276,17 +276,18 @@ func CheckResponse(resp *http.Response) error {
 
 	restErr := &Error{Resp: resp}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	msgBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	if len(b) == 0 {
+	if len(msgBody) == 0 {
 		return restErr
 	}
 
-	err = json.Unmarshal(b, restErr)
+	err = json.Unmarshal(msgBody, restErr)
 	if err != nil {
-		return err
+		restErr.Message = string(msgBody)
+		return restErr
 	}
 
 	return restErr
