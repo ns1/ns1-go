@@ -2,7 +2,4 @@ module gopkg.in/ns1/ns1-go.v2
 
 go 1.12
 
-require (
-	github.com/stretchr/testify v1.4.0
-	honnef.co/go/tools v0.3.3 // indirect
-)
+require github.com/stretchr/testify v1.4.0

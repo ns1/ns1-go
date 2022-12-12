@@ -27,15 +27,15 @@ type PulsarMeta struct {
 // pairs are used by a record's filter pipeline during a dns query.
 // All values can be a feed id as well, indicating real-time updates of these values.
 // Structure/Precendence of metadata tables:
-//  - Record
-//    - Meta <- lowest precendence in filter
-//    - Region(s)
-//      - Meta <- middle precedence in filter chain
-//      - ...
-//    - Answer(s)
-//      - Meta <- highest precedence in filter chain
-//      - ...
-//    - ...
+//   - Record
+//   - Meta <- lowest precendence in filter
+//   - Region(s)
+//   - Meta <- middle precedence in filter chain
+//   - ...
+//   - Answer(s)
+//   - Meta <- highest precedence in filter chain
+//   - ...
+//   - ...
 type Meta struct {
 	// STATUS
 
