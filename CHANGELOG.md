@@ -1,3 +1,9 @@
+## 2.7.2 (December 13, 2022)
+BUG FIXES:
+
+* When an HTTP error response with a non-JSON body is received, use the body as the error message (instead of a message about being unable to parse JSON).
+
+
 ## 2.7.1 (December 5, 2022)
 BUG FIXES:
 
