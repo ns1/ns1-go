@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type ReservationService service
 //
 // NS1 API docs: https://ns1.com/api#getlist-reservations
 func (s *ReservationService) List() ([]dhcp.Reservation, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *ReservationService) ListWithContext(ctx context.Context) ([]dhcp.Reservation, *http.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "dhcp/reservation", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	scs := make([]dhcp.Reservation, 0)
 	resp, err := s.client.Do(req, &scs)
@@ -33,11 +40,17 @@ func (s *ReservationService) List() ([]dhcp.Reservation, *http.Response, error) 
 //
 // NS1 API docs: https://ns1.com/api#getview-a-reservations-details
 func (s *ReservationService) Get(scID int) (*dhcp.Reservation, *http.Response, error) {
+	return s.GetWithContext(context.Background(), scID)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *ReservationService) GetWithContext(ctx context.Context, scID int) (*dhcp.Reservation, *http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/reservation/%d", scID)
 	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	sc := &dhcp.Reservation{}
 	var resp *http.Response
@@ -54,6 +67,11 @@ func (s *ReservationService) Get(scID int) (*dhcp.Reservation, *http.Response, e
 //
 // NS1 API docs: https://ns1.com/api#putcreate-a-reservation
 func (s *ReservationService) Create(sc *dhcp.Reservation) (*dhcp.Reservation, *http.Response, error) {
+	return s.CreateWithContext(context.Background(), sc)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *ReservationService) CreateWithContext(ctx context.Context, sc *dhcp.Reservation) (*dhcp.Reservation, *http.Response, error) {
 	switch {
 	case sc.Options == nil:
 		return nil, nil, errors.New("the Options field is required")
@@ -63,6 +81,7 @@ func (s *ReservationService) Create(sc *dhcp.Reservation) (*dhcp.Reservation, *h
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	respSc := new(dhcp.Reservation)
 	var resp *http.Response
@@ -79,6 +98,11 @@ func (s *ReservationService) Create(sc *dhcp.Reservation) (*dhcp.Reservation, *h
 //
 // NS1 API docs: https://ns1.com/api#postmodify-a-reservation
 func (s *ReservationService) Edit(sc *dhcp.Reservation) (*dhcp.Reservation, *http.Response, error) {
+	return s.EditWithContext(context.Background(), sc)
+}
+
+// EditWithContext is the same as Edit, but takes a context.
+func (s *ReservationService) EditWithContext(ctx context.Context, sc *dhcp.Reservation) (*dhcp.Reservation, *http.Response, error) {
 	switch {
 	case sc.ID == nil:
 		return nil, nil, errors.New("the ID field is required")
@@ -91,6 +115,7 @@ func (s *ReservationService) Edit(sc *dhcp.Reservation) (*dhcp.Reservation, *htt
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, sc)
 	if err != nil {
@@ -104,11 +129,17 @@ func (s *ReservationService) Edit(sc *dhcp.Reservation) (*dhcp.Reservation, *htt
 //
 // NS1 API docs: https://ns1.com/api#deletedelete-a-reservation
 func (s *ReservationService) Delete(id int) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), id)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *ReservationService) DeleteWithContext(ctx context.Context, id int) (*http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/reservation/%d", id)
 	req, err := s.client.NewRequest(http.MethodDelete, reqPath, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	return s.client.Do(req, nil)
 }

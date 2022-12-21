@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,12 +16,18 @@ type DNSSECService service
 //
 // NS1 API docs: https://ns1.com/api#get-get-dnssec-details-for-a-zone
 func (s *DNSSECService) Get(zone string) (*dns.ZoneDNSSEC, *http.Response, error) {
+	return s.GetWithContext(context.Background(), zone)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *DNSSECService) GetWithContext(ctx context.Context, zone string) (*dns.ZoneDNSSEC, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/dnssec", zone)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var d dns.ZoneDNSSEC
 	resp, err := s.client.Do(req, &d)

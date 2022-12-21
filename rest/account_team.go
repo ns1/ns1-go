@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type TeamsService service
 //
 // NS1 API docs: https://ns1.com/api/#teams-get
 func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *TeamsService) ListWithContext(ctx context.Context) ([]*account.Team, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/teams", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	tl := []*account.Team{}
 	resp, err := s.client.Do(req, &tl)
@@ -33,12 +40,18 @@ func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-get
 func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
+	return s.GetWithContext(context.Background(), id)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *TeamsService) GetWithContext(ctx context.Context, id string) (*account.Team, *http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var t account.Team
 	resp, err := s.client.Do(req, &t)
@@ -59,6 +72,11 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#teams-put
 func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), t)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *TeamsService) CreateWithContext(ctx context.Context, t *account.Team) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -77,6 +95,7 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 			return nil, err
 		}
 	}
+	req = req.WithContext(ctx)
 
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
@@ -97,6 +116,11 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-post
 func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), t)
+}
+
+// UpdateWithContext is the same as Update, but takes a context.
+func (s *TeamsService) UpdateWithContext(ctx context.Context, t *account.Team) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", t.ID)
 
 	var (
@@ -117,6 +141,7 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 			return nil, err
 		}
 	}
+	req = req.WithContext(ctx)
 
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
@@ -137,12 +162,18 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-delete
 func (s *TeamsService) Delete(id string) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), id)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *TeamsService) DeleteWithContext(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
