@@ -4,12 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/monitor"
 )
 
 // NotificationsService handles 'monitoring/lists' endpoint.
 type NotificationsService service
+
+var listMissingMatch = regexp.MustCompile(`not found`).MatchString
 
 // List returns all configured notification lists.
 //
@@ -45,7 +48,7 @@ func (s *NotificationsService) Get(listID string) (*monitor.NotifyList, *http.Re
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if err.(*Error).Message == "unknown notification list" {
+			if listMissingMatch(err.(*Error).Message) {
 				return nil, resp, ErrListMissing
 			}
 		}
