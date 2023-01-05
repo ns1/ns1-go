@@ -12,7 +12,7 @@ import (
 // UsersService handles 'account/users' endpoint.
 type UsersService service
 
-var userMissingMatch = regexp.MustCompile(`not found`).MatchString
+var userMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all users in the account.
 //

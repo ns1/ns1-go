@@ -12,7 +12,7 @@ import (
 // TeamsService handles 'account/teams' endpoint.
 type TeamsService service
 
-var teamMissingMatch = regexp.MustCompile(`[Tt]eam .* not found`).MatchString
+var teamMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all teams in the account.
 //

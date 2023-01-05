@@ -12,7 +12,7 @@ import (
 // APIKeysService handles 'account/apikeys' endpoint.
 type APIKeysService service
 
-var keyMissingMatch = regexp.MustCompile(`not found`).MatchString
+var keyMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all api keys in the account.
 //

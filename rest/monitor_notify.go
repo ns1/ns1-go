@@ -12,7 +12,7 @@ import (
 // NotificationsService handles 'monitoring/lists' endpoint.
 type NotificationsService service
 
-var listMissingMatch = regexp.MustCompile(`not found`).MatchString
+var listMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all configured notification lists.
 //
