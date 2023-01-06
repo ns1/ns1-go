@@ -1,3 +1,9 @@
+## 2.7.3 (January 6, 2023)
+BUG FIXES:
+
+* some of the ErrXXXXMissing error conditions were not being detected
+properly due to changes in the API responses.
+
 ## 2.7.2 (December 13, 2022)
 BUG FIXES:
 
