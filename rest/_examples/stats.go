@@ -13,7 +13,7 @@ import (
 var client *api.Client
 
 const (
-	zoneName = "example.com"
+	zoneName   = "example.com"
 	recordName = "test.example.com"
 	recordType = "A"
 )
