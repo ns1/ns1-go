@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -292,6 +293,11 @@ func CheckResponse(resp *http.Response) error {
 
 	return restErr
 }
+
+// Helper function for parsing API responses for a specific error.
+// Ideally this would take place in CheckResponse above rather than
+// in each caller.
+var resourceMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // RateLimitFunc is rate limiting strategy for the Client instance.
 type RateLimitFunc func(RateLimit)

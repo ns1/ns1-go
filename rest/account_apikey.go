@@ -4,15 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
 // APIKeysService handles 'account/apikeys' endpoint.
 type APIKeysService service
-
-var keyMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all api keys in the account.
 //
@@ -49,7 +46,7 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if keyMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return nil, resp, ErrKeyMissing
 			}
 
@@ -128,7 +125,7 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if keyMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return resp, ErrKeyMissing
 			}
 		}
@@ -153,7 +150,7 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if keyMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return resp, ErrKeyMissing
 			}
 		}

@@ -4,15 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
 // UsersService handles 'account/users' endpoint.
 type UsersService service
-
-var userMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all users in the account.
 //
@@ -48,7 +45,7 @@ func (s *UsersService) Get(username string) (*account.User, *http.Response, erro
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if userMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return nil, resp, ErrUserMissing
 			}
 		}

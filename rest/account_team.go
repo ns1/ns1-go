@@ -4,15 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
 )
 
 // TeamsService handles 'account/teams' endpoint.
 type TeamsService service
-
-var teamMissingMatch = regexp.MustCompile(` not found`).MatchString
 
 // List returns all teams in the account.
 //
@@ -48,7 +45,7 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if teamMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return nil, resp, ErrTeamMissing
 			}
 		}
@@ -126,7 +123,7 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if teamMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return resp, ErrTeamMissing
 			}
 		}
@@ -151,7 +148,7 @@ func (s *TeamsService) Delete(id string) (*http.Response, error) {
 	if err != nil {
 		switch err.(type) {
 		case *Error:
-			if teamMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.(*Error).Message) {
 				return resp, ErrTeamMissing
 			}
 		}
