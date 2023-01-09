@@ -31,7 +31,7 @@ jobs:
       - name: Jira Create issue
         id: jira_ticket
         if: ${{!steps.jira_founded_ticket.outputs.issue}}
-        uses: atlassian/gajira-create@v2.0.1
+        uses: atlassian/gajira-create@v3
         with:
           project: ${{secrets.JIRA_PROJECT_KEY}}
           issuetype: Task

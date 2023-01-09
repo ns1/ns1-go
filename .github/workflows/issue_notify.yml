@@ -22,7 +22,7 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN}}
       - name: Jira Create issue
         id: jira_ticket
-        uses: atlassian/gajira-create@v2.0.1
+        uses: atlassian/gajira-create@v3
         with:
           project: ${{secrets.JIRA_PROJECT_KEY}}
           issuetype: Bug
