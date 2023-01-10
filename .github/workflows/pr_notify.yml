@@ -2,7 +2,7 @@
 #
 name: pr_notify
 on:
-  pull_request_target:
+  pull_request:
     branches: [v2]
 permissions:
   issues: read
@@ -34,6 +34,6 @@ jobs:
         uses: atlassian/gajira-create@v3
         with:
           project: ${{secrets.JIRA_PROJECT_KEY}}
-          issuetype: Task
+          issuetype: Bug
           summary: '[ns1-go] ${{github.event.pull_request.title}}'
           description: ${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}
