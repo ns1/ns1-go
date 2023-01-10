@@ -36,4 +36,4 @@ jobs:
           project: ${{secrets.JIRA_PROJECT_KEY}}
           issuetype: Bug
           summary: '[ns1-go] ${{github.event.pull_request.title}}'
-          description: ${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}
+          customfield_10319: ${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}
