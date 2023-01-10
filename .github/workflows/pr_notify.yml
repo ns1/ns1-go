@@ -36,4 +36,6 @@ jobs:
           project: ${{secrets.JIRA_PROJECT_KEY}}
           issuetype: Bug
           summary: '[ns1-go] ${{github.event.pull_request.title}}'
-          fields: '{"customfield_10319": "${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}"}'
+          description: ${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}
+          fields: '{ "customfield_10319": "${{github.event.pull_request.body}} see more at ${{github.event.pull_request.html_url}}" }'
+          
