@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Jira Login
-        uses: atlassian/gajira-login@v2.0.0
+        uses: atlassian/gajira-login@v3
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
@@ -31,7 +31,7 @@ jobs:
       - name: Jira Create issue
         id: jira_ticket
         if: ${{!steps.jira_founded_ticket.outputs.issue}}
-        uses: atlassian/gajira-create@v2.0.1
+        uses: atlassian/gajira-create@v3
         with:
           project: ${{secrets.JIRA_PROJECT_KEY}}
           issuetype: Task
