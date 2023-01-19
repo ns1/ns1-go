@@ -1,3 +1,8 @@
+## 2.7.4 (January 17, 2023)
+FEATURES:
+
+* Adds support for getting DNS `networks`
+
 ## 2.7.3 (January 6, 2023)
 BUG FIXES:
 

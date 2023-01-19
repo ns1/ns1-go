@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	clientVersion = "2.7.3"
+	clientVersion = "2.7.4"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -83,6 +83,7 @@ type Client struct {
 	OptionDef     *OptionDefService
 	TSIG          *TsigService
 	View          *DNSViewService
+	Network       *NetworkService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -124,6 +125,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.OptionDef = (*OptionDefService)(&c.common)
 	c.TSIG = (*TsigService)(&c.common)
 	c.View = (*DNSViewService)(&c.common)
+	c.Network = (*NetworkService)(&c.common)
 
 	for _, option := range options {
 		option(c)
