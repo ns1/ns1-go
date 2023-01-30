@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dhcp"
 	"net/http"
 	"testing"
@@ -34,7 +35,7 @@ func TestDHCPScope(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSgs, _, err := client.Scope.List()
+		respSgs, _, err := client.Scope.List(context.Background())
 		if err != nil {
 			t.Fatalf("error listing scopes: %v", err)
 		}
@@ -60,7 +61,7 @@ func TestDHCPScope(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respAddr, _, err := client.Scope.Get(1)
+		respAddr, _, err := client.Scope.Get(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error getting scope: %v", err)
 		}
@@ -74,7 +75,7 @@ func TestDHCPScope(t *testing.T) {
 
 		t.Run("RequiredParams", func(t *testing.T) {
 			sg := &dhcp.Scope{}
-			_, _, err = client.Scope.Create(sg)
+			_, _, err = client.Scope.Create(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing address id to result in an error")
 			}
@@ -88,7 +89,7 @@ func TestDHCPScope(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		respSG, _, err := client.Scope.Create(sg)
+		respSG, _, err := client.Scope.Create(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error creating scope: %v", err)
 		}
@@ -101,13 +102,13 @@ func TestDHCPScope(t *testing.T) {
 		t.Run("RequiredParams", func(t *testing.T) {
 			idAddr := 123
 			sg := &dhcp.Scope{IDAddress: &idAddr}
-			_, _, err = client.Scope.Edit(sg)
+			_, _, err = client.Scope.Edit(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing ID to result in an error")
 			}
 
 			sg = &dhcp.Scope{}
-			_, _, err = client.Scope.Edit(sg)
+			_, _, err = client.Scope.Edit(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing address ID to result in an error")
 			}
@@ -125,7 +126,7 @@ func TestDHCPScope(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSG, _, err := client.Scope.Edit(sg)
+		respSG, _, err := client.Scope.Edit(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error editing scope: %v", err)
 		}
@@ -141,7 +142,7 @@ func TestDHCPScope(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		_, err = client.Scope.Delete(1)
+		_, err = client.Scope.Delete(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error deleting scope: %v", err)
 		}

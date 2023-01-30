@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type UsersService service
 // List returns all users in the account.
 //
 // NS1 API docs: https://ns1.com/api/#users-get
-func (s *UsersService) List() ([]*account.User, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "account/users", nil)
+func (s *UsersService) List(ctx context.Context) ([]*account.User, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "account/users", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,10 +33,10 @@ func (s *UsersService) List() ([]*account.User, *http.Response, error) {
 // Get returns details of a single user.
 //
 // NS1 API docs: https://ns1.com/api/#users-user-get
-func (s *UsersService) Get(username string) (*account.User, *http.Response, error) {
+func (s *UsersService) Get(ctx context.Context, username string) (*account.User, *http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", username)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,7 +59,7 @@ func (s *UsersService) Get(username string) (*account.User, *http.Response, erro
 // Create takes a *User and creates a new account user.
 //
 // NS1 API docs: https://ns1.com/api/#users-put
-func (s *UsersService) Create(u *account.User) (*http.Response, error) {
+func (s *UsersService) Create(ctx context.Context, u *account.User) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -67,12 +68,12 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && u != nil {
 		ddiUser := userToDDIUser(u)
-		req, err = s.client.NewRequest("PUT", "account/users", ddiUser)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/users", ddiUser)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("PUT", "account/users", u)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/users", u)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +97,7 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 // Update change contact details, notification settings, or access rights for a user.
 //
 // NS1 API docs: https://ns1.com/api/#users-user-post
-func (s *UsersService) Update(u *account.User) (*http.Response, error) {
+func (s *UsersService) Update(ctx context.Context, u *account.User) (*http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", u.Username)
 
 	var (
@@ -107,12 +108,12 @@ func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && u != nil {
 		ddiUser := userToDDIUser(u)
-		req, err = s.client.NewRequest("POST", path, ddiUser)
+		req, err = s.client.NewRequest(ctx, "POST", path, ddiUser)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("POST", path, u)
+		req, err = s.client.NewRequest(ctx, "POST", path, u)
 		if err != nil {
 			return nil, err
 		}
@@ -136,10 +137,10 @@ func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 // Delete deletes a user.
 //
 // NS1 API docs: https://ns1.com/api/#users-user-delete
-func (s *UsersService) Delete(username string) (*http.Response, error) {
+func (s *UsersService) Delete(ctx context.Context, username string) (*http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", username)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

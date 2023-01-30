@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -34,7 +35,7 @@ func TestIPAMAddrs(t *testing.T) {
 				t.Fatalf("error adding test case: %v", err)
 			}
 
-			respAddrs, _, err := client.IPAM.ListAddrs()
+			respAddrs, _, err := client.IPAM.ListAddrs(context.Background())
 			if err != nil {
 				t.Fatalf("error listing IPAM addresses: %v", err)
 			}
@@ -66,7 +67,7 @@ func TestIPAMAddrs(t *testing.T) {
 				t.Fatalf("error adding test case: %v", err)
 			}
 
-			respAddrs, resp, err := client.IPAM.ListAddrs()
+			respAddrs, resp, err := client.IPAM.ListAddrs(context.Background())
 			if err != nil {
 				t.Fatalf("error listing IPAM addresses: %v", err)
 			}
@@ -96,7 +97,7 @@ func TestIPAMAddrs(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respAddr, _, err := client.IPAM.GetSubnet(1)
+		respAddr, _, err := client.IPAM.GetSubnet(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error getting subnet: %v", err)
 		}
@@ -121,7 +122,7 @@ func TestIPAMAddrs(t *testing.T) {
 				t.Fatalf("error adding test case: %v", err)
 			}
 
-			respAddrs, _, err := client.IPAM.GetChildren(1)
+			respAddrs, _, err := client.IPAM.GetChildren(context.Background(), 1)
 			if err != nil {
 				t.Fatalf("error listing child subnets: %v", err)
 			}
@@ -153,7 +154,7 @@ func TestIPAMAddrs(t *testing.T) {
 				t.Fatalf("error adding test case: %v", err)
 			}
 
-			respAddrs, resp, err := client.IPAM.GetChildren(1)
+			respAddrs, resp, err := client.IPAM.GetChildren(context.Background(), 1)
 			if err != nil {
 				t.Fatalf("error listing child subnets %v", err)
 			}
@@ -182,7 +183,7 @@ func TestIPAMAddrs(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respAddr, _, err := client.IPAM.GetParent(1)
+		respAddr, _, err := client.IPAM.GetParent(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error getting subnet: %v", err)
 		}
@@ -196,12 +197,12 @@ func TestIPAMAddrs(t *testing.T) {
 
 		t.Run("RequiredParams", func(t *testing.T) {
 			addr := &ipam.Address{Name: "a", Network: 1}
-			_, _, err = client.IPAM.CreateSubnet(addr)
+			_, _, err = client.IPAM.CreateSubnet(context.Background(), addr)
 			if err == nil {
 				t.Errorf("expected a missing prefix to result in an error")
 			}
 			addr = &ipam.Address{Name: "a", Prefix: "127.0.1.0/24"}
-			_, _, err = client.IPAM.CreateSubnet(addr)
+			_, _, err = client.IPAM.CreateSubnet(context.Background(), addr)
 			if err == nil {
 				t.Errorf("expected a missing network to result in an error")
 			}
@@ -212,7 +213,7 @@ func TestIPAMAddrs(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		respAddr, _, err := client.IPAM.CreateSubnet(addr)
+		respAddr, _, err := client.IPAM.CreateSubnet(context.Background(), addr)
 		if err != nil {
 			t.Fatalf("error creating subnet: %v", err)
 		}
@@ -224,7 +225,7 @@ func TestIPAMAddrs(t *testing.T) {
 	t.Run("EditSubnet", func(t *testing.T) {
 		t.Run("RequiredParams", func(t *testing.T) {
 			addr := &ipam.Address{Name: "a"}
-			_, _, _, err = client.IPAM.EditSubnet(addr, true)
+			_, _, _, err = client.IPAM.EditSubnet(context.Background(), addr, true)
 			if err == nil {
 				t.Errorf("expected a missing ID to result in an error")
 			}
@@ -238,7 +239,7 @@ func TestIPAMAddrs(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error adding test case: %v", err)
 			}
-			respAddr, parent, _, err := client.IPAM.EditSubnet(addr, false)
+			respAddr, parent, _, err := client.IPAM.EditSubnet(context.Background(), addr, false)
 			if err != nil {
 				t.Fatalf("error editing subnet: %v", err)
 			}
@@ -257,7 +258,7 @@ func TestIPAMAddrs(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error adding test case: %v", err)
 			}
-			respAddr, parent, _, err := client.IPAM.EditSubnet(addr, true)
+			respAddr, parent, _, err := client.IPAM.EditSubnet(context.Background(), addr, true)
 			if err != nil {
 				t.Fatalf("error editing subnet: %v", err)
 			}
@@ -292,7 +293,7 @@ func TestIPAMAddrs(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		rootAddr, prefixIDs, _, err := client.IPAM.SplitSubnet(1, prefix)
+		rootAddr, prefixIDs, _, err := client.IPAM.SplitSubnet(context.Background(), 1, prefix)
 		if err != nil {
 			t.Fatalf("error creating subnet: %v", err)
 		}
@@ -321,7 +322,7 @@ func TestIPAMAddrs(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		newAddr, _, err := client.IPAM.MergeSubnet(1, 2)
+		newAddr, _, err := client.IPAM.MergeSubnet(context.Background(), 1, 2)
 		if err != nil {
 			t.Fatalf("error creating subnet: %v", err)
 		}
@@ -337,7 +338,7 @@ func TestIPAMAddrs(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		_, err = client.IPAM.DeleteSubnet(1)
+		_, err = client.IPAM.DeleteSubnet(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error deleting subnet: %v", err)
 		}

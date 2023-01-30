@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -33,7 +34,7 @@ func TestApplication(t *testing.T) {
 
 			require.Nil(t, mock.AddApplicationTestCase(nil, header, applications))
 
-			respApplications, resp, err := client.Applications.List()
+			respApplications, resp, err := client.Applications.List(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respApplications)
 			require.Equal(t, len(applications), len(respApplications))
@@ -53,7 +54,7 @@ func TestApplication(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				applications, resp, err := client.Applications.List()
+				applications, resp, err := client.Applications.List(context.Background())
 				require.Nil(t, applications)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -62,7 +63,7 @@ func TestApplication(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				applications, resp, err := c.Applications.List()
+				applications, resp, err := c.Applications.List(context.Background())
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, applications)
@@ -86,7 +87,7 @@ func TestApplication(t *testing.T) {
 				header,
 				pulsar.NewApplication(name)))
 
-			respApplication, resp, err := client.Applications.Get(id)
+			respApplication, resp, err := client.Applications.Get(context.Background(), id)
 			require.Nil(t, err)
 			require.NotNil(t, respApplication)
 			require.Equal(t, name, respApplication.Name)
@@ -102,7 +103,7 @@ func TestApplication(t *testing.T) {
 					nil, nil, "", `{"message": "error text that will be ignored by API"}`,
 				))
 
-				respApplications, resp, err := client.Applications.Get(id)
+				respApplications, resp, err := client.Applications.Get(context.Background(), id)
 				require.Nil(t, respApplications)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "does not exist")
@@ -111,7 +112,7 @@ func TestApplication(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				applications, resp, err := c.Applications.Get(id)
+				applications, resp, err := c.Applications.Get(context.Background(), id)
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, applications)
@@ -127,7 +128,7 @@ func TestApplication(t *testing.T) {
 
 			require.Nil(t, mock.AddApplicationCreateTestCase(nil, nil, application, application))
 
-			_, err := client.Applications.Create(application)
+			_, err := client.Applications.Create(context.Background(), application)
 			require.Nil(t, err)
 			require.Equal(t, application.Name, "App_test")
 		})
@@ -140,7 +141,7 @@ func TestApplication(t *testing.T) {
 				nil, nil, application, `{"Message": "test error"}`,
 			))
 
-			_, err := client.Applications.Create(application)
+			_, err := client.Applications.Create(context.Background(), application)
 			require.Contains(t, err.Error(), "test error")
 		})
 	})
@@ -157,7 +158,7 @@ func TestApplication(t *testing.T) {
 				application,
 				application))
 
-			_, err := client.Applications.Update(application)
+			_, err := client.Applications.Update(context.Background(), application)
 			require.Nil(t, err)
 		})
 
@@ -169,7 +170,7 @@ func TestApplication(t *testing.T) {
 				nil, nil, application, `{"message": "pulsar app not found"}`,
 			))
 
-			_, err := client.Applications.Update(application)
+			_, err := client.Applications.Update(context.Background(), application)
 			require.Equal(t, api.ErrApplicationMissing, err)
 		})
 	})
@@ -181,7 +182,7 @@ func TestApplication(t *testing.T) {
 
 			require.Nil(t, mock.AddApplicationDeleteTestCase(id, nil, nil))
 
-			_, err := client.Applications.Delete(id)
+			_, err := client.Applications.Delete(context.Background(), id)
 			require.Nil(t, err)
 		})
 
@@ -193,7 +194,7 @@ func TestApplication(t *testing.T) {
 				nil, nil, "", `{"message": "pulsar app not found"}`,
 			))
 
-			_, err := client.Applications.Delete(id)
+			_, err := client.Applications.Delete(context.Background(), id)
 			require.Equal(t, api.ErrApplicationMissing, err)
 		})
 	})

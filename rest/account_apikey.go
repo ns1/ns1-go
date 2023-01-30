@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type APIKeysService service
 // List returns all api keys in the account.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-get
-func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "account/apikeys", nil)
+func (s *APIKeysService) List(ctx context.Context) ([]*account.APIKey, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "account/apikeys", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -33,10 +34,10 @@ func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 // Note: do not use the API Key itself as the keyid in the URL — use the id of the key.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-get
-func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, error) {
+func (s *APIKeysService) Get(ctx context.Context, keyID string) (*account.APIKey, *http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,7 +61,7 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 // Create takes a *APIKey and creates a new account apikey.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-put
-func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
+func (s *APIKeysService) Create(ctx context.Context, a *account.APIKey) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -69,12 +70,12 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && a != nil {
 		ddiAPIKey := apiKeyToDDIAPIKey(a)
-		req, err = s.client.NewRequest("PUT", "account/apikeys", ddiAPIKey)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/apikeys", ddiAPIKey)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("PUT", "account/apikeys", a)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/apikeys", a)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +99,7 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 // Update changes the name or access rights for an API Key.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-post
-func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
+func (s *APIKeysService) Update(ctx context.Context, a *account.APIKey) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", a.ID)
 
 	var (
@@ -109,12 +110,12 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && a != nil {
 		ddiAPIKey := apiKeyToDDIAPIKey(a)
-		req, err = s.client.NewRequest("POST", path, ddiAPIKey)
+		req, err = s.client.NewRequest(ctx, "POST", path, ddiAPIKey)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("POST", path, a)
+		req, err = s.client.NewRequest(ctx, "POST", path, a)
 		if err != nil {
 			return nil, err
 		}
@@ -138,10 +139,10 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 // Delete deletes an apikey.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-delete
-func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
+func (s *APIKeysService) Delete(ctx context.Context, keyID string) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

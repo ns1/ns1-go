@@ -1,6 +1,7 @@
 package mockns1_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -37,7 +38,7 @@ func TestNetwork(t *testing.T) {
 
 		require.Nil(t, mock.NetworkGetTestCase(nil, nil, networks))
 
-		resp, _, err := client.Network.Get()
+		resp, _, err := client.Network.Get(context.Background())
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		require.Equal(t, len(networks), len(resp))

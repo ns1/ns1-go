@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dhcp"
 	"net/http"
 	"testing"
@@ -33,7 +34,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSgs, _, err := client.ScopeGroup.List()
+		respSgs, _, err := client.ScopeGroup.List(context.Background())
 		if err != nil {
 			t.Fatalf("error listing IPAM addresses: %v", err)
 		}
@@ -59,7 +60,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respAddr, _, err := client.ScopeGroup.Get(1)
+		respAddr, _, err := client.ScopeGroup.Get(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error getting scpe group: %v", err)
 		}
@@ -73,7 +74,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 
 		t.Run("RequiredParams", func(t *testing.T) {
 			sg := &dhcp.ScopeGroup{}
-			_, _, err = client.ScopeGroup.Create(sg)
+			_, _, err = client.ScopeGroup.Create(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing name to result in an error")
 			}
@@ -94,7 +95,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		respSG, _, err := client.ScopeGroup.Create(sg)
+		respSG, _, err := client.ScopeGroup.Create(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error creating scope group: %v", err)
 		}
@@ -106,7 +107,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 	t.Run("Edit", func(t *testing.T) {
 		t.Run("RequiredParams", func(t *testing.T) {
 			sg := &dhcp.ScopeGroup{Name: "a"}
-			_, _, err = client.ScopeGroup.Edit(sg)
+			_, _, err = client.ScopeGroup.Edit(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing ID to result in an error")
 			}
@@ -132,7 +133,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSG, _, err := client.ScopeGroup.Edit(sg)
+		respSG, _, err := client.ScopeGroup.Edit(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error editing scope group: %v", err)
 		}
@@ -148,7 +149,7 @@ func TestDHCPScopeGroup(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		_, err = client.ScopeGroup.Delete(1)
+		_, err = client.ScopeGroup.Delete(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error deleting scope group: %v", err)
 		}

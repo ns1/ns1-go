@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -36,7 +37,7 @@ func TestCreateAPIKey(t *testing.T) {
 		Permissions: account.PermissionsMap{},
 	}
 
-	_, err := c.APIKeys.Create(k)
+	_, err := c.APIKeys.Create(context.Background(), k)
 	require.NoError(t, err)
 }
 
@@ -95,7 +96,7 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		Permissions:       account.PermissionsMap{},
 	}
 
-	_, err := c.APIKeys.Create(k)
+	_, err := c.APIKeys.Create(context.Background(), k)
 	require.NoError(t, err)
 	// Create a key with auth tags
 	k = &account.APIKey{
@@ -150,6 +151,6 @@ func TestCreateDDIAPIKey(t *testing.T) {
 		},
 	}
 
-	_, err = c.APIKeys.Create(k)
+	_, err = c.APIKeys.Create(context.Background(), k)
 	require.NoError(t, err)
 }

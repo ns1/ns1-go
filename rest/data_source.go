@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -13,8 +14,8 @@ type DataSourcesService service
 // List returns all connected data sources.
 //
 // NS1 API docs: https://ns1.com/api/#sources-get
-func (s *DataSourcesService) List() ([]*data.Source, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "data/sources", nil)
+func (s *DataSourcesService) List(ctx context.Context) ([]*data.Source, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "data/sources", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -31,10 +32,10 @@ func (s *DataSourcesService) List() ([]*data.Source, *http.Response, error) {
 // Get takes an ID returns the details for a single data source.
 //
 // NS1 API docs: https://ns1.com/api/#sources-source-get
-func (s *DataSourcesService) Get(id string) (*data.Source, *http.Response, error) {
+func (s *DataSourcesService) Get(ctx context.Context, id string) (*data.Source, *http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", id)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,8 +52,8 @@ func (s *DataSourcesService) Get(id string) (*data.Source, *http.Response, error
 // Create takes a *DataSource and creates a new data source.
 //
 // NS1 API docs: https://ns1.com/api/#sources-put
-func (s *DataSourcesService) Create(ds *data.Source) (*http.Response, error) {
-	req, err := s.client.NewRequest("PUT", "data/sources", &ds)
+func (s *DataSourcesService) Create(ctx context.Context, ds *data.Source) (*http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "PUT", "data/sources", &ds)
 	if err != nil {
 		return nil, err
 	}
@@ -70,10 +71,10 @@ func (s *DataSourcesService) Create(ds *data.Source) (*http.Response, error) {
 // NOTE: This does not 'publish' data. See the Publish method.
 //
 // NS1 API docs: https://ns1.com/api/#sources-post
-func (s *DataSourcesService) Update(ds *data.Source) (*http.Response, error) {
+func (s *DataSourcesService) Update(ctx context.Context, ds *data.Source) (*http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", ds.ID)
 
-	req, err := s.client.NewRequest("POST", path, &ds)
+	req, err := s.client.NewRequest(ctx, "POST", path, &ds)
 	if err != nil {
 		return nil, err
 	}
@@ -90,10 +91,10 @@ func (s *DataSourcesService) Update(ds *data.Source) (*http.Response, error) {
 // Delete takes an ID and removes an existing data source and all connected feeds from the source.
 //
 // NS1 API docs: https://ns1.com/api/#sources-delete
-func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
+func (s *DataSourcesService) Delete(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", id)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -109,10 +110,10 @@ func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
 // Publish takes a datasources' id and data to publish.
 //
 // NS1 API docs: https://ns1.com/api/#feed-post
-func (s *DataSourcesService) Publish(dsID string, data interface{}) (*http.Response, error) {
+func (s *DataSourcesService) Publish(ctx context.Context, dsID string, data interface{}) (*http.Response, error) {
 	path := fmt.Sprintf("feed/%s", dsID)
 
-	req, err := s.client.NewRequest("POST", path, &data)
+	req, err := s.client.NewRequest(ctx, "POST", path, &data)
 	if err != nil {
 		return nil, err
 	}

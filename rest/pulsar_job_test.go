@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -48,7 +49,7 @@ func TestPulsarJob(t *testing.T) {
 
 			require.Nil(t, mock.AddPulsarJobListTestCase(myAppID, nil, nil, pulsarJobs))
 
-			respPulsarJobs, _, err := client.PulsarJobs.List(myAppID)
+			respPulsarJobs, _, err := client.PulsarJobs.List(context.Background(), myAppID)
 			require.Nil(t, err)
 			require.NotNil(t, respPulsarJobs)
 			require.Equal(t, len(pulsarJobs), len(respPulsarJobs))
@@ -73,7 +74,7 @@ func TestPulsarJob(t *testing.T) {
 					nil, nil, "", `{"message": "pulsar app not found"}`,
 				))
 
-				pulsarJobs, resp, err := client.PulsarJobs.List(myAppID)
+				pulsarJobs, resp, err := client.PulsarJobs.List(context.Background(), myAppID)
 				require.Nil(t, pulsarJobs)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrAppMissing.Error(), err.Error())
@@ -89,7 +90,7 @@ func TestPulsarJob(t *testing.T) {
 					nil, nil, "", `{"message": "error text that will be ignored by API"}`,
 				))
 
-				pulsarJobs, resp, err := client.PulsarJobs.List(myAppID)
+				pulsarJobs, resp, err := client.PulsarJobs.List(context.Background(), myAppID)
 				require.Nil(t, pulsarJobs)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "does not exist")
@@ -154,7 +155,7 @@ func TestPulsarJob(t *testing.T) {
 
 			require.Nil(t, mock.AddPulsarJobGetTestCase(myAppID, myJobID, nil, nil, pulsarJob))
 
-			respPulsarJob, _, err := client.PulsarJobs.Get(myAppID, myJobID)
+			respPulsarJob, _, err := client.PulsarJobs.Get(context.Background(), myAppID, myJobID)
 
 			require.Nil(t, err)
 			require.True(t, reflect.DeepEqual(pulsarJob, respPulsarJob))
@@ -169,7 +170,7 @@ func TestPulsarJob(t *testing.T) {
 					http.MethodGet, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", myAppID, myJobID), http.StatusNotFound,
 					nil, nil, "", fmt.Sprintf(`{"message": "pulsar job %s not found for appid %s"}`, myJobID, myAppID),
 				))
-				pulsarJob, resp, err := client.PulsarJobs.Get(myAppID, myJobID)
+				pulsarJob, resp, err := client.PulsarJobs.Get(context.Background(), myAppID, myJobID)
 				require.Nil(t, pulsarJob)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrJobMissing.Error(), err.Error())
@@ -184,7 +185,7 @@ func TestPulsarJob(t *testing.T) {
 					http.MethodGet, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", myAppID, myJobID), http.StatusNotFound,
 					nil, nil, "", `{"message": "pulsar app not found"}`,
 				))
-				pulsarJob, resp, err := client.PulsarJobs.Get(myAppID, myJobID)
+				pulsarJob, resp, err := client.PulsarJobs.Get(context.Background(), myAppID, myJobID)
 				require.Nil(t, pulsarJob)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrAppMissing.Error(), err.Error())
@@ -200,7 +201,7 @@ func TestPulsarJob(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				pulsarJob, resp, err := client.PulsarJobs.Get(myAppID, myJobID)
+				pulsarJob, resp, err := client.PulsarJobs.Get(context.Background(), myAppID, myJobID)
 				require.Nil(t, pulsarJob)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -221,7 +222,7 @@ func TestPulsarJob(t *testing.T) {
 
 			require.Nil(t, mock.AddPulsarJobCreateTestCase(nil, nil, pulsarJob, pulsarJob))
 
-			_, err := client.PulsarJobs.Create(pulsarJob)
+			_, err := client.PulsarJobs.Create(context.Background(), pulsarJob)
 			require.Nil(t, err)
 		})
 
@@ -235,7 +236,7 @@ func TestPulsarJob(t *testing.T) {
 					nil, nil, pulsarJob, `{"message": "pulsar app not found"}`,
 				))
 
-				_, err = client.PulsarJobs.Create(pulsarJob)
+				_, err = client.PulsarJobs.Create(context.Background(), pulsarJob)
 
 				require.Equal(t, api.ErrAppMissing.Error(), err.Error())
 			})
@@ -249,7 +250,7 @@ func TestPulsarJob(t *testing.T) {
 					nil, nil, pulsarJob, `{"message": "test error"}`,
 				))
 
-				_, err = client.PulsarJobs.Create(pulsarJob)
+				_, err = client.PulsarJobs.Create(context.Background(), pulsarJob)
 
 				require.Contains(t, err.Error(), "test error")
 			})
@@ -269,7 +270,7 @@ func TestPulsarJob(t *testing.T) {
 
 			require.Nil(t, mock.AddPulsarJobUpdateTestCase(nil, nil, pulsarJob, pulsarJob))
 
-			_, err := client.PulsarJobs.Update(pulsarJob)
+			_, err := client.PulsarJobs.Update(context.Background(), pulsarJob)
 			require.Nil(t, err)
 		})
 
@@ -282,7 +283,7 @@ func TestPulsarJob(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 					nil, nil, pulsarJob, fmt.Sprintf(`{"message": "pulsar job %s not found for appid %s"}`, myJobID, myAppID),
 				))
-				resp, err := client.PulsarJobs.Update(pulsarJob)
+				resp, err := client.PulsarJobs.Update(context.Background(), pulsarJob)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrJobMissing.Error(), err.Error())
 				require.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -296,7 +297,7 @@ func TestPulsarJob(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 					nil, nil, pulsarJob, `{"message": "pulsar app not found"}`,
 				))
-				resp, err := client.PulsarJobs.Update(pulsarJob)
+				resp, err := client.PulsarJobs.Update(context.Background(), pulsarJob)
 
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrAppMissing.Error(), err.Error())
@@ -311,7 +312,7 @@ func TestPulsarJob(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 					nil, nil, pulsarJob, `{"message": "test error"}`,
 				))
-				resp, err := client.PulsarJobs.Update(pulsarJob)
+				resp, err := client.PulsarJobs.Update(context.Background(), pulsarJob)
 
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -333,7 +334,7 @@ func TestPulsarJob(t *testing.T) {
 
 			require.Nil(t, mock.AddPulsarJobDeleteTestCase(nil, nil, pulsarJob, nil))
 
-			_, err := client.PulsarJobs.Delete(pulsarJob)
+			_, err := client.PulsarJobs.Delete(context.Background(), pulsarJob)
 			require.Nil(t, err)
 		})
 
@@ -347,7 +348,7 @@ func TestPulsarJob(t *testing.T) {
 						http.MethodDelete, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 						nil, nil, "", fmt.Sprintf(`{"message": "pulsar job %s not found for appid %s"}`, pulsarJob.JobID, pulsarJob.AppID),
 					))
-					resp, err := client.PulsarJobs.Delete(pulsarJob)
+					resp, err := client.PulsarJobs.Delete(context.Background(), pulsarJob)
 					require.NotNil(t, err)
 					require.Equal(t, api.ErrJobMissing.Error(), err.Error())
 					require.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -361,7 +362,7 @@ func TestPulsarJob(t *testing.T) {
 						http.MethodDelete, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 						nil, nil, "", `{"message": "pulsar app not found"}`,
 					))
-					resp, err := client.PulsarJobs.Delete(pulsarJob)
+					resp, err := client.PulsarJobs.Delete(context.Background(), pulsarJob)
 
 					require.NotNil(t, err)
 					require.Equal(t, api.ErrAppMissing.Error(), err.Error())
@@ -376,7 +377,7 @@ func TestPulsarJob(t *testing.T) {
 						http.MethodDelete, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusNotFound,
 						nil, nil, "", `{"message": "test error"}`,
 					))
-					resp, err := client.PulsarJobs.Delete(pulsarJob)
+					resp, err := client.PulsarJobs.Delete(context.Background(), pulsarJob)
 
 					require.NotNil(t, err)
 					require.Contains(t, err.Error(), "test error")

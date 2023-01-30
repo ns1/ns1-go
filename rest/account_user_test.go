@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -35,7 +36,7 @@ func TestCreateUser(t *testing.T) {
 		Permissions: account.PermissionsMap{},
 	}
 
-	_, err := c.Users.Create(u)
+	_, err := c.Users.Create(context.Background(), u)
 	require.NoError(t, err)
 }
 
@@ -66,6 +67,6 @@ func TestCreateDDIUser(t *testing.T) {
 		Permissions:       account.PermissionsMap{},
 	}
 
-	_, err := c.Users.Create(u)
+	_, err := c.Users.Create(context.Background(), u)
 	require.NoError(t, err)
 }

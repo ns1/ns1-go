@@ -2,6 +2,7 @@ package rest
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -201,7 +202,7 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 }
 
 // NextFunc knows how to get and parse additional info from uri into v.
-type NextFunc func(v *interface{}, uri string) (*http.Response, error)
+type NextFunc func(ctx context.Context, v *interface{}, uri string) (*http.Response, error)
 
 // DoWithPagination Does, and follows Link headers for pagination. The returned
 // Response is from the last URI visited - either the last page, or one that
@@ -218,7 +219,7 @@ func (c Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (
 
 	nextURI := ParseLink(resp.Header.Get("Link"), forceHTTPS).Next()
 	for nextURI != "" {
-		resp, err = f(&v, nextURI)
+		resp, err = f(req.Context(), &v, nextURI)
 		if err != nil {
 			return resp, err
 		}
@@ -228,7 +229,7 @@ func (c Client) DoWithPagination(req *http.Request, v interface{}, f NextFunc) (
 }
 
 // NewRequest constructs and returns a http.Request.
-func (c *Client) NewRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method, path string, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(path)
 	if err != nil {
 		return nil, err
@@ -249,6 +250,8 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	if err != nil {
 		return nil, err
 	}
+
+	req = req.WithContext(ctx)
 
 	req.Header.Add(headerAuth, c.APIKey)
 	req.Header.Add("User-Agent", c.UserAgent)
@@ -391,8 +394,8 @@ func SetIntParam(key string, val int) func(*url.Values) {
 	return func(v *url.Values) { v.Set(key, strconv.Itoa(val)) }
 }
 
-func (c *Client) getURI(v interface{}, uri string) (*http.Response, error) {
-	req, err := c.NewRequest("GET", uri, nil)
+func (c *Client) getURI(ctx context.Context, v interface{}, uri string) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, "GET", uri, nil)
 	if err != nil {
 		return nil, err
 	}

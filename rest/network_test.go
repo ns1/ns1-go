@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -43,7 +44,7 @@ func TestNetwork(t *testing.T) {
 
 			require.Nil(t, mock.NetworkGetTestCase(nil, nil, networks))
 
-			respNetworks, _, err := client.Network.Get()
+			respNetworks, _, err := client.Network.Get(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respNetworks)
 			require.Equal(t, len(networks), len(respNetworks))
@@ -62,7 +63,7 @@ func TestNetwork(t *testing.T) {
 
 			require.Nil(t, mock.NetworkGetTestCase(nil, nil, networks))
 
-			respNetworks, _, err := client.Network.Get()
+			respNetworks, _, err := client.Network.Get(context.Background())
 			require.Nil(t, err)
 			require.Equal(t, networks, respNetworks)
 
@@ -77,7 +78,7 @@ func TestNetwork(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				networks, resp, err := client.Network.Get()
+				networks, resp, err := client.Network.Get(context.Background())
 				require.Nil(t, networks)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -86,7 +87,7 @@ func TestNetwork(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				networks, resp, err := c.Network.Get()
+				networks, resp, err := c.Network.Get(context.Background())
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, networks)

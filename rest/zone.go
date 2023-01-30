@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type ZonesService service
 // List returns all active zones and basic zone configuration details for each.
 //
 // NS1 API docs: https://ns1.com/api/#zones-get
-func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "zones", nil)
+func (s *ZonesService) List(ctx context.Context) ([]*dns.Zone, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "zones", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,10 +38,10 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 // Get takes a zone name and returns a single active zone and its basic configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#zones-zone-get
-func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
+func (s *ZonesService) Get(ctx context.Context, zone string) (*dns.Zone, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -68,10 +69,10 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 // Create takes a *Zone and creates a new DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
-func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
+func (s *ZonesService) Create(ctx context.Context, z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
-	req, err := s.client.NewRequest("PUT", path, &z)
+	req, err := s.client.NewRequest(ctx, "PUT", path, &z)
 	if err != nil {
 		return nil, err
 	}
@@ -96,10 +97,10 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 // Update takes a *Zone and modifies basic details of a DNS zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
-func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
+func (s *ZonesService) Update(ctx context.Context, z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
-	req, err := s.client.NewRequest("POST", path, &z)
+	req, err := s.client.NewRequest(ctx, "POST", path, &z)
 	if err != nil {
 		return nil, err
 	}
@@ -122,10 +123,10 @@ func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 // Delete takes a zone and destroys an existing DNS zone and all records in the zone.
 //
 // NS1 API docs: https://ns1.com/api/#zones-delete
-func (s *ZonesService) Delete(zone string) (*http.Response, error) {
+func (s *ZonesService) Delete(ctx context.Context, zone string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -146,9 +147,9 @@ func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 
 // nextZones is a pagination helper than gets and appends another list of zones
 // to the passed list.
-func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, error) {
+func (s *ZonesService) nextZones(ctx context.Context, v *interface{}, uri string) (*http.Response, error) {
 	tmpZl := []*dns.Zone{}
-	resp, err := s.client.getURI(&tmpZl, uri)
+	resp, err := s.client.getURI(ctx, &tmpZl, uri)
 	if err != nil {
 		return resp, err
 	}
@@ -164,9 +165,9 @@ func (s *ZonesService) nextZones(v *interface{}, uri string) (*http.Response, er
 
 // nextRecords is a pagination helper tha gets and appends another set of
 // records to the passed zone.
-func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, error) {
+func (s *ZonesService) nextRecords(ctx context.Context, v *interface{}, uri string) (*http.Response, error) {
 	var tmpZone dns.Zone
-	resp, err := s.client.getURI(&tmpZone, uri)
+	resp, err := s.client.getURI(ctx, &tmpZone, uri)
 	if err != nil {
 		return resp, err
 	}

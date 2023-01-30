@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -31,7 +32,7 @@ func TestZone(t *testing.T) {
 			}
 			require.Nil(t, mock.AddZoneListTestCase(nil, nil, zones))
 
-			respZones, _, err := client.Zones.List()
+			respZones, _, err := client.Zones.List(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respZones)
 			require.Equal(t, len(zones), len(respZones))
@@ -55,7 +56,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddZoneListTestCase(nil, header, zones))
 
-			respZones, resp, err := client.Zones.List()
+			respZones, resp, err := client.Zones.List(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respZones)
 			require.Equal(t, len(zones), len(respZones))
@@ -75,7 +76,7 @@ func TestZone(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				zones, resp, err := client.Zones.List()
+				zones, resp, err := client.Zones.List(context.Background())
 				require.Nil(t, zones)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -84,7 +85,7 @@ func TestZone(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				zones, resp, err := c.Zones.List()
+				zones, resp, err := c.Zones.List(context.Background())
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, zones)
@@ -110,7 +111,7 @@ func TestZone(t *testing.T) {
 			}
 			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, nil, zone))
 
-			respZone, _, err := client.Zones.Get(zoneName)
+			respZone, _, err := client.Zones.Get(context.Background(), zoneName)
 			require.Nil(t, err)
 			require.NotNil(t, respZone)
 			require.Equal(t, len(zone.Records), len(respZone.Records))
@@ -138,7 +139,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, header, zone))
 
-			respZone, resp, err := client.Zones.Get(zoneName)
+			respZone, resp, err := client.Zones.Get(context.Background(), zoneName)
 			require.Nil(t, err)
 			require.NotNil(t, respZone)
 			require.Equal(t, len(zone.Records), len(respZone.Records))
@@ -158,7 +159,7 @@ func TestZone(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				zone, resp, err := client.Zones.Get(zoneName)
+				zone, resp, err := client.Zones.Get(context.Background(), zoneName)
 				require.Nil(t, zone)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -167,7 +168,7 @@ func TestZone(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				zones, resp, err := c.Zones.Get(zoneName)
+				zones, resp, err := c.Zones.Get(context.Background(), zoneName)
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, zones)
@@ -186,7 +187,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddZoneCreateTestCase(nil, nil, zone, zone))
 
-			_, err := client.Zones.Create(zone)
+			_, err := client.Zones.Create(context.Background(), zone)
 			require.Nil(t, err)
 		})
 
@@ -198,7 +199,7 @@ func TestZone(t *testing.T) {
 				nil, nil, zone, `{"message": "zone already exists"}`,
 			))
 
-			_, err := client.Zones.Create(zone)
+			_, err := client.Zones.Create(context.Background(), zone)
 			require.Equal(t, api.ErrZoneExists, err)
 		})
 
@@ -210,7 +211,7 @@ func TestZone(t *testing.T) {
 				nil, nil, zone, `{"message": "invalid: FQDN already exists"}`,
 			))
 
-			_, err := client.Zones.Create(zone)
+			_, err := client.Zones.Create(context.Background(), zone)
 			require.Equal(t, api.ErrZoneExists, err)
 		})
 
@@ -222,7 +223,7 @@ func TestZone(t *testing.T) {
 				nil, nil, zone, `{"message": "invalid: FQDN already exists in the view"}`,
 			))
 
-			_, err := client.Zones.Create(zone)
+			_, err := client.Zones.Create(context.Background(), zone)
 			require.Equal(t, api.ErrZoneExists, err)
 		})
 	})
@@ -238,7 +239,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddZoneUpdateTestCase(nil, nil, zone, zone))
 
-			_, err := client.Zones.Update(zone)
+			_, err := client.Zones.Update(context.Background(), zone)
 			require.Nil(t, err)
 		})
 
@@ -250,7 +251,7 @@ func TestZone(t *testing.T) {
 				nil, nil, zone, `{"message": "zone not found"}`,
 			))
 
-			_, err := client.Zones.Update(zone)
+			_, err := client.Zones.Update(context.Background(), zone)
 			require.Equal(t, api.ErrZoneMissing, err)
 		})
 	})
@@ -261,7 +262,7 @@ func TestZone(t *testing.T) {
 
 			require.Nil(t, mock.AddZoneDeleteTestCase("delete.zone", nil, nil))
 
-			_, err := client.Zones.Delete("delete.zone")
+			_, err := client.Zones.Delete(context.Background(), "delete.zone")
 			require.Nil(t, err)
 		})
 
@@ -273,7 +274,7 @@ func TestZone(t *testing.T) {
 				nil, nil, "", `{"message": "zone not found"}`,
 			))
 
-			_, err := client.Zones.Delete("delete.zone")
+			_, err := client.Zones.Delete(context.Background(), "delete.zone")
 			require.Equal(t, api.ErrZoneMissing, err)
 		})
 	})
