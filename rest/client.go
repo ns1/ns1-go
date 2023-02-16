@@ -69,6 +69,8 @@ type Client struct {
 	Notifications *NotificationsService
 	Records       *RecordsService
 	Applications  *ApplicationsService
+	RecordSearch  *RecordSearchService
+	ZoneSearch    *ZoneSearchService
 	Settings      *SettingsService
 	Stats         *StatsService
 	Teams         *TeamsService
@@ -111,6 +113,8 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Notifications = (*NotificationsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
 	c.Applications = (*ApplicationsService)(&c.common)
+	c.RecordSearch = (*RecordSearchService)(&c.common)
+	c.ZoneSearch = (*ZoneSearchService)(&c.common)
 	c.Settings = (*SettingsService)(&c.common)
 	c.Stats = (*StatsService)(&c.common)
 	c.Teams = (*TeamsService)(&c.common)
