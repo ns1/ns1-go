@@ -48,7 +48,7 @@ type Zone struct {
 	DNSSEC *bool `json:"dnssec,omitempty"`
 
 	// Contains the key/value tag information associated to the zone
-	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
+	Tags map[string]string `json:"tags"` // Only relevant for DDI
 }
 
 func (z Zone) String() string {
