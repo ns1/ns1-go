@@ -151,6 +151,8 @@ type Meta struct {
 	// subdivisions must follow the ISO-3166-2 code for a country and subdivisions
 	// map[string]interface{} or FeedPtr.
 	Subdivisions interface{} `json:"subdivisions,omitempty"`
+
+	AdditionalMetadata interface{} `json:"additional_metadata,omitempty"`
 }
 
 // StringMap returns a map[string]interface{} representation of metadata (for use with terraform in nested structures)
@@ -313,6 +315,11 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 			case "Note":
 				// If it's a Note, just pass the string without any type of parse.
 				fv.Set(reflect.ValueOf(v.(string)))
+			case "AdditionalMetadata":
+				var additonals []map[string]interface{}
+				if err := json.Unmarshal([]byte(v.(string)), &additonals); err == nil {
+					fv.Set(reflect.ValueOf(additonals))
+				}
 			default:
 				fv.Set(reflect.ValueOf(ParseType(v.(string))))
 			}
