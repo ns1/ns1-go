@@ -1,3 +1,8 @@
+## 2.7.5 (March 13, 2023)
+BUG FIXES:
+
+* Fixes `additonal_metadata` parsing
+
 ## 2.7.4 (January 17, 2023)
 FEATURES:
 

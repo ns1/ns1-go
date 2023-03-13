@@ -23,6 +23,11 @@ func TestMeta_StringMap(t *testing.T) {
 		"bias":       "*0.55",
 		"a5m_cutoff": 0.9,
 	}}
+	meta.AdditionalMetadata = []interface{}{map[string]interface{}{
+		"a": "1",
+		"b": "2",
+		"c": "3",
+	}}
 	m := meta.StringMap()
 
 	if m["up"].(string) != "1" {
@@ -68,6 +73,11 @@ func TestMeta_StringMap(t *testing.T) {
 	expected := `[{"a5m_cutoff":0.9,"bias":"*0.55","job_id":"abcdef"}]`
 	if m["pulsar"].(string) != expected {
 		t.Fatal("pulsar should be", expected, "was", m["pulsar"].(string))
+	}
+
+	expected = `[{"a":"1","b":"2","c":"3"}]`
+	if m["additional_metadata"].(string) != expected {
+		t.Fatal("additional_metadata should be", expected, "was", m["additional_metadata"].(string))
 	}
 
 	expected = `{"feed":"12345678"}`
@@ -152,6 +162,7 @@ func TestMetaFromMap(t *testing.T) {
 	m["ip_prefixes"] = "1.1.1.1/24,2.2.2.2/24"
 	m["asn"] = "1"
 	m["pulsar"] = `[{"job_id":"abcdef","bias":"*0.55","a5m_cutoff":0.9}]`
+	m["additional_metadata"] = `[{"a":"1","b":"2","c":"3"}]`
 	meta := MetaFromMap(m)
 
 	if meta.ASN.(string) != "1" {
@@ -181,6 +192,15 @@ func TestMetaFromMap(t *testing.T) {
 	}}
 	if !reflect.DeepEqual(meta.Pulsar, expect) {
 		t.Fatalf("meta.Pulsar should be %v, was %v", expect, meta.Pulsar)
+	}
+
+	expect = []map[string]interface{}{map[string]interface{}{
+		"a": "1",
+		"b": "2",
+		"c": "3",
+	}}
+	if !reflect.DeepEqual(meta.AdditionalMetadata, expect) {
+		t.Fatalf("meta.AdditonalMetadata should be %v, was %v", expect, meta.AdditionalMetadata)
 	}
 
 	expected := []string{"1.1.1.1/24", "2.2.2.2/24"}
@@ -271,6 +291,11 @@ func TestMeta_Validate(t *testing.T) {
 		"bias":       "*0.55",
 		"a5m_cutoff": 0.9,
 	}}
+	m.AdditionalMetadata = []interface{}{map[string]interface{}{
+		"a": "1",
+		"b": "2",
+		"c": "3",
+	}}
 	errs := m.Validate()
 	if len(errs) > 0 {
 		t.Fatal("there should be 0 errors, but there were", len(errs), ":", errs)
@@ -298,9 +323,17 @@ func TestMeta_Validate(t *testing.T) {
 	m.IPPrefixes = "1234567"
 	m.Priority = -1
 	m.Pulsar = []interface{}{map[string]interface{}{}}
+	addData := make([]map[string]interface{}, 2)
+	addData[0] = map[string]interface{}{
+		"a": "1",
+	}
+	addData[1] = map[string]interface{}{
+		"b": "2",
+	}
+	m.AdditionalMetadata = addData
 	errs = m.Validate()
-	if len(errs) != 16 {
-		t.Fatal("expected 15 errors, but there were", len(errs), ":", errs)
+	if len(errs) != 17 {
+		t.Fatal("expected 17 errors, but there were", len(errs), ":", errs)
 	}
 
 	m = &Meta{}
