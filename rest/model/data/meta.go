@@ -515,6 +515,15 @@ func validatePulsar(v reflect.Value) error {
 	return nil
 }
 
+func validateAdditionalMetadata(v reflect.Value) error {
+	// API expects additional_metadata to be array of length 1
+	if v.Len() > 1 {
+		return fmt.Errorf("unexpected length of `%d`, expected 1", v.Len())
+	}
+
+	return nil
+}
+
 // checkFuncs is shorthand for returning a slice of functions that take a reflect.Value and return an error
 func checkFuncs(f ...func(v reflect.Value) error) []func(v reflect.Value) error {
 	return f
@@ -562,9 +571,10 @@ var validationMap = map[string]metaValidation{
 		func(v reflect.Value) error {
 			return validatePositiveNumber("Cost", v)
 		})},
-	"LowWatermark":  {kinds(reflect.Int), nil},
-	"HighWatermark": {kinds(reflect.Int), nil},
-	"Subdivisions":  {kinds(reflect.String, reflect.Map), nil},
+	"LowWatermark":       {kinds(reflect.Int), nil},
+	"HighWatermark":      {kinds(reflect.Int), nil},
+	"Subdivisions":       {kinds(reflect.String, reflect.Map), nil},
+	"AdditionalMetadata": {kinds(reflect.String, reflect.Slice), checkFuncs(validateAdditionalMetadata)},
 }
 
 // validate takes a field name, a reflect value, and metaValidation and validates the given field
