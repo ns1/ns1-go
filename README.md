@@ -6,6 +6,8 @@
 
 The golang client for the NS1 API: https://ns1.com/api/
 
+The documentation can be found here: https://pkg.go.dev/gopkg.in/ns1/ns1-go.v2
+
 # Installing
 
 ```
