@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -34,7 +35,7 @@ func TestCreateTeam(t *testing.T) {
 		Permissions: account.PermissionsMap{},
 	}
 
-	_, err := c.Teams.Create(tm)
+	_, err := c.Teams.Create(context.Background(), tm)
 	require.NoError(t, err)
 }
 
@@ -64,6 +65,6 @@ func TestCreateDDITeam(t *testing.T) {
 		Permissions: account.PermissionsMap{},
 	}
 
-	_, err := c.Teams.Create(tm)
+	_, err := c.Teams.Create(context.Background(), tm)
 	require.NoError(t, err)
 }

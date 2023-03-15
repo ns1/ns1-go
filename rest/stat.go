@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
@@ -13,28 +14,28 @@ type StatsService service
 // GetQPS returns current queries per second (QPS) for the account.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s *StatsService) GetQPS() (float32, *http.Response, error) {
-	return s.getQPS(statsQPSEndpoint)
+func (s *StatsService) GetQPS(ctx context.Context) (float32, *http.Response, error) {
+	return s.getQPS(ctx, statsQPSEndpoint)
 }
 
 // GetZoneQPS returns current queries per second (QPS) for a specific zone.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s *StatsService) GetZoneQPS(zone string) (float32, *http.Response, error) {
+func (s *StatsService) GetZoneQPS(ctx context.Context, zone string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", statsQPSEndpoint, zone)
-	return s.getQPS(path)
+	return s.getQPS(ctx, path)
 }
 
 // GetRecordQPS returns current queries per second (QPS) for a specific record.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
-func (s *StatsService) GetRecordQPS(zone, record, t string) (float32, *http.Response, error) {
+func (s *StatsService) GetRecordQPS(ctx context.Context, zone, record, t string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s/%s", statsQPSEndpoint, zone, record, t)
-	return s.getQPS(path)
+	return s.getQPS(ctx, path)
 }
 
-func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", path, nil)
+func (s *StatsService) getQPS(ctx context.Context, path string) (float32, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return 0, nil, err
 	}

@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -39,7 +40,7 @@ func TestDNSView(t *testing.T) {
 
 			require.Nil(t, mock.AddDNSViewListTestCase(nil, nil, views))
 
-			respDNSViews, _, err := client.View.List()
+			respDNSViews, _, err := client.View.List(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respDNSViews)
 			require.Equal(t, len(views), len(respDNSViews))
@@ -60,7 +61,7 @@ func TestDNSView(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				views, resp, err := client.View.List()
+				views, resp, err := client.View.List(context.Background())
 				require.Nil(t, views)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -78,7 +79,7 @@ func TestDNSView(t *testing.T) {
 
 			require.Nil(t, mock.AddDNSViewGetTestCase(myView.Name, nil, nil, &dnsView))
 
-			respDNSView, _, err := client.View.Get(myView.Name)
+			respDNSView, _, err := client.View.Get(context.Background(), myView.Name)
 
 			require.Nil(t, err)
 			require.True(t, reflect.DeepEqual(&dnsView, respDNSView))
@@ -93,7 +94,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodGet, "views/myView", http.StatusNotFound,
 					nil, nil, "", `{"message": "Resource not found"}`,
 				))
-				dnsView, resp, err := client.View.Get("myView")
+				dnsView, resp, err := client.View.Get(context.Background(), "myView")
 				require.Nil(t, dnsView)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrViewMissing.Error(), err.Error())
@@ -108,7 +109,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodGet, "views/myView", http.StatusBadRequest,
 					nil, nil, "", `{"message": "test error"}`,
 				))
-				dnsView, resp, err := client.View.Get("myView")
+				dnsView, resp, err := client.View.Get(context.Background(), "myView")
 				require.Nil(t, dnsView)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -124,7 +125,7 @@ func TestDNSView(t *testing.T) {
 
 			require.Nil(t, mock.AddDNSViewCreateTestCase(nil, nil, &myView, &myView))
 
-			_, err := client.View.Create(&myView)
+			_, err := client.View.Create(context.Background(), &myView)
 			require.Nil(t, err)
 		})
 
@@ -139,7 +140,7 @@ func TestDNSView(t *testing.T) {
 					nil, nil, dnsView, `{"message": "conflicts with existing resource"}`,
 				))
 
-				_, err = client.View.Create(&dnsView)
+				_, err = client.View.Create(context.Background(), &dnsView)
 
 				require.Equal(t, api.ErrViewExists.Error(), err.Error())
 			})
@@ -154,7 +155,7 @@ func TestDNSView(t *testing.T) {
 					nil, nil, dnsView, `{"message": "test error"}`,
 				))
 
-				_, err = client.View.Create(&dnsView)
+				_, err = client.View.Create(context.Background(), &dnsView)
 
 				require.Contains(t, err.Error(), "test error")
 			})
@@ -170,7 +171,7 @@ func TestDNSView(t *testing.T) {
 
 			require.Nil(t, mock.AddDNSViewUpdateTestCase(nil, nil, &dnsView, &dnsView))
 
-			_, err := client.View.Update(&dnsView)
+			_, err := client.View.Update(context.Background(), &dnsView)
 			require.Nil(t, err)
 		})
 
@@ -183,7 +184,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("views/%s", dnsView.Name), http.StatusNotFound,
 					nil, nil, dnsView, `{"message": "Resource not found"}`,
 				))
-				resp, err := client.View.Update(&dnsView)
+				resp, err := client.View.Update(context.Background(), &dnsView)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrViewMissing.Error(), err.Error())
 				require.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -197,7 +198,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("views/%s", dnsView.Name), http.StatusBadGateway,
 					nil, nil, dnsView, `{"message": "test error"}`,
 				))
-				resp, err := client.View.Update(&dnsView)
+				resp, err := client.View.Update(context.Background(), &dnsView)
 
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -211,7 +212,7 @@ func TestDNSView(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 			require.Nil(t, mock.AddDNSViewGetPreferencesTestCase(nil, nil, myMap))
-			respMap, _, err := client.View.GetPreferences()
+			respMap, _, err := client.View.GetPreferences(context.Background())
 			require.Nil(t, err)
 			require.True(t, reflect.DeepEqual(myMap, respMap))
 		})
@@ -224,7 +225,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodGet, "config/views/preference", http.StatusBadGateway,
 					nil, nil, "", `{"message": "test error"}`,
 				))
-				m, resp, err := client.View.GetPreferences()
+				m, resp, err := client.View.GetPreferences(context.Background())
 				require.Nil(t, m)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -238,7 +239,7 @@ func TestDNSView(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 			require.Nil(t, mock.AddDNSViewUpdatePreferencesTestCase(nil, nil, myMap, myMap))
-			respMap, _, err := client.View.UpdatePreferences(myMap)
+			respMap, _, err := client.View.UpdatePreferences(context.Background(), myMap)
 			require.Nil(t, err)
 			require.True(t, reflect.DeepEqual(myMap, respMap))
 		})
@@ -251,7 +252,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodPost, "config/views/preference", http.StatusNotFound,
 					nil, nil, myMap, `{"message": "Resource not found"}`,
 				))
-				m, resp, err := client.View.UpdatePreferences(myMap)
+				m, resp, err := client.View.UpdatePreferences(context.Background(), myMap)
 				require.Nil(t, m)
 				require.NotNil(t, err)
 				require.Equal(t, api.ErrViewMissing.Error(), err.Error())
@@ -265,7 +266,7 @@ func TestDNSView(t *testing.T) {
 					http.MethodPost, "config/views/preference", http.StatusBadGateway,
 					nil, nil, myMap, `{"message": "test error"}`,
 				))
-				m, resp, err := client.View.UpdatePreferences(myMap)
+				m, resp, err := client.View.UpdatePreferences(context.Background(), myMap)
 				require.Nil(t, m)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")

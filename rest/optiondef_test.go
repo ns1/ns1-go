@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dhcp"
 	"net/http"
 	"testing"
@@ -45,7 +46,7 @@ func TestDHCPOptionDef(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSgs, _, err := client.OptionDef.List()
+		respSgs, _, err := client.OptionDef.List(context.Background())
 		if err != nil {
 			t.Fatalf("error listing DHCP option definitions: %v", err)
 		}
@@ -79,7 +80,7 @@ func TestDHCPOptionDef(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respOD, _, err := client.OptionDef.Get("space", "key")
+		respOD, _, err := client.OptionDef.Get(context.Background(), "space", "key")
 		if err != nil {
 			t.Fatalf("error getting scpe group: %v", err)
 		}
@@ -94,7 +95,7 @@ func TestDHCPOptionDef(t *testing.T) {
 
 		t.Run("RequiredParams", func(t *testing.T) {
 			od := &dhcp.OptionDef{}
-			_, _, err = client.OptionDef.Create(od, "space", "key")
+			_, _, err = client.OptionDef.Create(context.Background(), od, "space", "key")
 			if err == nil {
 				t.Errorf("expected a missing code to result in an error")
 			}
@@ -102,7 +103,7 @@ func TestDHCPOptionDef(t *testing.T) {
 			od = &dhcp.OptionDef{
 				Code: 1,
 			}
-			_, _, err = client.OptionDef.Create(od, "space", "key")
+			_, _, err = client.OptionDef.Create(context.Background(), od, "space", "key")
 			if err == nil {
 				t.Errorf("expected a missing friendly name to result in an error")
 			}
@@ -111,7 +112,7 @@ func TestDHCPOptionDef(t *testing.T) {
 				Code:        1,
 				Description: "a",
 			}
-			_, _, err = client.OptionDef.Create(od, "space", "key")
+			_, _, err = client.OptionDef.Create(context.Background(), od, "space", "key")
 			if err == nil {
 				t.Errorf("expected a missing description to result in an error")
 			}
@@ -121,7 +122,7 @@ func TestDHCPOptionDef(t *testing.T) {
 				Description:  "a",
 				FriendlyName: "a",
 			}
-			_, _, err = client.OptionDef.Create(od, "space", "key")
+			_, _, err = client.OptionDef.Create(context.Background(), od, "space", "key")
 			if err == nil {
 				t.Errorf("expected a missing schema type to result in an error")
 			}
@@ -139,7 +140,7 @@ func TestDHCPOptionDef(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		respOD, _, err := client.OptionDef.Create(od, "space", "key")
+		respOD, _, err := client.OptionDef.Create(context.Background(), od, "space", "key")
 		if err != nil {
 			t.Fatalf("error creating option definition: %v", err)
 		}
@@ -156,7 +157,7 @@ func TestDHCPOptionDef(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		_, err = client.OptionDef.Delete("space", "key")
+		_, err = client.OptionDef.Delete(context.Background(), "space", "key")
 		if err != nil {
 			t.Fatalf("error deleting option definition: %v", err)
 		}

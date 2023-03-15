@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type ApplicationsService service
 // List returns all pulsar Applications
 //
 // NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
-func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "pulsar/apps", nil)
+func (s *ApplicationsService) List(ctx context.Context) ([]*pulsar.Application, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "pulsar/apps", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,10 +33,10 @@ func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, err
 // Get takes a application id and returns application struct.
 //
 // NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
-func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Response, error) {
+func (s *ApplicationsService) Get(ctx context.Context, id string) (*pulsar.Application, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,8 +60,8 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 //
 // The given application must have at least the name
 // NS1 API docs: https://ns1.com/api#put-create-a-pulsar-application
-func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, error) {
-	req, err := s.client.NewRequest("PUT", "pulsar/apps", a)
+func (s *ApplicationsService) Create(ctx context.Context, a *pulsar.Application) (*http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "PUT", "pulsar/apps", a)
 	if err != nil {
 		return nil, err
 	}
@@ -71,10 +72,10 @@ func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, err
 // Update takes a *pulsar.Application and updates the application with same id on Ns1.
 //
 // NS1 API docs: https://ns1.com/api#post-modify-an-application
-func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, error) {
+func (s *ApplicationsService) Update(ctx context.Context, a *pulsar.Application) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", a.ID)
 
-	req, err := s.client.NewRequest("POST", path, &a)
+	req, err := s.client.NewRequest(ctx, "POST", path, &a)
 	if err != nil {
 		return nil, err
 	}
@@ -96,10 +97,10 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 // Delete takes a application Id, and removes an existing application
 //
 // NS1 API docs: https://ns1.com/api#delete-delete-a-pulsar-application
-func (s *ApplicationsService) Delete(id string) (*http.Response, error) {
+func (s *ApplicationsService) Delete(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

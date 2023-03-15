@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,9 +15,9 @@ type PulsarJobsService service
 // List takes an Application ID and returns all Jobs inside said Application.
 //
 // NS1 API docs: https://ns1.com/api/#getlist-jobs-within-an-app
-func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Response, error) {
+func (s *PulsarJobsService) List(ctx context.Context, appId string) ([]*pulsar.PulsarJob, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", appId)
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -40,10 +41,10 @@ func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Respo
 // Get takes an Application ID and Job Id and returns full configuration for a pulsar Job.
 //
 // NS1 API docs: https://ns1.com/api/#getview-job-details
-func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, *http.Response, error) {
+func (s *PulsarJobsService) Get(ctx context.Context, appId string, jobId string) (*pulsar.PulsarJob, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", appId, jobId)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,10 +73,10 @@ func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, 
 // Create takes a *PulsarJob and an AppId and creates a new Pulsar Job in the specified Application with the specific name, typeid, host and url_path.
 //
 // NS1 API docs: https://ns1.com/api/#putcreate-a-pulsar-job
-func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) {
+func (s *PulsarJobsService) Create(ctx context.Context, j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", j.AppID)
 
-	req, err := s.client.NewRequest("PUT", path, j)
+	req, err := s.client.NewRequest(ctx, "PUT", path, j)
 	if err != nil {
 		return nil, err
 	}
@@ -99,10 +100,10 @@ func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) 
 //
 // Only the fields to be updated are required in the given job.
 // NS1 API docs: https://ns1.com/api/#postmodify-a-pulsar-job
-func (s *PulsarJobsService) Update(j *pulsar.PulsarJob) (*http.Response, error) {
+func (s *PulsarJobsService) Update(ctx context.Context, j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", j.AppID, j.JobID)
 
-	req, err := s.client.NewRequest("POST", path, j)
+	req, err := s.client.NewRequest(ctx, "POST", path, j)
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +130,10 @@ func (s *PulsarJobsService) Update(j *pulsar.PulsarJob) (*http.Response, error) 
 // Delete takes a appId and jobId and removes an existing Pulsar job .
 //
 // NS1 API docs: https://ns1.com/api/#deletedelete-a-pulsar-job
-func (s *PulsarJobsService) Delete(pulsarJob *pulsar.PulsarJob) (*http.Response, error) {
+func (s *PulsarJobsService) Delete(ctx context.Context, pulsarJob *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

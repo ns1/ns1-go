@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -13,10 +14,10 @@ type DataFeedsService service
 // List returns all data feeds connected to a given data source.
 //
 // NS1 API docs: https://ns1.com/api/#feeds-get
-func (s *DataFeedsService) List(sourceID string) ([]*data.Feed, *http.Response, error) {
+func (s *DataFeedsService) List(ctx context.Context, sourceID string) ([]*data.Feed, *http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s", sourceID)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -33,10 +34,10 @@ func (s *DataFeedsService) List(sourceID string) ([]*data.Feed, *http.Response, 
 // Get takes a data source ID and a data feed ID and returns the details of a single data feed
 //
 // NS1 API docs: https://ns1.com/api/#feeds-feed-get
-func (s *DataFeedsService) Get(sourceID string, feedID string) (*data.Feed, *http.Response, error) {
+func (s *DataFeedsService) Get(ctx context.Context, sourceID string, feedID string) (*data.Feed, *http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, feedID)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -53,10 +54,10 @@ func (s *DataFeedsService) Get(sourceID string, feedID string) (*data.Feed, *htt
 // Create takes a *DataFeed and connects a new data feed to an existing data source.
 //
 // NS1 API docs: https://ns1.com/api/#feeds-put
-func (s *DataFeedsService) Create(sourceID string, df *data.Feed) (*http.Response, error) {
+func (s *DataFeedsService) Create(ctx context.Context, sourceID string, df *data.Feed) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s", sourceID)
 
-	req, err := s.client.NewRequest("PUT", path, &df)
+	req, err := s.client.NewRequest(ctx, "PUT", path, &df)
 	if err != nil {
 		return nil, err
 	}
@@ -79,10 +80,10 @@ func (s *DataFeedsService) Create(sourceID string, df *data.Feed) (*http.Respons
 //     not updated during a POST.
 //
 // NS1 API docs: https://ns1.com/api/#feeds-post
-func (s *DataFeedsService) Update(sourceID string, df *data.Feed) (*http.Response, error) {
+func (s *DataFeedsService) Update(ctx context.Context, sourceID string, df *data.Feed) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, df.ID)
 
-	req, err := s.client.NewRequest("POST", path, &df)
+	req, err := s.client.NewRequest(ctx, "POST", path, &df)
 	if err != nil {
 		return nil, err
 	}
@@ -99,10 +100,10 @@ func (s *DataFeedsService) Update(sourceID string, df *data.Feed) (*http.Respons
 // Delete takes a data source ID and a data feed ID and disconnects the feed from the data source and all attached destination metadata tables.
 //
 // NS1 API docs: https://ns1.com/api/#feeds-delete
-func (s *DataFeedsService) Delete(sourceID string, feedID string) (*http.Response, error) {
+func (s *DataFeedsService) Delete(ctx context.Context, sourceID string, feedID string) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, feedID)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

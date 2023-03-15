@@ -1,6 +1,7 @@
 package mockns1_test
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -29,7 +30,7 @@ func Example() {
 		[]*dns.Zone{{Zone: "foo.bar"}}))
 
 	// Perform your tests
-	zones, _, err := ns1.Zones.List()
+	zones, _, err := ns1.Zones.List(context.Background())
 	require.Nil(t, err)
 	require.Equal(t, 1, len(zones))
 	require.Equal(t, "foo.bar", zones[0].Zone)

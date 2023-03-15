@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type TsigService service
 // List returns all tsig keys and basic tsig keys configuration details for each.
 //
 // NS1 API docs: https://ns1.com/api/#getlist-tsig-keys
-func (s *TsigService) List() ([]*dns.TSIGKey, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "tsig", nil)
+func (s *TsigService) List(ctx context.Context) ([]*dns.TSIGKey, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "tsig", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -33,10 +34,10 @@ func (s *TsigService) List() ([]*dns.TSIGKey, *http.Response, error) {
 // Get takes a TSIG key name and returns a single TSIG key and its basic configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#getview-tsig-key-details
-func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
+func (s *TsigService) Get(ctx context.Context, name string) (*dns.TSIGKey, *http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", name)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,10 +61,10 @@ func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
 // Create takes a *TSIGkey and creates a new TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#putcreate-a-tsig-key
-func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
+func (s *TsigService) Create(ctx context.Context, tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
-	req, err := s.client.NewRequest("PUT", path, &tk)
+	req, err := s.client.NewRequest(ctx, "PUT", path, &tk)
 	if err != nil {
 		return nil, err
 	}
@@ -86,10 +87,10 @@ func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 // Update takes a *TSIGKey and modifies basic details of a TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#postmodify-a-tsig-key
-func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
+func (s *TsigService) Update(ctx context.Context, tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
-	req, err := s.client.NewRequest("POST", path, &tk)
+	req, err := s.client.NewRequest(ctx, "POST", path, &tk)
 	if err != nil {
 		return nil, err
 	}
@@ -112,10 +113,10 @@ func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
 // Delete takes a TSIG key name and destroys an existing TSIG key.
 //
 // NS1 API docs: https://ns1.com/api/#deleteremove-a-tsig-key
-func (s *TsigService) Delete(name string) (*http.Response, error) {
+func (s *TsigService) Delete(ctx context.Context, name string) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", name)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

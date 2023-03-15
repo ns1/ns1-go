@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,10 @@ type RecordsService service
 // Get takes a zone, domain and record type t and returns full configuration for a DNS record.
 //
 // NS1 API docs: https://ns1.com/api/#record-get
-func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Response, error) {
+func (s *RecordsService) Get(ctx context.Context, zone, domain, t string) (*dns.Record, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -46,10 +47,10 @@ func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Respons
 //
 // The given record must have at least one answer.
 // NS1 API docs: https://ns1.com/api/#record-put
-func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
+func (s *RecordsService) Create(ctx context.Context, r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
-	req, err := s.client.NewRequest("PUT", path, &r)
+	req, err := s.client.NewRequest(ctx, "PUT", path, &r)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +77,10 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 //
 // Only the fields to be updated are required in the given record.
 // NS1 API docs: https://ns1.com/api/#record-post
-func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
+func (s *RecordsService) Update(ctx context.Context, r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
-	req, err := s.client.NewRequest("POST", path, &r)
+	req, err := s.client.NewRequest(ctx, "POST", path, &r)
 	if err != nil {
 		return nil, err
 	}
@@ -107,10 +108,10 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 // Delete takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details.
 //
 // NS1 API docs: https://ns1.com/api/#record-delete
-func (s *RecordsService) Delete(zone string, domain string, t string) (*http.Response, error) {
+func (s *RecordsService) Delete(ctx context.Context, zone string, domain string, t string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

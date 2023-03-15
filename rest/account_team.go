@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type TeamsService service
 // List returns all teams in the account.
 //
 // NS1 API docs: https://ns1.com/api/#teams-get
-func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "account/teams", nil)
+func (s *TeamsService) List(ctx context.Context) ([]*account.Team, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "account/teams", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,10 +33,10 @@ func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
 // Get returns details of a single team.
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-get
-func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
+func (s *TeamsService) Get(ctx context.Context, id string) (*account.Team, *http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,7 +59,7 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 // Create takes a *Team and creates a new account team.
 //
 // NS1 API docs: https://ns1.com/api/#teams-put
-func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
+func (s *TeamsService) Create(ctx context.Context, t *account.Team) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -67,12 +68,12 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && t != nil {
 		ddiTeam := teamToDDITeam(t)
-		req, err = s.client.NewRequest("PUT", "account/teams", ddiTeam)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/teams", ddiTeam)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("PUT", "account/teams", t)
+		req, err = s.client.NewRequest(ctx, "PUT", "account/teams", t)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +97,7 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 // Update changes the name or access rights for a team.
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-post
-func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
+func (s *TeamsService) Update(ctx context.Context, t *account.Team) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", t.ID)
 
 	var (
@@ -107,12 +108,12 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 	// If this is DDI then the permissions need to be transformed to DDI-compatible permissions.
 	if s.client.DDI && t != nil {
 		ddiTeam := teamToDDITeam(t)
-		req, err = s.client.NewRequest("POST", path, ddiTeam)
+		req, err = s.client.NewRequest(ctx, "POST", path, ddiTeam)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		req, err = s.client.NewRequest("POST", path, t)
+		req, err = s.client.NewRequest(ctx, "POST", path, t)
 		if err != nil {
 			return nil, err
 		}
@@ -136,10 +137,10 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 // Delete deletes a team.
 //
 // NS1 API docs: https://ns1.com/api/#teams-id-delete
-func (s *TeamsService) Delete(id string) (*http.Response, error) {
+func (s *TeamsService) Delete(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

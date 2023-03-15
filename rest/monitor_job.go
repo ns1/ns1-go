@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -14,8 +15,8 @@ type JobsService service
 // List returns all monitoring jobs for the account.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-get
-func (s *JobsService) List() ([]*monitor.Job, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "monitoring/jobs", nil)
+func (s *JobsService) List(ctx context.Context) ([]*monitor.Job, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "monitoring/jobs", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,10 +33,10 @@ func (s *JobsService) List() ([]*monitor.Job, *http.Response, error) {
 // Get takes an ID and returns details for a specific monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-get
-func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
+func (s *JobsService) Get(ctx context.Context, id string) (*monitor.Job, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", id)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,10 +53,10 @@ func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
 // Create takes a *MonitoringJob and creates a new monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-put
-func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
+func (s *JobsService) Create(ctx context.Context, mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
 
-	req, err := s.client.NewRequest("PUT", path, &mj)
+	req, err := s.client.NewRequest(ctx, "PUT", path, &mj)
 	if err != nil {
 		return nil, err
 	}
@@ -72,10 +73,10 @@ func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
 // Update takes a *MonitoringJob and change the configuration details of an existing monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-post
-func (s *JobsService) Update(mj *monitor.Job) (*http.Response, error) {
+func (s *JobsService) Update(ctx context.Context, mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
 
-	req, err := s.client.NewRequest("POST", path, &mj)
+	req, err := s.client.NewRequest(ctx, "POST", path, &mj)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +93,10 @@ func (s *JobsService) Update(mj *monitor.Job) (*http.Response, error) {
 // Delete takes an ID and immediately terminates and deletes and existing monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#jobs-jobid-delete
-func (s *JobsService) Delete(id string) (*http.Response, error) {
+func (s *JobsService) Delete(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", id)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func (s *JobsService) Delete(id string) (*http.Response, error) {
 // History takes an ID and returns status log history for a specific monitoring job.
 //
 // NS1 API docs: https://ns1.com/api/#history-get
-func (s *JobsService) History(id string, opts ...func(*url.Values)) ([]*monitor.StatusLog, *http.Response, error) {
+func (s *JobsService) History(ctx context.Context, id string, opts ...func(*url.Values)) ([]*monitor.StatusLog, *http.Response, error) {
 	v := url.Values{}
 	for _, opt := range opts {
 		opt(&v)
@@ -119,7 +120,7 @@ func (s *JobsService) History(id string, opts ...func(*url.Values)) ([]*monitor.
 
 	path := fmt.Sprintf("%s/%s?%s", "monitoring/history", id, v.Encode())
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

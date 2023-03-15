@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,10 +15,10 @@ type DNSSECService service
 // Get takes a zone, and returns DNSSEC information.
 //
 // NS1 API docs: https://ns1.com/api#get-get-dnssec-details-for-a-zone
-func (s *DNSSECService) Get(zone string) (*dns.ZoneDNSSEC, *http.Response, error) {
+func (s *DNSSECService) Get(ctx context.Context, zone string) (*dns.ZoneDNSSEC, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/dnssec", zone)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

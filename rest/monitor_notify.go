@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type NotificationsService service
 // List returns all configured notification lists.
 //
 // NS1 API docs: https://ns1.com/api/#lists-get
-func (s *NotificationsService) List() ([]*monitor.NotifyList, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "lists", nil)
+func (s *NotificationsService) List(ctx context.Context) ([]*monitor.NotifyList, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "lists", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,10 +33,10 @@ func (s *NotificationsService) List() ([]*monitor.NotifyList, *http.Response, er
 // Get returns the details and notifiers associated with a specific notification list.
 //
 // NS1 API docs: https://ns1.com/api/#lists-listid-get
-func (s *NotificationsService) Get(listID string) (*monitor.NotifyList, *http.Response, error) {
+func (s *NotificationsService) Get(ctx context.Context, listID string) (*monitor.NotifyList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "lists", listID)
 
-	req, err := s.client.NewRequest("GET", path, nil)
+	req, err := s.client.NewRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,8 +59,8 @@ func (s *NotificationsService) Get(listID string) (*monitor.NotifyList, *http.Re
 // Create takes a *NotifyList and creates a new notify list.
 //
 // NS1 API docs: https://ns1.com/api/#lists-put
-func (s *NotificationsService) Create(nl *monitor.NotifyList) (*http.Response, error) {
-	req, err := s.client.NewRequest("PUT", "lists", &nl)
+func (s *NotificationsService) Create(ctx context.Context, nl *monitor.NotifyList) (*http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "PUT", "lists", &nl)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +83,10 @@ func (s *NotificationsService) Create(nl *monitor.NotifyList) (*http.Response, e
 // Update adds or removes entries or otherwise update a notification list.
 //
 // NS1 API docs: https://ns1.com/api/#list-listid-post
-func (s *NotificationsService) Update(nl *monitor.NotifyList) (*http.Response, error) {
+func (s *NotificationsService) Update(ctx context.Context, nl *monitor.NotifyList) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "lists", nl.ID)
 
-	req, err := s.client.NewRequest("POST", path, &nl)
+	req, err := s.client.NewRequest(ctx, "POST", path, &nl)
 	if err != nil {
 		return nil, err
 	}
@@ -102,10 +103,10 @@ func (s *NotificationsService) Update(nl *monitor.NotifyList) (*http.Response, e
 // Delete immediately deletes an existing notification list.
 //
 // NS1 API docs: https://ns1.com/api/#lists-listid-delete
-func (s *NotificationsService) Delete(listID string) (*http.Response, error) {
+func (s *NotificationsService) Delete(ctx context.Context, listID string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "lists", listID)
 
-	req, err := s.client.NewRequest("DELETE", path, nil)
+	req, err := s.client.NewRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

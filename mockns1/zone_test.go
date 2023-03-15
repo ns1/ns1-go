@@ -1,6 +1,7 @@
 package mockns1_test
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -27,7 +28,7 @@ func TestZone(t *testing.T) {
 
 		require.Nil(t, mock.AddZoneListTestCase(nil, nil, zones))
 
-		resp, _, err := client.Zones.List()
+		resp, _, err := client.Zones.List(context.Background())
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		require.Equal(t, len(zones), len(resp))
@@ -48,7 +49,7 @@ func TestZone(t *testing.T) {
 
 		require.Nil(t, mock.AddZoneGetTestCase(zone.Zone, nil, nil, zone))
 
-		resp, _, err := client.Zones.Get(zone.Zone)
+		resp, _, err := client.Zones.Get(context.Background(), zone.Zone)
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		require.Equal(t, zone.Zone, resp.Zone)
@@ -71,7 +72,7 @@ func TestZone(t *testing.T) {
 		require.Nil(t, mock.AddZoneCreateTestCase(nil, nil, zone, resp))
 		require.Zero(t, zone.TTL)
 
-		_, err := client.Zones.Create(zone)
+		_, err := client.Zones.Create(context.Background(), zone)
 		require.Nil(t, err)
 		require.Equal(t, zone.TTL, resp.TTL)
 	})
@@ -84,14 +85,14 @@ func TestZone(t *testing.T) {
 
 		require.Nil(t, mock.AddZoneUpdateTestCase(nil, nil, zone, zone))
 
-		_, err := client.Zones.Update(zone)
+		_, err := client.Zones.Update(context.Background(), zone)
 		require.Nil(t, err)
 	})
 
 	t.Run("AddZoneDeleteTestCase", func(t *testing.T) {
 		require.Nil(t, mock.AddZoneDeleteTestCase("delete.zone", nil, nil))
 
-		_, err := client.Zones.Delete("delete.zone")
+		_, err := client.Zones.Delete(context.Background(), "delete.zone")
 		require.Nil(t, err)
 	})
 }

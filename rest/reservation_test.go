@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dhcp"
 	"net/http"
 	"testing"
@@ -34,7 +35,7 @@ func TestDHCPReservation(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSgs, _, err := client.Reservation.List()
+		respSgs, _, err := client.Reservation.List(context.Background())
 		if err != nil {
 			t.Fatalf("error listing reservations: %v", err)
 		}
@@ -60,7 +61,7 @@ func TestDHCPReservation(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respAddr, _, err := client.Reservation.Get(1)
+		respAddr, _, err := client.Reservation.Get(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error getting reservation: %v", err)
 		}
@@ -74,7 +75,7 @@ func TestDHCPReservation(t *testing.T) {
 
 		t.Run("RequiredParams", func(t *testing.T) {
 			sg := &dhcp.Reservation{}
-			_, _, err = client.Reservation.Create(sg)
+			_, _, err = client.Reservation.Create(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing address id to result in an error")
 			}
@@ -89,7 +90,7 @@ func TestDHCPReservation(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		respSG, _, err := client.Reservation.Create(sg)
+		respSG, _, err := client.Reservation.Create(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error creating reservation: %v", err)
 		}
@@ -105,13 +106,13 @@ func TestDHCPReservation(t *testing.T) {
 				IDAddress: &idAddr,
 				Options:   make([]dhcp.Option, 0),
 			}
-			_, _, err = client.Reservation.Edit(sg)
+			_, _, err = client.Reservation.Edit(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing ID to result in an error")
 			}
 
 			sg = &dhcp.Reservation{}
-			_, _, err = client.Reservation.Edit(sg)
+			_, _, err = client.Reservation.Edit(context.Background(), sg)
 			if err == nil {
 				t.Errorf("expected a missing reservation ID to result in an error")
 			}
@@ -131,7 +132,7 @@ func TestDHCPReservation(t *testing.T) {
 			t.Fatalf("error adding test case: %v", err)
 		}
 
-		respSG, _, err := client.Reservation.Edit(sg)
+		respSG, _, err := client.Reservation.Edit(context.Background(), sg)
 		if err != nil {
 			t.Fatalf("error editing reservation: %v", err)
 		}
@@ -147,7 +148,7 @@ func TestDHCPReservation(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error adding test case: %v", err)
 		}
-		_, err = client.Reservation.Delete(1)
+		_, err = client.Reservation.Delete(context.Background(), 1)
 		if err != nil {
 			t.Fatalf("error deleting reservation: %v", err)
 		}

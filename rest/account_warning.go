@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
@@ -13,8 +14,8 @@ type WarningsService service
 // alert messages to users with billing notifications enabled.
 //
 // NS1 API docs: https://ns1.com/api/#usagewarnings-get
-func (s *WarningsService) Get() (*account.UsageWarning, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "account/usagewarnings", nil)
+func (s *WarningsService) Get(ctx context.Context) (*account.UsageWarning, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "account/usagewarnings", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -31,8 +32,8 @@ func (s *WarningsService) Get() (*account.UsageWarning, *http.Response, error) {
 // Update changes alerting toggles and thresholds for overage warning alert messages.
 //
 // NS1 API docs: https://ns1.com/api/#usagewarnings-post
-func (s *WarningsService) Update(uw *account.UsageWarning) (*http.Response, error) {
-	req, err := s.client.NewRequest("POST", "account/usagewarnings", &uw)
+func (s *WarningsService) Update(ctx context.Context, uw *account.UsageWarning) (*http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "POST", "account/usagewarnings", &uw)
 	if err != nil {
 		return nil, err
 	}

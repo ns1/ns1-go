@@ -1,6 +1,7 @@
 package rest_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -41,7 +42,7 @@ func TestTsigKey(t *testing.T) {
 
 			require.Nil(t, mock.AddTsigKeyListTestCase(nil, nil, tsigKeys))
 
-			respTsigKeys, _, err := client.TSIG.List()
+			respTsigKeys, _, err := client.TSIG.List(context.Background())
 			require.Nil(t, err)
 			require.NotNil(t, respTsigKeys)
 			require.Equal(t, len(tsigKeys), len(respTsigKeys))
@@ -61,7 +62,7 @@ func TestTsigKey(t *testing.T) {
 				nil, nil, "", `{"message": "test error"}`,
 			))
 
-			tsigKeys, resp, err := client.TSIG.List()
+			tsigKeys, resp, err := client.TSIG.List(context.Background())
 			require.Nil(t, tsigKeys)
 			require.NotNil(t, err)
 			require.Contains(t, err.Error(), "test error")
@@ -82,7 +83,7 @@ func TestTsigKey(t *testing.T) {
 
 			require.Nil(t, mock.AddTsigKeyGetTestCase("TsigKey1", nil, nil, tsigKey))
 
-			respTsigKey, _, err := client.TSIG.Get("TsigKey1")
+			respTsigKey, _, err := client.TSIG.Get(context.Background(), "TsigKey1")
 
 			require.Nil(t, err)
 			require.True(t, reflect.DeepEqual(tsigKey, respTsigKey))
@@ -96,7 +97,7 @@ func TestTsigKey(t *testing.T) {
 				http.MethodGet, fmt.Sprintf("/tsig/%s", "TsigKey1"), http.StatusNotFound,
 				nil, nil, "", `{"message": "TSIG key does not exist"}`,
 			))
-			tsigKey, resp, err := client.TSIG.Get("TsigKey1")
+			tsigKey, resp, err := client.TSIG.Get(context.Background(), "TsigKey1")
 			require.Nil(t, tsigKey)
 			require.NotNil(t, err)
 			require.Contains(t, err.Error(), api.ErrTsigKeyMissing.Error())
@@ -116,7 +117,7 @@ func TestTsigKey(t *testing.T) {
 
 			require.Nil(t, mock.AddTsigKeyCreateTestCase(nil, nil, tsigKey, tsigKey))
 
-			_, err := client.TSIG.Create(tsigKey)
+			_, err := client.TSIG.Create(context.Background(), tsigKey)
 			require.Nil(t, err)
 		})
 
@@ -130,7 +131,7 @@ func TestTsigKey(t *testing.T) {
 					nil, nil, tsigKey, `{"message": "TSIG key already exists"}`,
 				))
 
-				_, err = client.TSIG.Create(tsigKey)
+				_, err = client.TSIG.Create(context.Background(), tsigKey)
 
 				require.Contains(t, err.Error(), api.ErrTsigKeyExists.Error())
 			})
@@ -149,7 +150,7 @@ func TestTsigKey(t *testing.T) {
 
 			require.Nil(t, mock.AddTsigKeyUpdateTestCase(nil, nil, tsigKey, tsigKey))
 
-			_, err := client.TSIG.Update(tsigKey)
+			_, err := client.TSIG.Update(context.Background(), tsigKey)
 			require.Nil(t, err)
 		})
 
@@ -162,7 +163,7 @@ func TestTsigKey(t *testing.T) {
 					http.MethodPost, fmt.Sprintf("/tsig/%s", tsigKey.Name), http.StatusNotFound,
 					nil, nil, tsigKey, `{"message": "TSIG key does not exist"}`,
 				))
-				resp, err := client.TSIG.Update(tsigKey)
+				resp, err := client.TSIG.Update(context.Background(), tsigKey)
 
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), api.ErrTsigKeyMissing.Error())
@@ -183,7 +184,7 @@ func TestTsigKey(t *testing.T) {
 
 			require.Nil(t, mock.AddTsigKeyDeleteTestCase(nil, nil, tsigKey, nil))
 
-			_, err := client.TSIG.Delete(tsigKey.Name)
+			_, err := client.TSIG.Delete(context.Background(), tsigKey.Name)
 			require.Nil(t, err)
 		})
 
@@ -196,7 +197,7 @@ func TestTsigKey(t *testing.T) {
 					http.MethodDelete, fmt.Sprintf("tsig/%s", tsigKey.Name), http.StatusNotFound,
 					nil, nil, "", `{"message": "TSIG key does not exist"}`,
 				))
-				resp, err := client.TSIG.Delete(tsigKey.Name)
+				resp, err := client.TSIG.Delete(context.Background(), tsigKey.Name)
 
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), api.ErrTsigKeyMissing.Error())

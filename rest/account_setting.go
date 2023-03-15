@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/account"
@@ -12,8 +13,8 @@ type SettingsService service
 // Get returns the basic contact details associated with the account.
 //
 // NS1 API docs: https://ns1.com/api/#settings-get
-func (s *SettingsService) Get() (*account.Setting, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "account/settings", nil)
+func (s *SettingsService) Get(ctx context.Context) (*account.Setting, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "GET", "account/settings", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -30,8 +31,8 @@ func (s *SettingsService) Get() (*account.Setting, *http.Response, error) {
 // Update changes most of the basic contact details, except customerid.
 //
 // NS1 API docs: https://ns1.com/api/#settings-post
-func (s *SettingsService) Update(us *account.Setting) (*http.Response, error) {
-	req, err := s.client.NewRequest("POST", "account/settings", &us)
+func (s *SettingsService) Update(ctx context.Context, us *account.Setting) (*http.Response, error) {
+	req, err := s.client.NewRequest(ctx, "POST", "account/settings", &us)
 	if err != nil {
 		return nil, err
 	}

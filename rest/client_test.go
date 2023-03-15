@@ -2,6 +2,7 @@ package rest
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -238,7 +239,7 @@ func TestClient_getURI(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
 
 	var v interface{}
-	resp, err := client.getURI(v, "http://example.com")
+	resp, err := client.getURI(context.Background(), v, "http://example.com")
 
 	assert.Equal(t, &mockResp, resp)
 	assert.Nil(t, err)
@@ -257,7 +258,7 @@ func TestClient_getURIWithNon2XXResponse(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&mockResp, nil)
 
 	var v interface{}
-	resp, err := client.getURI(v, "http://example.com")
+	resp, err := client.getURI(context.Background(), v, "http://example.com")
 
 	assert.Equal(t, &mockResp, resp)
 	assert.Equal(t, &Error{Resp: &mockResp}, err)
@@ -276,7 +277,7 @@ func (c *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 // Hanging this off of mockHTTPClient for convent access to mocking stuff
-func (c *mockHTTPClient) nextFunc(v *interface{}, uri string) (*http.Response, error) {
+func (c *mockHTTPClient) nextFunc(ctx context.Context, v *interface{}, uri string) (*http.Response, error) {
 	args := c.Called(v, uri)
 	return args.Get(0).(*http.Response), args.Error(1)
 }

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dhcp"
@@ -13,8 +14,8 @@ type OptionDefService service
 // List returns a list of all option definitions.
 //
 // NS1 API docs: https://ns1.com/api#getlist-dhcp-option-definitions
-func (s *OptionDefService) List() ([]dhcp.OptionDef, *http.Response, error) {
-	req, err := s.client.NewRequest(http.MethodGet, "dhcp/optiondef", nil)
+func (s *OptionDefService) List(ctx context.Context) ([]dhcp.OptionDef, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, "dhcp/optiondef", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -27,9 +28,9 @@ func (s *OptionDefService) List() ([]dhcp.OptionDef, *http.Response, error) {
 // Get returns the option definition corresponding to the provided ID.
 //
 // NS1 API docs: https://ns1.com/api#getview-dhcp-option-definition
-func (s *OptionDefService) Get(odSpace, odKey string) (*dhcp.OptionDef, *http.Response, error) {
+func (s *OptionDefService) Get(ctx context.Context, odSpace, odKey string) (*dhcp.OptionDef, *http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/optiondef/%s/%s", odSpace, odKey)
-	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,7 +49,7 @@ func (s *OptionDefService) Get(odSpace, odKey string) (*dhcp.OptionDef, *http.Re
 // The FriendlyName, Description, Code, Schema.Type fields are required.
 //
 // NS1 API docs: https://ns1.com/api#putcreate-an-custom-dhcp-option-definition
-func (s *OptionDefService) Create(od *dhcp.OptionDef, odSpace, odKey string) (*dhcp.OptionDef, *http.Response, error) {
+func (s *OptionDefService) Create(ctx context.Context, od *dhcp.OptionDef, odSpace, odKey string) (*dhcp.OptionDef, *http.Response, error) {
 	switch {
 	case od.FriendlyName == "":
 		return nil, nil, errors.New("the FriendlyName field is required")
@@ -61,7 +62,7 @@ func (s *OptionDefService) Create(od *dhcp.OptionDef, odSpace, odKey string) (*d
 	}
 
 	reqPath := fmt.Sprintf("dhcp/optiondef/%s/%s", odSpace, odKey)
-	req, err := s.client.NewRequest(http.MethodPut, reqPath, od)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, reqPath, od)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,9 +80,9 @@ func (s *OptionDefService) Create(od *dhcp.OptionDef, odSpace, odKey string) (*d
 // Delete removes a option definition entirely.
 //
 // NS1 API docs: https://ns1.com/api#deletedelete-a-custom-dhcp-option-definition
-func (s *OptionDefService) Delete(odSpace, odKey string) (*http.Response, error) {
+func (s *OptionDefService) Delete(ctx context.Context, odSpace, odKey string) (*http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/optiondef/%s/%s", odSpace, odKey)
-	req, err := s.client.NewRequest(http.MethodDelete, reqPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, reqPath, nil)
 	if err != nil {
 		return nil, err
 	}
