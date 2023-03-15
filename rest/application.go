@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type ApplicationsService service
 //
 // NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
 func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *ApplicationsService) ListWithContext(ctx context.Context) ([]*pulsar.Application, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "pulsar/apps", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var al []*pulsar.Application
 	resp, err := s.client.Do(req, &al)
@@ -33,12 +40,18 @@ func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, err
 //
 // NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
 func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Response, error) {
+	return s.GetWithContext(context.Background(), id)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *ApplicationsService) GetWithContext(ctx context.Context, id string) (*pulsar.Application, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var a pulsar.Application
 	resp, err := s.client.Do(req, &a)
@@ -60,10 +73,16 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 // The given application must have at least the name
 // NS1 API docs: https://ns1.com/api#put-create-a-pulsar-application
 func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), a)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *ApplicationsService) CreateWithContext(ctx context.Context, a *pulsar.Application) (*http.Response, error) {
 	req, err := s.client.NewRequest("PUT", "pulsar/apps", a)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 	resp, err := s.client.Do(req, a)
 	return resp, err
 }
@@ -72,12 +91,18 @@ func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, err
 //
 // NS1 API docs: https://ns1.com/api#post-modify-an-application
 func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), a)
+}
+
+// UpdateWithContext is the same as Update, but takes a context.
+func (s *ApplicationsService) UpdateWithContext(ctx context.Context, a *pulsar.Application) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", a.ID)
 
 	req, err := s.client.NewRequest("POST", path, &a)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
@@ -97,12 +122,18 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 //
 // NS1 API docs: https://ns1.com/api#delete-delete-a-pulsar-application
 func (s *ApplicationsService) Delete(id string) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), id)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *ApplicationsService) DeleteWithContext(ctx context.Context, id string) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {

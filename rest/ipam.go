@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -16,10 +17,16 @@ type IPAMService service
 //
 // NS1 API docs: https://ns1.com/api#getview-a-list-of-root-addresses
 func (s *IPAMService) ListAddrs() ([]ipam.Address, *http.Response, error) {
+	return s.ListAddrsWithContext(context.Background())
+}
+
+// ListAddrsWithContext is the same as ListAddrs, but takes a context.
+func (s *IPAMService) ListAddrsWithContext(ctx context.Context) ([]ipam.Address, *http.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "ipam/address", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	addrs := []ipam.Address{}
 	var resp *http.Response
@@ -39,11 +46,17 @@ func (s *IPAMService) ListAddrs() ([]ipam.Address, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api#getview-a-subnet
 func (s *IPAMService) GetSubnet(addrID int) (*ipam.Address, *http.Response, error) {
+	return s.GetSubnetWithContext(context.Background(), addrID)
+}
+
+// GetSubnetWithContext is the same as GetSubnet, but takes a context.
+func (s *IPAMService) GetSubnetWithContext(ctx context.Context, addrID int) (*ipam.Address, *http.Response, error) {
 	reqPath := fmt.Sprintf("ipam/address/%d", addrID)
 	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	addr := &ipam.Address{}
 	var resp *http.Response
@@ -60,11 +73,17 @@ func (s *IPAMService) GetSubnet(addrID int) (*ipam.Address, *http.Response, erro
 //
 // NS1 API docs: https://ns1.com/api#getview-address-children
 func (s *IPAMService) GetChildren(addrID int) ([]*ipam.Address, *http.Response, error) {
+	return s.GetChildrenWithContext(context.Background(), addrID)
+}
+
+// GetChildrenWithContext is the same as GetChildren, but takes a context.
+func (s *IPAMService) GetChildrenWithContext(ctx context.Context, addrID int) ([]*ipam.Address, *http.Response, error) {
 	reqPath := fmt.Sprintf("ipam/address/%d/children", addrID)
 	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	addrs := []*ipam.Address{}
 	var resp *http.Response
@@ -84,11 +103,17 @@ func (s *IPAMService) GetChildren(addrID int) ([]*ipam.Address, *http.Response, 
 //
 // NS1 API docs: https://ns1.com/api#getview-address-parent
 func (s *IPAMService) GetParent(addrID int) (*ipam.Address, *http.Response, error) {
+	return s.GetParentWithContext(context.Background(), addrID)
+}
+
+// GetParentWithContext is the same as GetParent, but takes a context.
+func (s *IPAMService) GetParentWithContext(ctx context.Context, addrID int) (*ipam.Address, *http.Response, error) {
 	reqPath := fmt.Sprintf("ipam/address/%d/parent", addrID)
 	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	addr := &ipam.Address{}
 	var resp *http.Response
@@ -105,6 +130,11 @@ func (s *IPAMService) GetParent(addrID int) (*ipam.Address, *http.Response, erro
 //
 // NS1 API docs: https://ns1.com/api#putcreate-a-subnet
 func (s *IPAMService) CreateSubnet(addr *ipam.Address) (*ipam.Address, *http.Response, error) {
+	return s.CreateSubnetWithContext(context.Background(), addr)
+}
+
+// CreateSubnetWithContext is the same as CreateSubnet, but takes a context.
+func (s *IPAMService) CreateSubnetWithContext(ctx context.Context, addr *ipam.Address) (*ipam.Address, *http.Response, error) {
 	switch {
 	case addr.Prefix == "":
 		return nil, nil, errors.New("the Prefix field is required")
@@ -116,6 +146,7 @@ func (s *IPAMService) CreateSubnet(addr *ipam.Address) (*ipam.Address, *http.Res
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	respAddr := &ipam.Address{}
 	var resp *http.Response
@@ -133,6 +164,11 @@ func (s *IPAMService) CreateSubnet(addr *ipam.Address) (*ipam.Address, *http.Res
 //
 // NS1 API docs: https://ns1.com/api#postedit-a-subnet
 func (s *IPAMService) EditSubnet(addr *ipam.Address, parent bool) (newAddr, parentAddr *ipam.Address, resp *http.Response, err error) {
+	return s.EditSubnetWithContext(context.Background(), addr, parent)
+}
+
+// EditSubnetWithContext is the same as EditSubnet, but takes a context.
+func (s *IPAMService) EditSubnetWithContext(ctx context.Context, addr *ipam.Address, parent bool) (newAddr, parentAddr *ipam.Address, resp *http.Response, err error) {
 	if addr.ID == 0 {
 		return nil, nil, nil, errors.New("the ID field is required")
 	}
@@ -142,6 +178,7 @@ func (s *IPAMService) EditSubnet(addr *ipam.Address, parent bool) (newAddr, pare
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	req = req.WithContext(ctx)
 	if parent {
 		q := req.URL.Query()
 		q.Add("parent", "true")
@@ -174,6 +211,11 @@ func (s *IPAMService) EditSubnet(addr *ipam.Address, parent bool) (newAddr, pare
 //
 // NS1 API docs: https://ns1.com/api#postsplit-a-subnet
 func (s *IPAMService) SplitSubnet(id, prefix int) (rootAddr int, prefixIDs []int, resp *http.Response, err error) {
+	return s.SplitSubnetWithContext(context.Background(), id, prefix)
+}
+
+// SplitSubnetWithContext is the same as SplitSubnet, but takes a context.
+func (s *IPAMService) SplitSubnetWithContext(ctx context.Context, id, prefix int) (rootAddr int, prefixIDs []int, resp *http.Response, err error) {
 	reqPath := fmt.Sprintf("ipam/address/%d/split", id)
 	req, err := s.client.NewRequest(http.MethodPost, reqPath, struct {
 		Prefix int `json:"prefix"`
@@ -183,6 +225,7 @@ func (s *IPAMService) SplitSubnet(id, prefix int) (rootAddr int, prefixIDs []int
 	if err != nil {
 		return 0, nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	data := &struct {
 		RootAddr  int   `json:"root_address_id"`
@@ -196,6 +239,11 @@ func (s *IPAMService) SplitSubnet(id, prefix int) (rootAddr int, prefixIDs []int
 //
 // NS1 API docs: https://ns1.com/api#postmerge-a-subnet
 func (s *IPAMService) MergeSubnet(rootID, mergeID int) (*ipam.Address, *http.Response, error) {
+	return s.MergeSubnetWithContext(context.Background(), rootID, mergeID)
+}
+
+// MergeSubnetWithContext is the same as MergeSubnet, but takes a context.
+func (s *IPAMService) MergeSubnetWithContext(ctx context.Context, rootID, mergeID int) (*ipam.Address, *http.Response, error) {
 	req, err := s.client.NewRequest(http.MethodPost, "ipam/address/merge", struct {
 		Root  int `json:"root_address_id"`
 		Merge int `json:"merged_address_id"`
@@ -206,6 +254,7 @@ func (s *IPAMService) MergeSubnet(rootID, mergeID int) (*ipam.Address, *http.Res
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	addr := &ipam.Address{}
 	resp, err := s.client.Do(req, &addr)
@@ -216,11 +265,17 @@ func (s *IPAMService) MergeSubnet(rootID, mergeID int) (*ipam.Address, *http.Res
 //
 // NS1 API docs: https://ns1.com/api#deletedelete-a-subnet
 func (s *IPAMService) DeleteSubnet(id int) (*http.Response, error) {
+	return s.DeleteSubnetWithContext(context.Background(), id)
+}
+
+// DeleteSubnetWithContext is the same as DeleteSubnet, but takes a context.
+func (s *IPAMService) DeleteSubnetWithContext(ctx context.Context, id int) (*http.Response, error) {
 	reqPath := fmt.Sprintf("ipam/address/%d", id)
 	req, err := s.client.NewRequest(http.MethodDelete, reqPath, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	return s.client.Do(req, nil)
 }

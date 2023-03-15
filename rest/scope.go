@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type ScopeService service
 //
 // NS1 API docs: https://ns1.com/api#getlist-scopes
 func (s *ScopeService) List() ([]dhcp.Scope, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *ScopeService) ListWithContext(ctx context.Context) ([]dhcp.Scope, *http.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "dhcp/scope", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	scs := make([]dhcp.Scope, 0)
 	resp, err := s.client.Do(req, &scs)
@@ -33,11 +40,17 @@ func (s *ScopeService) List() ([]dhcp.Scope, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api#getview-scope-details
 func (s *ScopeService) Get(scID int) (*dhcp.Scope, *http.Response, error) {
+	return s.GetWithContext(context.Background(), scID)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *ScopeService) GetWithContext(ctx context.Context, scID int) (*dhcp.Scope, *http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/scope/%d", scID)
 	req, err := s.client.NewRequest(http.MethodGet, reqPath, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	sc := &dhcp.Scope{}
 	var resp *http.Response
@@ -54,6 +67,11 @@ func (s *ScopeService) Get(scID int) (*dhcp.Scope, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api#putcreate-a-scope
 func (s *ScopeService) Create(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error) {
+	return s.CreateWithContext(context.Background(), sc)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *ScopeService) CreateWithContext(ctx context.Context, sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error) {
 	switch {
 	case sc.IDAddress == nil:
 		return nil, nil, errors.New("the IDAddress field is required")
@@ -63,6 +81,7 @@ func (s *ScopeService) Create(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, erro
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	respSc := new(dhcp.Scope)
 	var resp *http.Response
@@ -79,6 +98,11 @@ func (s *ScopeService) Create(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, erro
 //
 // NS1 API docs: https://ns1.com/api#postmodify-a-scope
 func (s *ScopeService) Edit(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error) {
+	return s.EditWithContext(context.Background(), sc)
+}
+
+// CreateWithContext is the same as Edit, but takes a context.
+func (s *ScopeService) EditWithContext(ctx context.Context, sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error) {
 	switch {
 	case sc.IDAddress == nil:
 		return nil, nil, errors.New("the IDAddress field is required")
@@ -89,6 +113,7 @@ func (s *ScopeService) Edit(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, sc)
 	if err != nil {
@@ -102,11 +127,17 @@ func (s *ScopeService) Edit(sc *dhcp.Scope) (*dhcp.Scope, *http.Response, error)
 //
 // NS1 API docs: https://ns1.com/api#deleteremove-a-scope
 func (s *ScopeService) Delete(id int) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), id)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *ScopeService) DeleteWithContext(ctx context.Context, id int) (*http.Response, error) {
 	reqPath := fmt.Sprintf("dhcp/scope/%d", id)
 	req, err := s.client.NewRequest(http.MethodDelete, reqPath, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	return s.client.Do(req, nil)
 }

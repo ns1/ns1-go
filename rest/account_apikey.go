@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type APIKeysService service
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-get
 func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but accepts a context.
+func (s *APIKeysService) ListWithContext(ctx context.Context) ([]*account.APIKey, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/apikeys", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	kl := []*account.APIKey{}
 	resp, err := s.client.Do(req, &kl)
@@ -34,12 +41,18 @@ func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-get
 func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, error) {
+	return s.GetWithContext(context.Background(), keyID)
+}
+
+// GetWithContext is the same as Get, but accepts a context.
+func (s *APIKeysService) GetWithContext(ctx context.Context, keyID string) (*account.APIKey, *http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var a account.APIKey
 	resp, err := s.client.Do(req, &a)
@@ -61,6 +74,11 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-put
 func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), a)
+}
+
+// CreateWithContext is the same as Create, but accepts a context.
+func (s *APIKeysService) CreateWithContext(ctx context.Context, a *account.APIKey) (*http.Response, error) {
 	var (
 		req *http.Request
 		err error
@@ -79,6 +97,7 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 			return nil, err
 		}
 	}
+	req = req.WithContext(ctx)
 
 	// Update account fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
@@ -99,6 +118,11 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-post
 func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), a)
+}
+
+// UpdateWithContext is the same as Update, but accepts a context.
+func (s *APIKeysService) UpdateWithContext(ctx context.Context, a *account.APIKey) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", a.ID)
 
 	var (
@@ -119,6 +143,7 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 			return nil, err
 		}
 	}
+	req = req.WithContext(ctx)
 
 	// Update apikey fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
@@ -139,12 +164,18 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-id-delete
 func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), keyID)
+}
+
+// DeleteWithContext is the same as Update, but accepts a context.
+func (s *APIKeysService) DeleteWithContext(ctx context.Context, keyID string) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,11 +16,17 @@ type PulsarJobsService service
 //
 // NS1 API docs: https://ns1.com/api/#getlist-jobs-within-an-app
 func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Response, error) {
+	return s.ListWithContext(context.Background(), appId)
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *PulsarJobsService) ListWithContext(ctx context.Context, appId string) ([]*pulsar.PulsarJob, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", appId)
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	jl := []*pulsar.PulsarJob{}
 	var resp *http.Response
@@ -41,12 +48,18 @@ func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Respo
 //
 // NS1 API docs: https://ns1.com/api/#getview-job-details
 func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, *http.Response, error) {
+	return s.GetWithContext(context.Background(), appId, jobId)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *PulsarJobsService) GetWithContext(ctx context.Context, appId string, jobId string) (*pulsar.PulsarJob, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", appId, jobId)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var job pulsar.PulsarJob
 
@@ -73,12 +86,18 @@ func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, 
 //
 // NS1 API docs: https://ns1.com/api/#putcreate-a-pulsar-job
 func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), j)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *PulsarJobsService) CreateWithContext(ctx context.Context, j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", j.AppID)
 
 	req, err := s.client.NewRequest("PUT", path, j)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update job fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, j)
@@ -100,12 +119,18 @@ func (s *PulsarJobsService) Create(j *pulsar.PulsarJob) (*http.Response, error) 
 // Only the fields to be updated are required in the given job.
 // NS1 API docs: https://ns1.com/api/#postmodify-a-pulsar-job
 func (s *PulsarJobsService) Update(j *pulsar.PulsarJob) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), j)
+}
+
+// UpdateWithContext is the same as Update, but takes a context.
+func (s *PulsarJobsService) UpdateWithContext(ctx context.Context, j *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", j.AppID, j.JobID)
 
 	req, err := s.client.NewRequest("POST", path, j)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update jobs fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, j)
@@ -130,12 +155,18 @@ func (s *PulsarJobsService) Update(j *pulsar.PulsarJob) (*http.Response, error) 
 //
 // NS1 API docs: https://ns1.com/api/#deletedelete-a-pulsar-job
 func (s *PulsarJobsService) Delete(pulsarJob *pulsar.PulsarJob) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), pulsarJob)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *PulsarJobsService) DeleteWithContext(ctx context.Context, pulsarJob *pulsar.PulsarJob) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {

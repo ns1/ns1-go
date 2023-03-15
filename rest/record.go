@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -16,12 +17,18 @@ type RecordsService service
 //
 // NS1 API docs: https://ns1.com/api/#record-get
 func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Response, error) {
+	return s.GetWithContext(context.Background(), zone, domain, t)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *RecordsService) GetWithContext(ctx context.Context, zone, domain, t string) (*dns.Record, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var r dns.Record
 	resp, err := s.client.Do(req, &r)
@@ -47,12 +54,18 @@ func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Respons
 // The given record must have at least one answer.
 // NS1 API docs: https://ns1.com/api/#record-put
 func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), r)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *RecordsService) CreateWithContext(ctx context.Context, r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("PUT", path, &r)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update record fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
@@ -77,12 +90,18 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 // Only the fields to be updated are required in the given record.
 // NS1 API docs: https://ns1.com/api/#record-post
 func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), r)
+}
+
+// UpdateWithContext is the same as Update, but takes a context.
+func (s *RecordsService) UpdateWithContext(ctx context.Context, r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
 	req, err := s.client.NewRequest("POST", path, &r)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update records fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &r)
@@ -108,12 +127,18 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#record-delete
 func (s *RecordsService) Delete(zone string, domain string, t string) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), zone, domain, t)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *RecordsService) DeleteWithContext(ctx context.Context, zone string, domain string, t string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {

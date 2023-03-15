@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,10 +16,16 @@ type ZonesService service
 //
 // NS1 API docs: https://ns1.com/api/#zones-get
 func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
+	return s.ListWithContext(context.Background())
+}
+
+// ListWithContext is the same as List, but takes a context.
+func (s *ZonesService) ListWithContext(ctx context.Context) ([]*dns.Zone, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "zones", nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	zl := []*dns.Zone{}
 	var resp *http.Response
@@ -38,12 +45,18 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-zone-get
 func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
+	return s.GetWithContext(context.Background(), zone)
+}
+
+// GetWithContext is the same as Get, but takes a context.
+func (s *ZonesService) GetWithContext(ctx context.Context, zone string) (*dns.Zone, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+	req = req.WithContext(ctx)
 
 	var z dns.Zone
 	var resp *http.Response
@@ -69,12 +82,18 @@ func (s *ZonesService) Get(zone string) (*dns.Zone, *http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
 func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
+	return s.CreateWithContext(context.Background(), z)
+}
+
+// CreateWithContext is the same as Create, but takes a context.
+func (s *ZonesService) CreateWithContext(ctx context.Context, z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("PUT", path, &z)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
@@ -97,12 +116,18 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
 func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
+	return s.UpdateWithContext(context.Background(), z)
+}
+
+// UpdateWithContext is the same as Update, but takes a context.
+func (s *ZonesService) UpdateWithContext(ctx context.Context, z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("POST", path, &z)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
@@ -123,12 +148,18 @@ func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-delete
 func (s *ZonesService) Delete(zone string) (*http.Response, error) {
+	return s.DeleteWithContext(context.Background(), zone)
+}
+
+// DeleteWithContext is the same as Delete, but takes a context.
+func (s *ZonesService) DeleteWithContext(ctx context.Context, zone string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
