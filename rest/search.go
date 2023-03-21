@@ -32,7 +32,7 @@ func (s *RecordSearchService) Search(params string) (*dns.SearchResult, *http.Re
 type ZoneSearchService service
 
 // Find takes query parameters and returns matching DNS zones.
-func (s *ZoneSearchService) Find(params string) (*dns.SearchResult, *http.Response, error) {
+func (s *ZoneSearchService) Search(params string) (*dns.SearchResult, *http.Response, error) {
 	path := fmt.Sprintf("dns/zone/search?%s", params)
 
 	req, err := s.client.NewRequest("GET", path, nil)
