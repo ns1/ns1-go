@@ -11,7 +11,7 @@ import (
 type RecordSearchService service
 
 // Find takes query parameters and returns matching DNS records.
-func (s *RecordSearchService) Find(params string) (*dns.SearchResult, *http.Response, error) {
+func (s *RecordSearchService) Search(params string) (*dns.SearchResult, *http.Response, error) {
 	path := fmt.Sprintf("dns/record/search?%s", params)
 
 	req, err := s.client.NewRequest("GET", path, nil)
