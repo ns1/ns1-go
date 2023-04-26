@@ -3,6 +3,7 @@ package rest
 import (
 	"log"
 	"net/http"
+	"strings"
 )
 
 // DoerFunc satisfies Interface. DoerFuncs are useful for adding
@@ -35,7 +36,11 @@ func Decorate(d Doer, ds ...Decorator) Doer {
 func Logging(l *log.Logger) Decorator {
 	return func(d Doer) Doer {
 		return DoerFunc(func(r *http.Request) (*http.Response, error) {
-			l.Printf("%s: %s %s", r.UserAgent(), r.Method, r.URL)
+			userAgent := r.UserAgent()
+			escapedUserAgent := strings.Replace(userAgent, "\n", "", -1)
+			escapedUserAgent = strings.Replace(escapedUserAgent, "\r", "", -1)
+			userURL := r.URL.String()
+			l.Printf("%s: %s %s", escapedUserAgent, r.Method, userURL)
 			return d.Do(r)
 		})
 	}
