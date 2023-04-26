@@ -40,7 +40,9 @@ func Logging(l *log.Logger) Decorator {
 			escapedUserAgent := strings.Replace(userAgent, "\n", "", -1)
 			escapedUserAgent = strings.Replace(escapedUserAgent, "\r", "", -1)
 			userURL := r.URL.String()
-			l.Printf("%s: %s %s", escapedUserAgent, r.Method, userURL)
+			escapedURL := strings.Replace(userURL, "\n", "", -1)
+			escapedURL = strings.Replace(escapedURL, "\r", "", -1)
+			l.Printf("%s: %s %s", escapedUserAgent, r.Method, escapedURL)
 			return d.Do(r)
 		})
 	}
