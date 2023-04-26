@@ -12,7 +12,7 @@ import (
 func TestUnmarshalZoneRecords(t *testing.T) {
 	d := []byte(`[
     {
-      "domain": "foo.test.zone",
+      "Domain": "foo.test.zone",
       "short_answers": [
         "1.2.3.4"
       ],

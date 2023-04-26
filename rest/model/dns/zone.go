@@ -57,7 +57,7 @@ func (z Zone) String() string {
 
 // ZoneRecord wraps Zone's "records" attribute
 type ZoneRecord struct {
-	Domain   string      `json:"Domain,omitempty"`
+	Domain   string      `json:"domain,omitempty"`
 	ID       string      `json:"id,omitempty"`
 	Link     string      `json:"link,omitempty"`
 	ShortAns []string    `json:"short_answers,omitempty"`
