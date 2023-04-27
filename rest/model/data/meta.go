@@ -26,9 +26,9 @@ type PulsarMeta struct {
 // Meta contains information on an entity's metadata table. Metadata key/value
 // pairs are used by a record's filter pipeline during a dns query.
 // All values can be a feed id as well, indicating real-time updates of these values.
-// Structure/Precendence of metadata tables:
+// Structure/Precedence of metadata tables:
 //   - Record
-//   - Meta <- lowest precendence in filter
+//   - Meta <- lowest precedence in filter
 //   - Region(s)
 //   - Meta <- middle precedence in filter chain
 //   - ...
