@@ -185,7 +185,7 @@ func TestMetaFromMap(t *testing.T) {
 		t.Fatal("meta.Longitude should be a feed ptr with id 12345678, was", meta.Longitude)
 	}
 
-	expect := []map[string]interface{}{map[string]interface{}{
+	expect := []map[string]interface{}{{
 		"job_id":     "abcdef",
 		"bias":       "*0.55",
 		"a5m_cutoff": 0.9,
@@ -194,7 +194,7 @@ func TestMetaFromMap(t *testing.T) {
 		t.Fatalf("meta.Pulsar should be %v, was %v", expect, meta.Pulsar)
 	}
 
-	expect = []map[string]interface{}{map[string]interface{}{
+	expect = []map[string]interface{}{{
 		"a": "1",
 		"b": "2",
 		"c": "3",
