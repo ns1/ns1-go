@@ -26,9 +26,9 @@ type PulsarMeta struct {
 // Meta contains information on an entity's metadata table. Metadata key/value
 // pairs are used by a record's filter pipeline during a dns query.
 // All values can be a feed id as well, indicating real-time updates of these values.
-// Structure/Precendence of metadata tables:
+// Structure/Precedence of metadata tables:
 //   - Record
-//   - Meta <- lowest precendence in filter
+//   - Meta <- lowest precedence in filter
 //   - Region(s)
 //   - Meta <- middle precedence in filter chain
 //   - ...
@@ -316,9 +316,9 @@ func MetaFromMap(m map[string]interface{}) *Meta {
 				// If it's a Note, just pass the string without any type of parse.
 				fv.Set(reflect.ValueOf(v.(string)))
 			case "AdditionalMetadata":
-				var additonals []map[string]interface{}
-				if err := json.Unmarshal([]byte(v.(string)), &additonals); err == nil {
-					fv.Set(reflect.ValueOf(additonals))
+				var additional []map[string]interface{}
+				if err := json.Unmarshal([]byte(v.(string)), &additional); err == nil {
+					fv.Set(reflect.ValueOf(additional))
 				}
 			default:
 				fv.Set(reflect.ValueOf(ParseType(v.(string))))

@@ -13,6 +13,7 @@ type PulsarJob struct {
 	Config    *JobConfig `json:"config,omitempty"`
 }
 
+// JobConfig config parameter struct
 type JobConfig struct {
 	Host                 *string             `json:"host"`
 	URL_Path             *string             `json:"url_path"`
@@ -25,11 +26,13 @@ type JobConfig struct {
 	BlendMetricWeights   *BlendMetricWeights `json:"blend_metric_weights,omitempty"`
 }
 
+// BlendMetricWeights parameter struct
 type BlendMetricWeights struct {
 	Timestamp int        `json:"timestamp"`
 	Weights   []*Weights `json:"weights"`
 }
 
+// Weights parameter struct
 type Weights struct {
 	Name         string  `json:"name,omitempty"`
 	Weight       int     `json:"weight"`

@@ -100,16 +100,16 @@ func TestMeta_StringMap(t *testing.T) {
 
 	meta.Subdivisions = map[string]interface{}{"BR": []string{"SP", "MG"}}
 	stra := meta.StringMap()
-	str_expected := "{\"BR\":[\"SP\",\"MG\"]}"
-	if stra["subdivisions"] != str_expected {
-		t.Fatal("expected:", str_expected, "got: ", stra["subdivisions"])
+	strExpected := "{\"BR\":[\"SP\",\"MG\"]}"
+	if stra["subdivisions"] != strExpected {
+		t.Fatal("expected:", strExpected, "got: ", stra["subdivisions"])
 	}
 
 	meta.Up = map[string]interface{}{"key": "12345678"}
 	stra = meta.StringMap()
-	str_expected = "{\"key\":\"12345678\"}"
-	if stra["up"] != str_expected {
-		t.Fatal("expected:", str_expected, "got: ", stra["up"])
+	strExpected = "{\"key\":\"12345678\"}"
+	if stra["up"] != strExpected {
+		t.Fatal("expected:", strExpected, "got: ", stra["up"])
 	}
 }
 
@@ -185,7 +185,7 @@ func TestMetaFromMap(t *testing.T) {
 		t.Fatal("meta.Longitude should be a feed ptr with id 12345678, was", meta.Longitude)
 	}
 
-	expect := []map[string]interface{}{map[string]interface{}{
+	expect := []map[string]interface{}{{
 		"job_id":     "abcdef",
 		"bias":       "*0.55",
 		"a5m_cutoff": 0.9,
@@ -194,7 +194,7 @@ func TestMetaFromMap(t *testing.T) {
 		t.Fatalf("meta.Pulsar should be %v, was %v", expect, meta.Pulsar)
 	}
 
-	expect = []map[string]interface{}{map[string]interface{}{
+	expect = []map[string]interface{}{{
 		"a": "1",
 		"b": "2",
 		"c": "3",

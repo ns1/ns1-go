@@ -234,13 +234,13 @@ func TestUnmarshalZones(t *testing.T) {
 	primary := &ZonePrimary{
 		Enabled: true,
 		Secondaries: []ZoneSecondaryServer{
-			ZoneSecondaryServer{
+			{
 				IP:         "1.1.1.1",
 				Port:       53,
 				Notify:     true,
 				NetworkIDs: []int{},
 			},
-			ZoneSecondaryServer{
+			{
 				IP:         "2.2.2.2",
 				Port:       53,
 				Notify:     true,

@@ -8,14 +8,14 @@ import (
 	"gopkg.in/ns1/ns1-go.v2/rest/model/pulsar"
 )
 
-// JobsService handles 'pulsar/apps/APPID/jobs/JOBID' endpoint.
+// PulsarJobsService handles 'pulsar/apps/APPID/jobs/JOBID' endpoint.
 type PulsarJobsService service
 
 // List takes an Application ID and returns all Jobs inside said Application.
 //
 // NS1 API docs: https://ns1.com/api/#getlist-jobs-within-an-app
-func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Response, error) {
-	path := fmt.Sprintf("pulsar/apps/%s/jobs", appId)
+func (s *PulsarJobsService) List(appID string) ([]*pulsar.PulsarJob, *http.Response, error) {
+	path := fmt.Sprintf("pulsar/apps/%s/jobs", appID)
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -40,8 +40,8 @@ func (s *PulsarJobsService) List(appId string) ([]*pulsar.PulsarJob, *http.Respo
 // Get takes an Application ID and Job Id and returns full configuration for a pulsar Job.
 //
 // NS1 API docs: https://ns1.com/api/#getview-job-details
-func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, *http.Response, error) {
-	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", appId, jobId)
+func (s *PulsarJobsService) Get(appID string, jobID string) (*pulsar.PulsarJob, *http.Response, error) {
+	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", appID, jobID)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *PulsarJobsService) Get(appId string, jobId string) (*pulsar.PulsarJob, 
 	if err != nil {
 		switch errorType := err.(type) {
 		case *Error:
-			jobNotFound := fmt.Sprintf("pulsar job %s not found for appid %s", jobId, appId)
+			jobNotFound := fmt.Sprintf("pulsar job %s not found for appid %s", jobID, appID)
 			switch errorType.Message {
 			case jobNotFound:
 				return nil, resp, ErrJobMissing

@@ -68,7 +68,7 @@ func (s *Service) AddDNSViewGetPreferencesTestCase(
 	)
 }
 
-// AddDNSViewGetPreferencesTestCase sets up a test case for the api.Client.View.GetPreferences()
+// AddDNSViewUpdatePreferencesTestCase sets up a test case for the api.Client.View.GetPreferences()
 // function
 func (s *Service) AddDNSViewUpdatePreferencesTestCase(
 	requestHeaders, responseHeaders http.Header,

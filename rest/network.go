@@ -9,7 +9,7 @@ import (
 // NetworkService handles the 'networks' endpoint
 type NetworkService service
 
-// GetNetworks returns a list of all available NS1 DNS networks associated
+// Get returns a list of all available NS1 DNS networks associated
 // with your account.
 // NS1 API docs: https://ns1.com/api?docId=403388
 func (s *NetworkService) Get() ([]*dns.Network, *http.Response, error) {
