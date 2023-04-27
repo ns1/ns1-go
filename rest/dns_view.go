@@ -130,7 +130,7 @@ func (s *DNSViewService) Delete(viewName string) (*http.Response, error) {
 	return resp, nil
 }
 
-// GetPreference returns a map[string]int of preferences.
+// GetPreferences returns a map[string]int of preferences.
 //
 // NS1 API docs: https://ns1.com/api#getget-dns-view-preference
 func (s *DNSViewService) GetPreferences() (map[string]int, *http.Response, error) {
@@ -150,7 +150,7 @@ func (s *DNSViewService) GetPreferences() (map[string]int, *http.Response, error
 	return m, resp, nil
 }
 
-// UpdatePreference takes a map[string]int and returns a map[string]int of preferences.
+// UpdatePreferences takes a map[string]int and returns a map[string]int of preferences.
 //
 // NS1 API docs: https://ns1.com/api#postedit-dns-view-preference
 func (s *DNSViewService) UpdatePreferences(m map[string]int) (map[string]int, *http.Response, error) {
@@ -180,6 +180,6 @@ var (
 	// ErrViewExists bundles CREATE error.
 	ErrViewExists = errors.New("DNS view already exists")
 
-	// ErrViewExists bundles GET error.
+	// ErrViewMissing bundles GET error.
 	ErrViewMissing = errors.New("DNS view not found")
 )

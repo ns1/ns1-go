@@ -33,7 +33,7 @@ func (s *Service) AddPulsarJobGetTestCase(
 	)
 }
 
-// AddPulsarJobGetTestCase sets up a test case for the api.Client.PulsarJobs.Create()
+// AddPulsarJobCreateTestCase sets up a test case for the api.Client.PulsarJobs.Create()
 // function
 func (s *Service) AddPulsarJobCreateTestCase(
 	requestHeaders, responseHeaders http.Header,
@@ -45,7 +45,7 @@ func (s *Service) AddPulsarJobCreateTestCase(
 	)
 }
 
-// AddPulsarJobGetTestCase sets up a test case for the api.Client.PulsarJobs.Update()
+// AddPulsarJobUpdateTestCase sets up a test case for the api.Client.PulsarJobs.Update()
 // function
 func (s *Service) AddPulsarJobUpdateTestCase(
 	requestHeaders, responseHeaders http.Header,
@@ -57,7 +57,7 @@ func (s *Service) AddPulsarJobUpdateTestCase(
 	)
 }
 
-// AddPulsarJobGetTestCase sets up a test case for the api.Client.PulsarJobs.Delete()
+// AddPulsarJobDeleteTestCase sets up a test case for the api.Client.PulsarJobs.Delete()
 // function
 func (s *Service) AddPulsarJobDeleteTestCase(
 	requestHeaders, responseHeaders http.Header,

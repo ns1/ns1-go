@@ -17,8 +17,10 @@ type Option struct {
 // OptionSet is a convenience type for marshalling an array of options to and from a JSON field.
 type OptionSet []Option
 
+// ItemType defines the type of the item as a string
 type ItemType string
 
+// List of available types
 const (
 	ItemTypeBinary      = "binary"
 	ItemTypeBoolean     = "boolean"
@@ -44,8 +46,10 @@ type OptionDefSchemaItems struct {
 	Type ItemType `json:"type"`
 }
 
+// SchemaType defines the type of the schema as a string
 type SchemaType string
 
+// List of available types
 const (
 	SchemaTypeArray       SchemaType = "array"
 	SchemaTypeBinary                 = "binary"

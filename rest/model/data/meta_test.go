@@ -100,16 +100,16 @@ func TestMeta_StringMap(t *testing.T) {
 
 	meta.Subdivisions = map[string]interface{}{"BR": []string{"SP", "MG"}}
 	stra := meta.StringMap()
-	str_expected := "{\"BR\":[\"SP\",\"MG\"]}"
-	if stra["subdivisions"] != str_expected {
-		t.Fatal("expected:", str_expected, "got: ", stra["subdivisions"])
+	strExpected := "{\"BR\":[\"SP\",\"MG\"]}"
+	if stra["subdivisions"] != strExpected {
+		t.Fatal("expected:", strExpected, "got: ", stra["subdivisions"])
 	}
 
 	meta.Up = map[string]interface{}{"key": "12345678"}
 	stra = meta.StringMap()
-	str_expected = "{\"key\":\"12345678\"}"
-	if stra["up"] != str_expected {
-		t.Fatal("expected:", str_expected, "got: ", stra["up"])
+	strExpected = "{\"key\":\"12345678\"}"
+	if stra["up"] != strExpected {
+		t.Fatal("expected:", strExpected, "got: ", stra["up"])
 	}
 }
 
