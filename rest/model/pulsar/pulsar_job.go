@@ -13,7 +13,7 @@ type PulsarJob struct {
 	Config    *JobConfig `json:"config,omitempty"`
 }
 
-// JobConfig config paramater struct
+// JobConfig config parameter struct
 type JobConfig struct {
 	Host                 *string             `json:"host"`
 	URL_Path             *string             `json:"url_path"`
