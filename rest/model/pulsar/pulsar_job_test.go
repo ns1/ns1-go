@@ -23,5 +23,5 @@ func TestNewJSPulsarJob(t *testing.T) {
 	assert.Equal(t, "myJSPulsarJob", j.Name, "Wrong name")
 	assert.Equal(t, "myAppId", j.AppID, "Wrong appid")
 	assert.Equal(t, &myHost, j.Config.Host, "Wrong host")
-	assert.Equal(t, &myURLPath, j.Config.URL_Path, "Wrong url_path")
+	assert.Equal(t, &myURLPath, j.Config.URLPath, "Wrong url_path")
 }

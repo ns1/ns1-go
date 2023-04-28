@@ -1,7 +1,7 @@
 package pulsar
 
-// PulsarJob wraps an NS1 pulsar/apps/{appid}/jobs/{jobid} resource
-type PulsarJob struct {
+// Job wraps an NS1 pulsar/apps/{appid}/jobs/{jobid} resource
+type Job struct {
 	Customer  int        `json:"customer,omitempty"`
 	TypeID    string     `json:"typeid"`
 	Name      string     `json:"name"`
@@ -16,9 +16,9 @@ type PulsarJob struct {
 // JobConfig config parameter struct
 type JobConfig struct {
 	Host                 *string             `json:"host"`
-	URL_Path             *string             `json:"url_path"`
-	Http                 *bool               `json:"http,omitempty"`
-	Https                *bool               `json:"https,omitempty"`
+	URLPath              *string             `json:"url_path"`
+	HTTP                 *bool               `json:"http,omitempty"`
+	HTTPS                *bool               `json:"https,omitempty"`
 	RequestTimeoutMillis *int                `json:"request_timeout_millis,omitempty"`
 	JobTimeoutMillis     *int                `json:"job_timeout_millis,omitempty"`
 	UseXHR               *bool               `json:"use_xhr,omitempty"`
@@ -40,22 +40,22 @@ type Weights struct {
 	Maximize     bool    `json:"maximize"`
 }
 
-// NewJSPulsarJob takes a name, appid, host and urlPath and creates a JavaScript Pulsar job (type *PulsarJob)
-func NewJSPulsarJob(name string, appid string, host string, urlPath string) *PulsarJob {
-	return &PulsarJob{
+// NewJSPulsarJob takes a name, appid, host and urlPath and creates a JavaScript Pulsar job (type *Job)
+func NewJSPulsarJob(name string, appid string, host string, urlPath string) *Job {
+	return &Job{
 		Name:   name,
 		TypeID: "latency",
 		AppID:  appid,
 		Config: &JobConfig{
-			Host:     &host,
-			URL_Path: &urlPath,
+			Host:    &host,
+			URLPath: &urlPath,
 		},
 	}
 }
 
 // NewBBPulsarJob takes a name and appid and creates a Bulk Beacon Pulsar job (type *PulsarJob)
-func NewBBPulsarJob(name string, appid string) *PulsarJob {
-	return &PulsarJob{
+func NewBBPulsarJob(name string, appid string) *Job {
+	return &Job{
 		Name:   name,
 		TypeID: "custom",
 		AppID:  appid,

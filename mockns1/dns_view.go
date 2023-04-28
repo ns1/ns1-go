@@ -11,7 +11,7 @@ import (
 // function
 func (s *Service) AddDNSViewListTestCase(
 	requestHeaders, responseHeaders http.Header,
-	response []*dns.DNSView,
+	response []*dns.View,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, "views", http.StatusOK, requestHeaders,
@@ -24,7 +24,7 @@ func (s *Service) AddDNSViewListTestCase(
 func (s *Service) AddDNSViewGetTestCase(
 	viewName string,
 	requestHeaders, responseHeaders http.Header,
-	response *dns.DNSView,
+	response *dns.View,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, fmt.Sprintf("views/%s", viewName), http.StatusOK, requestHeaders,
@@ -36,7 +36,7 @@ func (s *Service) AddDNSViewGetTestCase(
 // function
 func (s *Service) AddDNSViewCreateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	dnsView, response *dns.DNSView,
+	dnsView, response *dns.View,
 ) error {
 	return s.AddTestCase(
 		http.MethodPut, fmt.Sprintf("views/%s", dnsView.Name), http.StatusOK, requestHeaders,
@@ -48,7 +48,7 @@ func (s *Service) AddDNSViewCreateTestCase(
 // function
 func (s *Service) AddDNSViewUpdateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	dnsView, response *dns.DNSView,
+	dnsView, response *dns.View,
 ) error {
 	return s.AddTestCase(
 		http.MethodPost, fmt.Sprintf("views/%s", dnsView.Name), http.StatusOK, requestHeaders,

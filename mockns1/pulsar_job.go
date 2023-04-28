@@ -12,7 +12,7 @@ import (
 func (s *Service) AddPulsarJobListTestCase(
 	appid string,
 	requestHeaders, responseHeaders http.Header,
-	response []*pulsar.PulsarJob,
+	response []*pulsar.Job,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, fmt.Sprintf("/pulsar/apps/%s/jobs", appid), http.StatusOK, requestHeaders,
@@ -25,7 +25,7 @@ func (s *Service) AddPulsarJobListTestCase(
 func (s *Service) AddPulsarJobGetTestCase(
 	appid, jobid string,
 	requestHeaders, responseHeaders http.Header,
-	response *pulsar.PulsarJob,
+	response *pulsar.Job,
 ) error {
 	return s.AddTestCase(
 		http.MethodGet, fmt.Sprintf("/pulsar/apps/%s/jobs/%s", appid, jobid), http.StatusOK, requestHeaders,
@@ -37,7 +37,7 @@ func (s *Service) AddPulsarJobGetTestCase(
 // function
 func (s *Service) AddPulsarJobCreateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	pulsarJob, response *pulsar.PulsarJob,
+	pulsarJob, response *pulsar.Job,
 ) error {
 	return s.AddTestCase(
 		http.MethodPut, fmt.Sprintf("pulsar/apps/%s/jobs", pulsarJob.AppID), http.StatusOK, requestHeaders,
@@ -49,7 +49,7 @@ func (s *Service) AddPulsarJobCreateTestCase(
 // function
 func (s *Service) AddPulsarJobUpdateTestCase(
 	requestHeaders, responseHeaders http.Header,
-	pulsarJob, response *pulsar.PulsarJob,
+	pulsarJob, response *pulsar.Job,
 ) error {
 	return s.AddTestCase(
 		http.MethodPost, fmt.Sprintf("pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusOK, requestHeaders,
@@ -61,7 +61,7 @@ func (s *Service) AddPulsarJobUpdateTestCase(
 // function
 func (s *Service) AddPulsarJobDeleteTestCase(
 	requestHeaders, responseHeaders http.Header,
-	pulsarJob, response *pulsar.PulsarJob,
+	pulsarJob, response *pulsar.Job,
 ) error {
 	return s.AddTestCase(
 		http.MethodDelete, fmt.Sprintf("pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID), http.StatusOK, requestHeaders,
