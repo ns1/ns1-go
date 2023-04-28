@@ -19,7 +19,7 @@ type Record struct {
 	Type            string `json:"type"`
 	Link            string `json:"link,omitempty"`
 	TTL             int    `json:"ttl,omitempty"`
-	Override_TTL    *bool  `json:"override_ttl,omitempty"`
+	OverrideTTL     *bool  `json:"override_ttl,omitempty"`
 	UseClientSubnet *bool  `json:"use_client_subnet,omitempty"`
 
 	// Answers must all be of the same type as the record.

@@ -1,3 +1,20 @@
+## 2.7.6 (April 28, 2023)
+BUG FIXES:
+
+* **Breaking** Various name changes to be more idiomatic 
+    *  `DNSView`        -> `View`
+    *  `PulsarJob`      -> `Job`
+    *  `Created_at`     -> `CreatedAt`
+    *  `Updated_at`     -> `UpdatedAt`
+    *  `Read_acls`      -> `ReadACLs`
+    *  `Update_acls`    -> `UpdateACLs`
+    *  `Qps`            -> `QPS`
+    *  `URL_Path`       -> `URLPath`
+    *  `Http`           -> `HTTP`
+    *  `Https`          -> `HTTPS`
+    *  `Override_TTL`   -> `OverrideTTL`
+* Sanitized user input before logging
+
 ## 2.7.5 (March 13, 2023)
 BUG FIXES:
 

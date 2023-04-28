@@ -46,7 +46,7 @@ func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
 			Qps float32
 		}
 		*/
-		Qps float32
+		QPS float32
 	}
 	resp, err := s.client.Do(req, &value)
 
@@ -62,5 +62,5 @@ func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
 		}
 		return 0, resp, err
 	}
-	return value.Qps, resp, nil
+	return value.QPS, resp, nil
 }

@@ -31,13 +31,13 @@ func TestPulsarJob(t *testing.T) {
 				myURLPATH = "/myURLPath1"
 			)
 
-			pulsarJobs := []*pulsar.PulsarJob{
+			pulsarJobs := []*pulsar.Job{
 				{
 					Name:   "PulsarJob1",
 					TypeID: "latency",
 					Config: &pulsar.JobConfig{
-						Host:     &myhost,
-						URL_Path: &myURLPATH,
+						Host:    &myhost,
+						URLPath: &myURLPATH,
 					},
 				},
 				{
@@ -58,7 +58,7 @@ func TestPulsarJob(t *testing.T) {
 				require.Equal(t, pulsarJobs[i].TypeID, respPulsarJobs[i].TypeID, i)
 				if respPulsarJobs[i].TypeID == "latency" {
 					require.Equal(t, pulsarJobs[i].Config.Host, respPulsarJobs[i].Config.Host, i)
-					require.Equal(t, pulsarJobs[i].Config.URL_Path, respPulsarJobs[i].Config.URL_Path, i)
+					require.Equal(t, pulsarJobs[i].Config.URLPath, respPulsarJobs[i].Config.URLPath, i)
 				}
 			}
 		})
@@ -114,7 +114,7 @@ func TestPulsarJob(t *testing.T) {
 				testStaticValues   = true
 			)
 
-			pulsarJob := &pulsar.PulsarJob{
+			pulsarJob := &pulsar.Job{
 				Customer:  2156,
 				TypeID:    "latency",
 				Name:      "myPulsarJob",
@@ -125,9 +125,9 @@ func TestPulsarJob(t *testing.T) {
 				Shared:    true,
 				Config: &pulsar.JobConfig{
 					Host:                 &testHost,
-					URL_Path:             &testUrlPath,
-					Http:                 &testHttp,
-					Https:                &testHttps,
+					URLPath:              &testUrlPath,
+					HTTP:                 &testHttp,
+					HTTPS:                &testHttps,
 					RequestTimeoutMillis: &testRequestTimeout,
 					JobTimeoutMillis:     &testJobTimeout,
 					UseXHR:               &testXHR,
@@ -210,7 +210,7 @@ func TestPulsarJob(t *testing.T) {
 	})
 
 	t.Run("Create", func(t *testing.T) {
-		pulsarJob := &pulsar.PulsarJob{
+		pulsarJob := &pulsar.Job{
 			Name:   "myPulsarJob",
 			TypeID: "latency",
 			AppID:  myAppID,
@@ -257,7 +257,7 @@ func TestPulsarJob(t *testing.T) {
 	})
 
 	t.Run("Update", func(t *testing.T) {
-		pulsarJob := &pulsar.PulsarJob{
+		pulsarJob := &pulsar.Job{
 			Name:   "updatedPulsarJob",
 			TypeID: "custom",
 			AppID:  myAppID,
@@ -321,7 +321,7 @@ func TestPulsarJob(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		pulsarJob := &pulsar.PulsarJob{
+		pulsarJob := &pulsar.Job{
 			Name:   "myPulsarJob",
 			TypeID: "custom",
 			AppID:  myAppID,

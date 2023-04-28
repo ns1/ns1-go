@@ -26,7 +26,7 @@ func TestDNSView(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
 
-			views := []*dns.DNSView{
+			views := []*dns.View{
 				{
 					Name:       "DNSView1",
 					Preference: 1,
@@ -276,15 +276,15 @@ func TestDNSView(t *testing.T) {
 }
 
 var (
-	myView = dns.DNSView{
-		Name:       "myView",
-		Created_at: 123456789,
-		Updated_at: 987654321,
-		Read_acls: []string{
+	myView = dns.View{
+		Name:      "myView",
+		CreatedAt: 123456789,
+		UpdatedAt: 987654321,
+		ReadACLs: []string{
 			"myACLS1",
 			"myACLS2",
 		},
-		Update_acls: []string{
+		UpdateACLs: []string{
 			"myACLS1",
 			"myACLS2",
 			"myACLS3",

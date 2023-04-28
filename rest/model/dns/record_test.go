@@ -77,7 +77,7 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 	}
 	for _, tt := range marshalALIASRecordCases {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.record.Override_TTL = tt.overrideTTL
+			tt.record.OverrideTTL = tt.overrideTTL
 			result, err := json.Marshal(tt.record)
 			if err != nil {
 				t.Error(err)
