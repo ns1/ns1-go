@@ -9,7 +9,7 @@ import (
 // RegionsService handles 'monitoring/regions' endpoint.
 type RegionsService service
 
-// List returns all monitoring jobs for the account.
+// List returns all available monitoring regions for the account.
 //
 // NS1 API docs: https://ns1.com/api?docId=2247
 func (s *RegionsService) List() ([]*monitor.Region, *http.Response, error) {
