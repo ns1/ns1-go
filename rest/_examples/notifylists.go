@@ -43,7 +43,7 @@ func main() {
 		prettyPrint("notification:", n)
 	}
 
-	webhook := monitor.NewWebNotification("test.com/test")
+	webhook := monitor.NewWebNotification("test.com/test", map[string]string{})
 	nList := monitor.NewNotifyList("my list", webhook)
 	_, err = client.Notifications.Create(nList)
 	if err != nil {
