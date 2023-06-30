@@ -24,9 +24,14 @@ func (s *Service) AddZoneGetTestCase(
 	name string,
 	requestHeaders, responseHeaders http.Header,
 	response *dns.Zone,
+	records bool,
 ) error {
+	uri := "/zones/" + name
+	if !records {
+		uri = uri + "?records=false"
+	}
 	return s.AddTestCase(
-		http.MethodGet, "/zones/"+name, http.StatusOK, requestHeaders,
+		http.MethodGet, uri, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
 	)
 }

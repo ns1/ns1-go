@@ -108,9 +108,9 @@ func TestZone(t *testing.T) {
 					{Domain: "4.a.get.zone"},
 				},
 			}
-			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, nil, zone))
+			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, nil, zone, true))
 
-			respZone, _, err := client.Zones.Get(zoneName)
+			respZone, _, err := client.Zones.Get(zoneName, true)
 			require.Nil(t, err)
 			require.NotNil(t, respZone)
 			require.Equal(t, len(zone.Records), len(respZone.Records))
@@ -136,9 +136,9 @@ func TestZone(t *testing.T) {
 			header := http.Header{}
 			header.Set("Link", `</`+link+`&limit=2>; rel="next"`)
 
-			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, header, zone))
+			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, header, zone, true))
 
-			respZone, resp, err := client.Zones.Get(zoneName)
+			respZone, resp, err := client.Zones.Get(zoneName, true)
 			require.Nil(t, err)
 			require.NotNil(t, respZone)
 			require.Equal(t, len(zone.Records), len(respZone.Records))
@@ -158,7 +158,7 @@ func TestZone(t *testing.T) {
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
-				zone, resp, err := client.Zones.Get(zoneName)
+				zone, resp, err := client.Zones.Get(zoneName, true)
 				require.Nil(t, zone)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")
@@ -167,12 +167,30 @@ func TestZone(t *testing.T) {
 
 			t.Run("Other", func(t *testing.T) {
 				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
-				zones, resp, err := c.Zones.Get(zoneName)
+				zones, resp, err := c.Zones.Get(zoneName, true)
 				require.Nil(t, resp)
 				require.Error(t, err)
 				require.Nil(t, zones)
 			})
 		})
+
+		t.Run("No Records", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			client.FollowPagination = true
+			zone := &dns.Zone{
+				Zone:    "a.get.zone",
+				Records: []*dns.ZoneRecord{},
+			}
+			require.Nil(t, mock.AddZoneGetTestCase(zoneName, nil, nil, zone, false))
+
+			respZone, _, err := client.Zones.Get(zoneName, false)
+			require.Nil(t, err)
+			require.NotNil(t, respZone)
+			require.Equal(t, 0, len(respZone.Records))
+
+		})
+
 	})
 
 	t.Run("Create", func(t *testing.T) {
