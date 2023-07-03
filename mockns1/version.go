@@ -27,7 +27,7 @@ func (s *Service) AddCreateVersionTestCase(
 	response *dns.Version,
 ) error {
 	return s.AddTestCase(
-		http.MethodPut, fmt.Sprintf("/zones/%s/versions", zoneName), http.StatusOK, requestHeaders,
+		http.MethodPut, fmt.Sprintf("/zones/%s/versions?force=false", zoneName), http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
 	)
 }

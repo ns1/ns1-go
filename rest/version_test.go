@@ -86,7 +86,7 @@ func TestVersion(t *testing.T) {
 			require.Nil(t, mock.AddCreateVersionTestCase("versioned.zone", nil, nil, &version))
 
 			boolFlag := false
-			respVersion, _, err := client.Versions.Create("versioned.zone", &boolFlag)
+			respVersion, _, err := client.Versions.Create("versioned.zone", boolFlag)
 			require.Nil(t, err)
 			require.NotNil(t, respVersion)
 
@@ -103,12 +103,12 @@ func TestVersion(t *testing.T) {
 				defer mock.ClearTestCases()
 
 				require.Nil(t, mock.AddTestCase(
-					http.MethodPut, "/zones/versioned.zone/versions", http.StatusInternalServerError,
+					http.MethodPut, "/zones/versioned.zone/versions?force=false", http.StatusInternalServerError,
 					nil, nil, "", `{"message": "test error"}`,
 				))
 
 				boolFlag := false
-				version, resp, err := client.Versions.Create("versioned.zone", &boolFlag)
+				version, resp, err := client.Versions.Create("versioned.zone", boolFlag)
 				require.Nil(t, version)
 				require.NotNil(t, err)
 				require.Contains(t, err.Error(), "test error")

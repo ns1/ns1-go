@@ -33,8 +33,8 @@ func (s *VersionsService) List(zone string) ([]*dns.Version, *http.Response, err
 // Create creates a new version for a zone
 //
 // NS1 API docs: https://ns1.com/api/#zones-get
-func (s *VersionsService) Create(zone string, force *bool) (*dns.Version, *http.Response, error) {
-	path := fmt.Sprintf("zones/%s/versions", zone)
+func (s *VersionsService) Create(zone string, force bool) (*dns.Version, *http.Response, error) {
+	path := fmt.Sprintf("zones/%s/versions?force=%t", zone, force)
 	req, err := s.client.NewRequest("PUT", path, nil)
 	if err != nil {
 		return nil, nil, err
