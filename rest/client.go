@@ -77,6 +77,7 @@ type Client struct {
 	Users         *UsersService
 	Warnings      *WarningsService
 	Zones         *ZonesService
+	Versions      *VersionsService
 	DNSSEC        *DNSSECService
 	IPAM          *IPAMService
 	ScopeGroup    *ScopeGroupService
@@ -121,6 +122,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Users = (*UsersService)(&c.common)
 	c.Warnings = (*WarningsService)(&c.common)
 	c.Zones = (*ZonesService)(&c.common)
+	c.Versions = (*VersionsService)(&c.common)
 	c.DNSSEC = (*DNSSECService)(&c.common)
 	c.IPAM = (*IPAMService)(&c.common)
 	c.ScopeGroup = (*ScopeGroupService)(&c.common)
