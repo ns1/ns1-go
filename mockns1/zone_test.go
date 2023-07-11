@@ -46,9 +46,9 @@ func TestZone(t *testing.T) {
 			},
 		}
 
-		require.Nil(t, mock.AddZoneGetTestCase(zone.Zone, nil, nil, zone))
+		require.Nil(t, mock.AddZoneGetTestCase(zone.Zone, nil, nil, zone, true))
 
-		resp, _, err := client.Zones.Get(zone.Zone)
+		resp, _, err := client.Zones.Get(zone.Zone, true)
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		require.Equal(t, zone.Zone, resp.Zone)
