@@ -1,3 +1,8 @@
+## 2.7.8 (July 27th, 2023)
+BUG FIXES:
+
+* Removes `id` field from monitoring job creation URL
+
 ## 2.7.6 (April 28, 2023)
 BUG FIXES:
 
