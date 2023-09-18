@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	clientVersion = "2.7.8"
+	clientVersion = "2.7.9"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -61,32 +61,33 @@ type Client struct {
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
 	// Services used for communicating with different components of the NS1 API.
-	APIKeys       *APIKeysService
-	DataFeeds     *DataFeedsService
-	DataSources   *DataSourcesService
-	Jobs          *JobsService
-	PulsarJobs    *PulsarJobsService
-	Notifications *NotificationsService
-	Records       *RecordsService
-	Applications  *ApplicationsService
-	RecordSearch  *RecordSearchService
-	ZoneSearch    *ZoneSearchService
-	Settings      *SettingsService
-	Stats         *StatsService
-	Teams         *TeamsService
-	Users         *UsersService
-	Warnings      *WarningsService
-	Zones         *ZonesService
-	Versions      *VersionsService
-	DNSSEC        *DNSSECService
-	IPAM          *IPAMService
-	ScopeGroup    *ScopeGroupService
-	Scope         *ScopeService
-	Reservation   *ReservationService
-	OptionDef     *OptionDefService
-	TSIG          *TsigService
-	View          *DNSViewService
-	Network       *NetworkService
+	APIKeys           *APIKeysService
+	DataFeeds         *DataFeedsService
+	DataSources       *DataSourcesService
+	Jobs              *JobsService
+	PulsarJobs        *PulsarJobsService
+	Notifications     *NotificationsService
+	Records           *RecordsService
+	Applications      *ApplicationsService
+	RecordSearch      *RecordSearchService
+	ZoneSearch        *ZoneSearchService
+	Settings          *SettingsService
+	Stats             *StatsService
+	Teams             *TeamsService
+	Users             *UsersService
+	Warnings          *WarningsService
+	Zones             *ZonesService
+	Versions          *VersionsService
+	DNSSEC            *DNSSECService
+	IPAM              *IPAMService
+	ScopeGroup        *ScopeGroupService
+	Scope             *ScopeService
+	Reservation       *ReservationService
+	OptionDef         *OptionDefService
+	TSIG              *TsigService
+	View              *DNSViewService
+	Network           *NetworkService
+	GlobalIPWhitelist *GlobalIPWhitelistService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -132,6 +133,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.TSIG = (*TsigService)(&c.common)
 	c.View = (*DNSViewService)(&c.common)
 	c.Network = (*NetworkService)(&c.common)
+	c.GlobalIPWhitelist = (*GlobalIPWhitelistService)(&c.common)
 
 	for _, option := range options {
 		option(c)

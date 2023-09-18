@@ -1,3 +1,9 @@
+## 2.7.9 (September 18th, 2023)
+
+FEATURES:
+
+* Adds support for global IP allow lists
+
 ## 2.7.8 (July 27th, 2023)
 BUG FIXES:
 
