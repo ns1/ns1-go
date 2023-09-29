@@ -13,14 +13,15 @@ import (
 type Record struct {
 	Meta *data.Meta `json:"meta,omitempty"`
 
-	ID              string `json:"id,omitempty"`
-	Zone            string `json:"zone"`
-	Domain          string `json:"domain"`
-	Type            string `json:"type"`
-	Link            string `json:"link,omitempty"`
-	TTL             int    `json:"ttl,omitempty"`
-	OverrideTTL     *bool  `json:"override_ttl,omitempty"`
-	UseClientSubnet *bool  `json:"use_client_subnet,omitempty"`
+	ID                     string `json:"id,omitempty"`
+	Zone                   string `json:"zone"`
+	Domain                 string `json:"domain"`
+	Type                   string `json:"type"`
+	Link                   string `json:"link,omitempty"`
+	TTL                    int    `json:"ttl,omitempty"`
+	OverrideTTL            *bool  `json:"override_ttl,omitempty"`
+	OverrideAddressRecords *bool  `json:"override_address_records,omitempty"`
+	UseClientSubnet        *bool  `json:"use_client_subnet,omitempty"`
 
 	// Answers must all be of the same type as the record.
 	Answers []*Answer `json:"answers"`

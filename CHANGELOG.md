@@ -1,3 +1,9 @@
+## 2.7.10 (September 29th, 2023)
+
+FEATURES:
+
+* Adds support for Override Address Records
+
 ## 2.7.9 (September 18th, 2023)
 
 FEATURES:
