@@ -1,3 +1,9 @@
+## 2.7.11 (October 5th, 2023)
+
+BUG FIXES:
+
+* Remove `omitempty` from filters to allow removal of filters
+
 ## 2.7.10 (September 29th, 2023)
 
 FEATURES:
