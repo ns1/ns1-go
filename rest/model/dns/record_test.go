@@ -16,13 +16,13 @@ var marshalRecordCases = []struct {
 }{
 	{
 		"marshalCAARecord",
-		NewRecord("example.com", "caa.example.com", "CAA"),
+		NewRecord("example.com", "caa.example.com", "CAA", nil, nil),
 		[]*Answer{NewCAAAnswer(0, "issue", "letsencrypt.org")},
 		[]byte(`{"meta":{},"zone":"example.com","domain":"caa.example.com","type":"CAA","answers":[{"meta":{},"answer":["0","issue","letsencrypt.org"]}],"filters":[]}`),
 	},
 	{
 		"marshalURLFWDRecord",
-		NewRecord("example.com", "fwd.example.com", "URLFWD"),
+		NewRecord("example.com", "fwd.example.com", "URLFWD", nil, nil),
 		[]*Answer{
 			NewURLFWDAnswer("/net", "https://example.net", 301, 1, 1),
 			NewURLFWDAnswer("/org", "https://example.org", 302, 2, 0),
@@ -58,19 +58,19 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 	}{
 		{
 			"marshalOverrideTTLNil",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			nil,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
 		},
 		{
 			"marshalOverrideTTLTrue",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&trueb,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"answers":[],"filters":[]}`),
 		},
 		{
 			"marshalOverrideTTLFalse",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&falseb,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"answers":[],"filters":[]}`),
 		},
@@ -101,21 +101,21 @@ func TestMarshalRecordsOverrideAddressRecords(t *testing.T) {
 	}{
 		{
 			"marshalOverrideAddressRecordsNil",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			nil,
 			nil,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
 		},
 		{
 			"marshalOverrideAddressRecordsTrue",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&trueb,
 			&trueb,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"override_address_records":true,"answers":[],"filters":[]}`),
 		},
 		{
 			"marshalOverrideAddressRecordsFalse",
-			NewRecord("example.com", "example.com", "ALIAS"),
+			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&falseb,
 			&falseb,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"override_address_records":false,"answers":[],"filters":[]}`),
@@ -182,7 +182,7 @@ func TestNewRecord(t *testing.T) {
 	}
 	for _, tt := range CapitalLettersCases {
 		t.Run(tt.name, func(t *testing.T) {
-			record := NewRecord(tt.zone, tt.domain, "A")
+			record := NewRecord(tt.zone, tt.domain, "A", nil, nil)
 			assert.Equal(t, tt.ExpectedDomain, record.Domain)
 			assert.Equal(t, tt.ExpectedZone, record.Zone)
 		})
