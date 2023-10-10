@@ -34,7 +34,7 @@ type Record struct {
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 
 	// List of tag key names that should not inherit from the parent zone
-	BlockedTags []string `json:"blocked_tags,omitempty"` //Only relevant for DDI
+	BlockedTags []string `json:"blocked_tags"` //Only relevant for DDI
 
 	// Read-only fields
 	LocalTags []string `json:"local_tags,omitempty"` // Only relevant for DDI
