@@ -1,3 +1,10 @@
+## 2.7.12 (October 11th, 2023)
+
+BUG FIXES:
+
+* Remove `omitempty` from `blocked_tags` to allow `tag` POST
+* Fix `tag` creation and update
+
 ## 2.7.11 (October 5th, 2023)
 
 BUG FIXES:
