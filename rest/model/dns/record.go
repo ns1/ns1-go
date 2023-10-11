@@ -34,7 +34,7 @@ type Record struct {
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 
 	// List of tag key names that should not inherit from the parent zone
-	BlockedTags []string `json:"blocked_tags,omitempty"` //Only relevant for DDI
+	BlockedTags []string `json:"blocked_tags"` //Only relevant for DDI
 
 	// Read-only fields
 	LocalTags []string `json:"local_tags,omitempty"` // Only relevant for DDI
@@ -47,18 +47,20 @@ func (r *Record) String() string {
 
 // NewRecord takes a zone, domain and record type t and creates a *Record with
 // UseClientSubnet: true & empty Answers.
-func NewRecord(zone string, domain string, t string) *Record {
+func NewRecord(zone string, domain string, t string, tags map[string]string, blockedTags []string) *Record {
 	if !strings.HasSuffix(strings.ToLower(domain), strings.ToLower(zone)) {
 		domain = fmt.Sprintf("%s.%s", domain, zone)
 	}
 	return &Record{
-		Meta:    &data.Meta{},
-		Zone:    zone,
-		Domain:  domain,
-		Type:    t,
-		Answers: []*Answer{},
-		Filters: []*filter.Filter{},
-		Regions: data.Regions{},
+		Meta:        &data.Meta{},
+		Zone:        zone,
+		Domain:      domain,
+		Type:        t,
+		Answers:     []*Answer{},
+		Filters:     []*filter.Filter{},
+		Regions:     data.Regions{},
+		Tags:        tags,
+		BlockedTags: blockedTags,
 	}
 }
 
