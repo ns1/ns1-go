@@ -1,3 +1,9 @@
+## 2.7.13 (October 12th, 2023)
+
+BUG FIXES:
+
+* Remove `omitempty` from `tags` to allow POST without `tags` after update 2.7.12
+
 ## 2.7.12 (October 11th, 2023)
 
 BUG FIXES:
