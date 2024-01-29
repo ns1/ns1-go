@@ -18,7 +18,7 @@ var marshalRecordCases = []struct {
 		"marshalCAARecord",
 		NewRecord("example.com", "caa.example.com", "CAA", nil, nil),
 		[]*Answer{NewCAAAnswer(0, "issue", "letsencrypt.org")},
-		[]byte(`{"meta":{},"zone":"example.com","domain":"caa.example.com","type":"CAA","answers":[{"meta":{},"answer":["0","issue","letsencrypt.org"]}],"filters":[]}`),
+		[]byte(`{"meta":{},"zone":"example.com","domain":"caa.example.com","type":"CAA","answers":[{"meta":{},"answer":["0","issue","letsencrypt.org"]}],"filters":[],"tags":null,"blocked_tags":null}`),
 	},
 	{
 		"marshalURLFWDRecord",
@@ -27,7 +27,7 @@ var marshalRecordCases = []struct {
 			NewURLFWDAnswer("/net", "https://example.net", 301, 1, 1),
 			NewURLFWDAnswer("/org", "https://example.org", 302, 2, 0),
 		},
-		[]byte(`{"answers":[{"answer":["/net","https://example.net",301,1,1],"meta":{}},{"answer":["/org","https://example.org",302,2,0],"meta":{}}],"meta":{},"zone":"example.com","domain":"fwd.example.com","type":"URLFWD","filters":[]}`),
+		[]byte(`{"answers":[{"answer":["/net","https://example.net",301,1,1],"meta":{}},{"answer":["/org","https://example.org",302,2,0],"meta":{}}],"meta":{},"zone":"example.com","domain":"fwd.example.com","type":"URLFWD","filters":[],"tags":null,"blocked_tags":null}`),
 	},
 }
 
@@ -41,7 +41,7 @@ func TestMarshalRecords(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if bytes.Compare(result, tt.out) != 0 {
+			if !bytes.Equal(result, tt.out) {
 				t.Errorf("got %q, want %q", result, tt.out)
 			}
 		})
@@ -60,19 +60,19 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 			"marshalOverrideTTLNil",
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			nil,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 		{
 			"marshalOverrideTTLTrue",
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&trueb,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 		{
 			"marshalOverrideTTLFalse",
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&falseb,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 	}
 	for _, tt := range marshalALIASRecordCases {
@@ -82,7 +82,7 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if bytes.Compare(result, tt.out) != 0 {
+			if !bytes.Equal(result, tt.out) {
 				t.Errorf("got %q, want %q", result, tt.out)
 			}
 		})
@@ -104,21 +104,21 @@ func TestMarshalRecordsOverrideAddressRecords(t *testing.T) {
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			nil,
 			nil,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 		{
 			"marshalOverrideAddressRecordsTrue",
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&trueb,
 			&trueb,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"override_address_records":true,"answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":true,"override_address_records":true,"answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 		{
 			"marshalOverrideAddressRecordsFalse",
 			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
 			&falseb,
 			&falseb,
-			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"override_address_records":false,"answers":[],"filters":[]}`),
+			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","override_ttl":false,"override_address_records":false,"answers":[],"filters":[],"tags":null,"blocked_tags":null}`),
 		},
 	}
 	for _, tt := range marshalALIASRecordCases {
@@ -129,7 +129,7 @@ func TestMarshalRecordsOverrideAddressRecords(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if bytes.Compare(result, tt.out) != 0 {
+			if !bytes.Equal(result, tt.out) {
 				t.Errorf("got %q, want %q", result, tt.out)
 			}
 		})
