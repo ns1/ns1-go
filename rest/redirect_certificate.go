@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/redirect"
 )
@@ -51,7 +52,7 @@ func (s *RedirectCertificateService) Get(certId string) (*redirect.Certificate, 
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "certificate not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return nil, resp, ErrRedirectCertificateNotFound
 			}
 		}
@@ -104,7 +105,7 @@ func (s *RedirectCertificateService) Update(certId string) (*http.Response, erro
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "certificate not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return resp, ErrRedirectCertificateNotFound
 			}
 		}
@@ -129,7 +130,7 @@ func (s *RedirectCertificateService) Delete(certId string) (*http.Response, erro
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "certificate not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return resp, ErrRedirectCertificateNotFound
 			}
 		}

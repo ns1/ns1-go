@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/redirect"
 )
@@ -51,7 +52,7 @@ func (s *RedirectService) Get(cfgId string) (*redirect.Configuration, *http.Resp
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "configuration not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return nil, resp, ErrRedirectNotFound
 			}
 		}
@@ -109,7 +110,7 @@ func (s *RedirectService) Update(cfg *redirect.Configuration) (*redirect.Configu
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "configuration not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return nil, resp, ErrRedirectNotFound
 			}
 		}
@@ -134,7 +135,7 @@ func (s *RedirectService) Delete(cfgId string) (*http.Response, error) {
 	if err != nil {
 		switch err := err.(type) {
 		case *Error:
-			if err.Message == "configuration not found" {
+			if strings.HasSuffix(err.Message, " not found") {
 				return resp, ErrRedirectNotFound
 			}
 		}
