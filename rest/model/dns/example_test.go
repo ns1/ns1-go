@@ -54,7 +54,7 @@ func ExampleZone_MakePrimary() {
 
 func ExampleRecord() {
 	// Construct the A record
-	record := dns.NewRecord("test.com", "a", "A")
+	record := dns.NewRecord("test.com", "a", "A", nil, nil)
 	record.TTL = 300
 
 	// Construct primary answer(higher priority)
@@ -125,11 +125,11 @@ func ExampleRecord() {
 
 func ExampleRecord_LinkTo() {
 	// Construct the src record
-	srcRecord := dns.NewRecord("test.com", "a", "A")
+	srcRecord := dns.NewRecord("test.com", "a", "A", nil, nil)
 	srcRecord.TTL = 300
 	srcRecord.Meta.Priority = 2
 
-	linkedRecord := dns.NewRecord("test.com", "l", "A")
+	linkedRecord := dns.NewRecord("test.com", "l", "A", nil, nil)
 	linkedRecord.LinkTo(srcRecord.Domain)
 	fmt.Println(linkedRecord)
 	fmt.Println(linkedRecord.Meta)
