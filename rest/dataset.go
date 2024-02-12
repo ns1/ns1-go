@@ -20,7 +20,7 @@ type DatasetsService service
 
 // List returns the configured datasets.
 //
-// NS1 API docs: TBD
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listDataset
 func (s *DatasetsService) List() ([]*dataset.Dataset, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "datasets", nil)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s *DatasetsService) List() ([]*dataset.Dataset, *http.Response, error) {
 
 // Get takes a dataset id and returns all its data.
 //
-// NS1 API docs: TBD
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDataset
 func (s *DatasetsService) Get(dtID string) (*dataset.Dataset, *http.Response, error) {
 	path := fmt.Sprintf("datasets/%s", dtID)
 
@@ -62,7 +62,7 @@ func (s *DatasetsService) Get(dtID string) (*dataset.Dataset, *http.Response, er
 
 // Create takes a *Dataset and creates a new dataset.
 //
-// NS1 API docs: TBD
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createDataset
 func (s *DatasetsService) Create(dt *dataset.Dataset) (*dataset.Dataset, *http.Response, error) {
 	req, err := s.client.NewRequest("PUT", "datasets", dt)
 	if err != nil {
@@ -75,7 +75,7 @@ func (s *DatasetsService) Create(dt *dataset.Dataset) (*dataset.Dataset, *http.R
 
 // Delete takes a dataset id and deletes it.
 //
-// NS1 API docs: TBD
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#deleteDataset
 func (s *DatasetsService) Delete(dtID string) (*http.Response, error) {
 	path := fmt.Sprintf("datasets/%s", dtID)
 
@@ -102,7 +102,7 @@ func (s *DatasetsService) Delete(dtID string) (*http.Response, error) {
 // GetReport takes a dataset id and a report id and returns bytes.Buffer which contains the file contents
 // Additionally, file name can be grabbed from the 'Content-Disposition' header in the http.Response
 //
-// NS1 API docs: TBD
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDatasetReport
 func (s *DatasetsService) GetReport(dtID string, reportID string) (*bytes.Buffer, *http.Response, error) {
 	path := fmt.Sprintf("datasets/%s/reports/%s", dtID, reportID)
 
