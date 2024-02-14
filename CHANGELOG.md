@@ -1,3 +1,9 @@
+## 2.7.14 (February 14th, 2024)
+
+FEATURES:
+
+* Adds support for Datasets
+
 ## 2.7.13 (October 12th, 2023)
 
 BUG FIXES:
