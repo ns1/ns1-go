@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -88,6 +89,7 @@ type Client struct {
 	View              *DNSViewService
 	Network           *NetworkService
 	GlobalIPWhitelist *GlobalIPWhitelistService
+	Datasets          *DatasetsService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -134,6 +136,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.View = (*DNSViewService)(&c.common)
 	c.Network = (*NetworkService)(&c.common)
 	c.GlobalIPWhitelist = (*GlobalIPWhitelistService)(&c.common)
+	c.Datasets = (*DatasetsService)(&c.common)
 
 	for _, option := range options {
 		option(c)
@@ -199,6 +202,14 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	if v != nil {
+		// For non-JSON responses, the desired destination might be a bytes buffer
+		if buf, ok := v.(*bytes.Buffer); ok {
+			if _, err := io.Copy(buf, resp.Body); err != nil {
+				return nil, err
+			}
+			return resp, err
+		}
+
 		// Try to unmarshal body into given type using streaming decoder.
 		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 			return nil, err
