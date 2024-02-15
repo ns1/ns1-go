@@ -1,4 +1,4 @@
-## 2.7.14 (February 14th, 2024)
+## 2.8.0 (February 14th, 2024)
 
 FEATURES:
 
