@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	clientVersion = "2.7.13"
+	clientVersion = "2.8.0"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -88,6 +88,7 @@ type Client struct {
 	View                 *DNSViewService
 	Network              *NetworkService
 	GlobalIPWhitelist    *GlobalIPWhitelistService
+	Datasets             *DatasetsService
 	Redirects            *RedirectService
 	RedirectCertificates *RedirectCertificateService
 }
@@ -136,6 +137,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.View = (*DNSViewService)(&c.common)
 	c.Network = (*NetworkService)(&c.common)
 	c.GlobalIPWhitelist = (*GlobalIPWhitelistService)(&c.common)
+	c.Datasets = (*DatasetsService)(&c.common)
 	c.Redirects = (*RedirectService)(&c.common)
 	c.RedirectCertificates = (*RedirectCertificateService)(&c.common)
 
@@ -203,6 +205,14 @@ func (c Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	if v != nil {
+		// For non-JSON responses, the desired destination might be a bytes buffer
+		if buf, ok := v.(*bytes.Buffer); ok {
+			if _, err := io.Copy(buf, resp.Body); err != nil {
+				return nil, err
+			}
+			return resp, err
+		}
+
 		// Try to unmarshal body into given type using streaming decoder.
 		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 			return nil, err
@@ -291,7 +301,7 @@ func CheckResponse(resp *http.Response) error {
 
 	restErr := &Error{Resp: resp}
 
-	msgBody, err := ioutil.ReadAll(resp.Body)
+	msgBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
