@@ -1,4 +1,4 @@
-## 2.9.0 (February 14th, 2024)
+## 2.9.0 (March 7th, 2024)
 
 FEATURES:
 
