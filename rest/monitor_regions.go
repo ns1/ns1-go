@@ -6,7 +6,7 @@ import (
 	"gopkg.in/ns1/ns1-go.v2/rest/model/monitor"
 )
 
-// MonitoringRegionsService handles 'monitoring/regions' endpoint.
+// MonitorRegionsService handles 'monitoring/regions' endpoint.
 type MonitorRegionsService service
 
 // List returns all available monitoring regions.
