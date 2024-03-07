@@ -1,3 +1,9 @@
+## 2.9.0 (March 7th, 2024)
+
+FEATURES:
+
+* Adds support for listing available monitoring regions
+
 ## 2.8.0 (February 14th, 2024)
 
 FEATURES:

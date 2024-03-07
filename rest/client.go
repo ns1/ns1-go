@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	clientVersion = "2.8.0"
+	clientVersion = "2.9.0"
 
 	defaultEndpoint               = "https://api.nsone.net/v1/"
 	defaultShouldFollowPagination = true
@@ -66,6 +66,7 @@ type Client struct {
 	DataFeeds         *DataFeedsService
 	DataSources       *DataSourcesService
 	Jobs              *JobsService
+	MonitorRegions    *MonitorRegionsService
 	PulsarJobs        *PulsarJobsService
 	Notifications     *NotificationsService
 	Records           *RecordsService
@@ -113,6 +114,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.DataFeeds = (*DataFeedsService)(&c.common)
 	c.DataSources = (*DataSourcesService)(&c.common)
 	c.Jobs = (*JobsService)(&c.common)
+	c.MonitorRegions = (*MonitorRegionsService)(&c.common)
 	c.PulsarJobs = (*PulsarJobsService)(&c.common)
 	c.Notifications = (*NotificationsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
