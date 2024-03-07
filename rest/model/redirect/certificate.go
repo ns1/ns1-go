@@ -5,8 +5,11 @@ type Certificate struct {
 	ID          *string `json:"id,omitempty"`
 	Domain      string  `json:"domain,omitempty"`
 	Certificate *string `json:"certificate,omitempty"`
+	ValidFrom   *int64  `json:"valid_from,omitempty"`
+	ValidUntil  *int64  `json:"valid_until,omitempty"`
 	Processing  *bool   `json:"processing,omitempty"`
 	Errors      *string `json:"errors,omitempty"`
+	LastUpdated *int64  `json:"last_updated,omitempty"`
 }
 
 // CertificateList represents an NS1 redirect certificate list object

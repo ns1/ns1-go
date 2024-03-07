@@ -10,9 +10,10 @@ type Configuration struct {
 	Tags            []string        `json:"tags"`
 	ForwardingMode  *ForwardingMode `json:"forwarding_mode,omitempty"`
 	ForwardingType  *ForwardingType `json:"forwarding_type,omitempty"`
-	SslEnabled      *bool           `json:"ssl_enabled,omitempty"`
-	ForceRedirect   *bool           `json:"force_redirect,omitempty"`
+	HttpsEnabled    *bool           `json:"https_enabled,omitempty"`
+	HttpsForced     *bool           `json:"https_forced,omitempty"`
 	QueryForwarding *bool           `json:"query_forwarding,omitempty"`
+	LastUpdated     *int64          `json:"last_updated,omitempty"`
 }
 
 // ConfigurationList represents an NS1 redirect configuration list object
@@ -25,7 +26,17 @@ type ConfigurationList struct {
 }
 
 // NewConfiguration creates a new configuration with the given parameters
-func NewConfiguration(domain string, path string, target string, tags []string, fwMode *ForwardingMode, fwType *ForwardingType, ssl *bool, force *bool, queryFwd *bool) *Configuration {
+func NewConfiguration(
+	domain string,
+	path string,
+	target string,
+	tags []string,
+	fwMode *ForwardingMode,
+	fwType *ForwardingType,
+	httpsEnabled *bool,
+	httpsForced *bool,
+	queryFwd *bool,
+) *Configuration {
 	cfg := Configuration{
 		Domain:          domain,
 		Path:            path,
@@ -33,8 +44,8 @@ func NewConfiguration(domain string, path string, target string, tags []string, 
 		Tags:            tags,
 		ForwardingMode:  fwMode,
 		ForwardingType:  fwType,
-		SslEnabled:      ssl,
-		ForceRedirect:   force,
+		HttpsEnabled:    httpsEnabled,
+		HttpsForced:     httpsForced,
 		QueryForwarding: queryFwd,
 	}
 	return &cfg

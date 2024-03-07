@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +19,7 @@ func TestNewConfiguration(t *testing.T) {
 		ForwardingMode: &fwMode,
 		ForwardingType: &fwType,
 	}
-	got := NewConfiguration(cfg.Domain, cfg.Path, cfg.Target, cfg.Tags, cfg.ForwardingMode, cfg.ForwardingType, cfg.SslEnabled, cfg.ForceRedirect, cfg.QueryForwarding)
+	got := NewConfiguration(cfg.Domain, cfg.Path, cfg.Target, cfg.Tags, cfg.ForwardingMode, cfg.ForwardingType, cfg.HttpsEnabled, cfg.HttpsForced, cfg.QueryForwarding)
 	assert.Equal(t, &cfg, got, "Configuration mismatch")
 }
 
@@ -40,10 +41,11 @@ func TestUnmarshalConfiguration(t *testing.T) {
 	target := "https://www.google.com"
 	fwMode := Capture
 	fwType := Temporary
-	ssl := true
+	https := true
 	force := true
 	queryFwd := true
 	tag := "aaa"
+	updated := time.Now().Unix()
 	d := []byte(`{
 		"id": "` + id + `",
 		"certificate_id": "` + certId + `",
@@ -52,12 +54,13 @@ func TestUnmarshalConfiguration(t *testing.T) {
 		"target": "` + target + `",
 		"forwarding_mode": "` + fwMode.String() + `",
 		"forwarding_type": "` + fwType.String() + `",
-		"ssl_enabled": ` + strconv.FormatBool(ssl) + `,
-		"force_redirect": ` + strconv.FormatBool(force) + `,
+		"https_enabled": ` + strconv.FormatBool(https) + `,
+		"https_forced": ` + strconv.FormatBool(force) + `,
 		"query_forwarding": ` + strconv.FormatBool(queryFwd) + `,
 		"tags": [
 			"` + tag + `"
-		]
+		],
+		"last_updated": ` + strconv.FormatInt(updated, 10) + `
 	}`)
 	cfg := Configuration{}
 	err := json.Unmarshal(d, &cfg)
@@ -73,20 +76,22 @@ func TestUnmarshalConfiguration(t *testing.T) {
 	assert.Equal(t, fwMode, *cfg.ForwardingMode, "forwarding_mode mismatch")
 	assert.NotNil(t, cfg.ForwardingType, "nil forwarding_type")
 	assert.Equal(t, fwType, *cfg.ForwardingType, "forwarding_type mismatch")
-	assert.NotNil(t, cfg.SslEnabled, "nil ssl_enabled")
-	assert.Equal(t, ssl, *cfg.SslEnabled, "ssl_enabled mismatch")
-	assert.NotNil(t, cfg.ForceRedirect, "nil force_redirect")
-	assert.Equal(t, force, *cfg.ForceRedirect, "force_redirect mismatch")
+	assert.NotNil(t, cfg.HttpsEnabled, "nil https_enabled")
+	assert.Equal(t, https, *cfg.HttpsEnabled, "https_enabled mismatch")
+	assert.NotNil(t, cfg.HttpsForced, "nil https_forced")
+	assert.Equal(t, force, *cfg.HttpsForced, "https_forced mismatch")
 	assert.NotNil(t, cfg.QueryForwarding, "nil query_forwarding")
 	assert.Equal(t, queryFwd, *cfg.QueryForwarding, "query_forwarding mismatch")
 	assert.Len(t, cfg.Tags, 1, "tag size mismatch")
 	assert.Equal(t, tag, cfg.Tags[0], "tags mismatch")
+	assert.NotNil(t, cfg.LastUpdated, "nil last_updated")
+	assert.Equal(t, updated, *cfg.LastUpdated, "last_updated mismatch")
 }
 
 func TestMarshalConfiguration(t *testing.T) {
 	fwMode := None
 	fwType := Masking
-	ssl := true
+	https := true
 	force := true
 	queryFwd := true
 	cfg := NewConfiguration(
@@ -96,7 +101,7 @@ func TestMarshalConfiguration(t *testing.T) {
 		[]string{"a", "b"},
 		&fwMode,
 		&fwType,
-		&ssl,
+		&https,
 		&force,
 		&queryFwd,
 	)
@@ -108,8 +113,8 @@ func TestMarshalConfiguration(t *testing.T) {
 		"target": "`+cfg.Target+`",
 		"forwarding_mode": "`+cfg.ForwardingMode.String()+`",
 		"forwarding_type": "`+cfg.ForwardingType.String()+`",
-		"ssl_enabled": `+strconv.FormatBool(ssl)+`,
-		"force_redirect": `+strconv.FormatBool(force)+`,
+		"https_enabled": `+strconv.FormatBool(https)+`,
+		"https_forced": `+strconv.FormatBool(force)+`,
 		"query_forwarding": `+strconv.FormatBool(queryFwd)+`,
 		"tags": [
 			"`+cfg.Tags[0]+`", "`+cfg.Tags[1]+`"
