@@ -41,7 +41,7 @@ func TestMarshalRecords(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if bytes.Compare(result, tt.out) != 0 {
+			if !bytes.Equal(result, tt.out) {
 				t.Errorf("got %q, want %q", result, tt.out)
 			}
 		})
@@ -82,7 +82,7 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if bytes.Compare(result, tt.out) != 0 {
+			if !bytes.Equal(result, tt.out) {
 				t.Errorf("got %q, want %q", result, tt.out)
 			}
 		})
