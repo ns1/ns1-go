@@ -58,7 +58,7 @@ func TestMarshalRecordsOverrideTTL(t *testing.T) {
 	}{
 		{
 			"marshalOverrideTTLNil",
-			NewRecord("example.com", "example.com", "ALIAS", nil, nil),
+			NewRecord("example.com", "example.com", "ALIAS", make(map[string]string), []string{}),
 			nil,
 			[]byte(`{"meta":{},"zone":"example.com","domain":"example.com","type":"ALIAS","answers":[],"filters":[]}`),
 		},
