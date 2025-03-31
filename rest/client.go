@@ -87,6 +87,7 @@ type Client struct {
 	Redirects            *RedirectService
 	RedirectCertificates *RedirectCertificateService
 	Alerts               *AlertsService
+	BillingUsage         *BillingUsageService
 }
 
 // NewClient constructs and returns a reference to an instantiated Client.
@@ -134,6 +135,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Redirects = (*RedirectService)(&c.common)
 	c.RedirectCertificates = (*RedirectCertificateService)(&c.common)
 	c.Alerts = (*AlertsService)(&c.common)
+	c.BillingUsage = (*BillingUsageService)(&c.common)
 
 	for _, option := range options {
 		option(c)
