@@ -1,1 +1,3 @@
 test/test
+rest/_examples/*.csv
+.vscode/launch.json
