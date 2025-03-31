@@ -1,3 +1,15 @@
+## 2.14.0 (Dec 5th, 2024)
+
+FEATURES:
+
+* Added support for billing-usage endpoints
+    GET/billing-usage/v1/queries
+    GET/billing-usage/v1/decisions
+    GET/billing-usage/v1/filter-chains
+    GET/billing-usage/v1/monitors
+    GET/billing-usage/v1/records
+    GET/billing-usage/v1/limits
+
 ## 2.13.0 (Dec 5th, 2024)
 
 FEATURES:
