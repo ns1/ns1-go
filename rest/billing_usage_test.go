@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ns1/ns1-go.v2/mockns1"
 	api "gopkg.in/ns1/ns1-go.v2/rest"
-	billing_usage "gopkg.in/ns1/ns1-go.v2/rest/model/billing-usage"
+	billingusage "gopkg.in/ns1/ns1-go.v2/rest/model/billingusage"
 )
 
 func TestBillingUsageService(t *testing.T) {
@@ -25,13 +25,11 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage Queries", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			queries := &billing_usage.Queries{
+			queries := &billingusage.Queries{
 				CleanQueries: 0,
 				DdosQueries:  0,
 				NxdResponses: 0,
-				ByNetwork:    []billing_usage.ByNetwork{},
+				ByNetwork:    []billingusage.QueriesByNetwork{},
 			}
 			require.Nil(t, mock.AddBillingUsageQueriesGetTestCase(int32(from), int32(to), nil, nil, queries))
 
@@ -71,9 +69,7 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage Limits", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			limits := &billing_usage.Limits{
+			limits := &billingusage.Limits{
 				QueriesLimit:          0,
 				ChinaQueriesLimit:     0,
 				RecordsLimit:          0,
@@ -122,9 +118,7 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage Decisions", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			decisions := &billing_usage.TotalUsage{
+			decisions := &billingusage.TotalUsage{
 				TotalUsage: 0,
 			}
 			require.Nil(t, mock.AddBillingUsageDecisionsGetTestCase(int32(from), int32(to), nil, nil, decisions))
@@ -165,9 +159,7 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage Monitors", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			records := &billing_usage.TotalUsage{
+			records := &billingusage.TotalUsage{
 				TotalUsage: 0,
 			}
 			require.Nil(t, mock.AddBillingUsageMonitorsGetTestCase(nil, nil, records))
@@ -208,9 +200,7 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage FilterChains", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			filterChains := &billing_usage.TotalUsage{
+			filterChains := &billingusage.TotalUsage{
 				TotalUsage: 0,
 			}
 			require.Nil(t, mock.AddBillingUsageFilterChainsGetTestCase(nil, nil, filterChains))
@@ -251,9 +241,7 @@ func TestBillingUsageService(t *testing.T) {
 	t.Run("Get Billing Usage Records", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			defer mock.ClearTestCases()
-
-			client.FollowPagination = true
-			records := &billing_usage.TotalUsage{
+			records := &billingusage.TotalUsage{
 				TotalUsage: 0,
 			}
 			require.Nil(t, mock.AddBillingUsageRecordsGetTestCase(nil, nil, records))

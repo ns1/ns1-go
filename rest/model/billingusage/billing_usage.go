@@ -16,19 +16,19 @@ const (
 
 var (
 	// ErrBillingUsageNotFound bundles GET not found errors.
-	ErrBillingUsageNotFound        = errors.New("billing_usage not found")
-	NotFound                string = " not found"
+	ErrBillingUsageNotFound = errors.New("billing_usage not found")
+	NotFound                = " not found"
 )
 
-// wraps an NS1 /billing-usage-queries resource
+// Queries wraps an NS1 /billing-usage-queries resource
 type Queries struct {
-	CleanQueries int32       `json:"clean_queries"`
-	DdosQueries  int32       `json:"ddos_queries"`
-	NxdResponses int32       `json:"nxd_responses"`
-	ByNetwork    []ByNetwork `json:"by_network"`
+	CleanQueries int32              `json:"clean_queries"`
+	DdosQueries  int32              `json:"ddos_queries"`
+	NxdResponses int32              `json:"nxd_responses"`
+	ByNetwork    []QueriesByNetwork `json:"by_network"`
 }
 
-// wraps an NS1 /billing-usage-limits resource
+// Limits wraps an NS1 /billing-usage-limits resource
 type Limits struct {
 	QueriesLimit                                int32 `json:"queries_limit"`
 	ChinaQueriesLimit                           int32 `json:"china_queries_limit"`
@@ -41,18 +41,18 @@ type Limits struct {
 	IncludeDedicatedDnsNetworkInManagedDnsUsage bool  `json:"include_dedicated_dns_network_in_managed_dns_usage"`
 }
 
-// wraps an NS1 /billing-usage-queries.ByNetwork resource
-type ByNetwork struct {
-	Network         int32   `json:"network"`
-	CleanQueries    int32   `json:"clean_queries"`
-	DdosQueries     int32   `json:"ddos_queries"`
-	NxdResponses    int32   `json:"nxd_responses"`
-	BillableQueries int32   `json:"billable_queries"`
-	Daily           []Daily `json:"daily"`
+// QueriesByNetwork wraps an NS1 /billing-usage-queries.ByNetwork resource
+type QueriesByNetwork struct {
+	Network         int32                   `json:"network"`
+	CleanQueries    int32                   `json:"clean_queries"`
+	DdosQueries     int32                   `json:"ddos_queries"`
+	NxdResponses    int32                   `json:"nxd_responses"`
+	BillableQueries int32                   `json:"billable_queries"`
+	Daily           []QueriesByNetworkDaily `json:"daily"`
 }
 
-// wraps an NS1 /billing-usage-queries.ByNetwork.Daily resource
-type Daily struct {
+// QueriesByNetworkDaily an NS1 /billing-usage-queries.ByNetwork.Daily resource
+type QueriesByNetworkDaily struct {
 	Timestamp    int32 `json:"timestamp"`
 	CleanQueries int32 `json:"clean_queries"`
 	DdosQueries  int32 `json:"ddos_queries"`

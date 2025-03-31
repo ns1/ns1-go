@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	billing_usage "gopkg.in/ns1/ns1-go.v2/rest/model/billing-usage"
+	billingusage "gopkg.in/ns1/ns1-go.v2/rest/model/billingusage"
 )
 
-// Should be identical to rest.billing_usage
+// Should be identical to rest.billingusage
 const billingUsagePath = "../billing-usage/v1/"
 
 // AddBillingUsageQueriesGetTestCase sets up a test case for the api.Client.BillingUsage.GetQueries(int32(from), int32(to))
@@ -16,10 +16,10 @@ func (s *Service) AddBillingUsageQueriesGetTestCase(
 	from int32,
 	to int32,
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.Queries,
+	response *billingusage.Queries,
 ) error {
 
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageQueries, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageQueries, from, to)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -33,7 +33,7 @@ func (s *Service) AddBillingUsageQueriesFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageQueries, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageQueries, from, to)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
@@ -45,10 +45,10 @@ func (s *Service) AddBillingUsageLimitsGetTestCase(
 	from int32,
 	to int32,
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.Limits,
+	response *billingusage.Limits,
 ) error {
 
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageLimits, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageLimits, from, to)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -62,7 +62,7 @@ func (s *Service) AddBillingUsageLimitsFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageLimits, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageLimits, from, to)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
@@ -74,10 +74,10 @@ func (s *Service) AddBillingUsageDecisionsGetTestCase(
 	from int32,
 	to int32,
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.TotalUsage,
+	response *billingusage.TotalUsage,
 ) error {
 
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageDecisions, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageDecisions, from, to)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -91,7 +91,7 @@ func (s *Service) AddBillingUsageDecisionsFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billing_usage.BillingUsageDecisions, from, to)
+	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsagePath, billingusage.BillingUsageDecisions, from, to)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
@@ -101,9 +101,9 @@ func (s *Service) AddBillingUsageDecisionsFailTestCase(
 // function
 func (s *Service) AddBillingUsageMonitorsGetTestCase(
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.TotalUsage,
+	response *billingusage.TotalUsage,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageMonitors)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageMonitors)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -117,7 +117,7 @@ func (s *Service) AddBillingUsageMonitorsFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageMonitors)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageMonitors)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
@@ -127,9 +127,9 @@ func (s *Service) AddBillingUsageMonitorsFailTestCase(
 // function
 func (s *Service) AddBillingUsageFilterChainsGetTestCase(
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.TotalUsage,
+	response *billingusage.TotalUsage,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageFilterChains)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageFilterChains)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -143,7 +143,7 @@ func (s *Service) AddBillingUsageFilterChainsFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageFilterChains)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageFilterChains)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
@@ -153,9 +153,9 @@ func (s *Service) AddBillingUsageFilterChainsFailTestCase(
 // function
 func (s *Service) AddBillingUsageRecordsGetTestCase(
 	requestHeaders, responseHeaders http.Header,
-	response *billing_usage.TotalUsage,
+	response *billingusage.TotalUsage,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageRecords)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageRecords)
 	return s.AddTestCase(
 		http.MethodGet, path, http.StatusOK, requestHeaders,
 		responseHeaders, "", response,
@@ -169,7 +169,7 @@ func (s *Service) AddBillingUsageRecordFailTestCase(
 	requestHeaders, responseHeaders http.Header,
 	responseBody string,
 ) error {
-	path := fmt.Sprintf("%s/%s", billingUsagePath, billing_usage.BillingUsageRecords)
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageRecords)
 	return s.AddTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
