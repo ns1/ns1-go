@@ -1,4 +1,11 @@
-## 2.14.0 (March 31st, 2025)
+
+### 2.14.1 (April 4th, 2025)
+
+BUG FIXES:
+
+* Fixing billing usage models to use `int64` instead of `int` for all usage values
+
+# 2.14.0 (March 31st, 2025)
 
 FEATURES:
 
