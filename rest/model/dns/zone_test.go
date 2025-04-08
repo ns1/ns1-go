@@ -110,6 +110,7 @@ func TestUnmarshalZones(t *testing.T) {
         "last_xfr":0,
         "primary_ip":"1.1.1.1",
         "primary_port":53,
+        "primary_network": 5,
       "other_ips":[
       "1.1.1.2",
       "1.1.1.3"
@@ -265,6 +266,7 @@ func TestUnmarshalZones(t *testing.T) {
 	assert.Equal(t, secondary.LastXfr, 0, "Wrong zone secondary last xfr")
 	assert.Equal(t, secondary.PrimaryIP, "1.1.1.1", "Wrong zone secondary primary ip")
 	assert.Equal(t, secondary.PrimaryPort, 53, "Wrong zone secondary primary port")
+	assert.Equal(t, 5, secondary.PrimaryNetwork, "Wrong zone secondary primary network")
 	assert.Equal(t, secondary.Enabled, true, "Wrong zone secondary enabled")
 	assert.ElementsMatch(t, secondary.OtherIPs, []string{"1.1.1.2", "1.1.1.3"}, "Wrong zone secondary list of other IPs")
 	assert.ElementsMatch(t, secondary.OtherPorts, []int{53, 53}, "Wrong zone secondary list of other ports")
