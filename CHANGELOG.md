@@ -1,11 +1,15 @@
+## 2.14.2 (April 8th, 2025)
+FEATURES:
 
-### 2.14.1 (April 4th, 2025)
+* Adds support for `primary_network` for secondary zones
+
+## 2.14.1 (April 4th, 2025)
 
 BUG FIXES:
 
 * Fixing billing usage models to use `int64` instead of `int` for all usage values
 
-# 2.14.0 (March 31st, 2025)
+## 2.14.0 (March 31st, 2025)
 
 FEATURES:
 
@@ -18,7 +22,7 @@ FEATURES:
     GET/billing-usage/v1/limits
 
 
-## 2.13.0 (Dec 5th, 2024)
+## 2.13.0 (December 5th, 2024)
 
 FEATURES:
 
@@ -30,14 +34,14 @@ BUG FIXES:
 
 * Allowing to wipe the record regions
 
-## 2.12.1 (Sep 23rd, 2024)
+## 2.12.1 (September 23rd, 2024)
 
 BUG FIXES:
 
 * Adds "feeds" field to the Answer struct
 * Adds "destinations" field to the Feed struct
 
-## 2.12.0 (Jul 19th, 2024)
+## 2.12.0 (July 19th, 2024)
 
 FEATURES:
 

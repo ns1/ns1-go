@@ -98,9 +98,10 @@ type ZoneSecondary struct {
 	Status  string  `json:"status,omitempty"`
 	Error   *string `json:"error"`
 
-	PrimaryIP   string `json:"primary_ip,omitempty"`
-	PrimaryPort int    `json:"primary_port,omitempty"`
-	Enabled     bool   `json:"enabled"`
+	PrimaryIP      string `json:"primary_ip,omitempty"`
+	PrimaryPort    int    `json:"primary_port,omitempty"`
+	PrimaryNetwork int    `json:"primary_network"`
+	Enabled        bool   `json:"enabled"`
 
 	OtherIPs      []string `json:"other_ips,omitempty"`
 	OtherPorts    []int    `json:"other_ports,omitempty"`
