@@ -103,9 +103,10 @@ type ZoneSecondary struct {
 	PrimaryNetwork int    `json:"primary_network"`
 	Enabled        bool   `json:"enabled"`
 
-	OtherIPs      []string `json:"other_ips,omitempty"`
-	OtherPorts    []int    `json:"other_ports,omitempty"`
-	OtherNetworks []int    `json:"other_networks,omitempty"`
+	OtherIPs        []string `json:"other_ips,omitempty"`
+	OtherPorts      []int    `json:"other_ports,omitempty"`
+	OtherNetworks   []int    `json:"other_networks,omitempty"`
+	OtherNotifyOnly []bool   `json:"other_notify_only,omitempty"`
 
 	TSIG *TSIG `json:"tsig,omitempty"`
 }
@@ -121,6 +122,8 @@ type TSIG struct {
 	Hash string `json:"hash,omitempty"`
 	// Name of the TSIG key
 	Name string `json:"name,omitempty"`
+	// Whether TSIG notifies are signed
+	SignedNotifies bool `json:"signed_notifies,omitempty"`
 }
 
 // NewZone takes a zone domain name and creates a new zone.
