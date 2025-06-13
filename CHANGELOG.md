@@ -1,4 +1,11 @@
+## 2.14.4 (June 13th, 2025)
+
+FEATURES:
+
+* Adds support for missing `manage_redirects` permission
+
 ## 2.14.2 (April 8th, 2025)
+
 FEATURES:
 
 * Adds support for `primary_network` for secondary zones

@@ -146,6 +146,9 @@ func TestUnmarshalUsers(t *testing.T) {
 						UpdateJobs:  false,
 						DeleteJobs:  false,
 					},
+					Redirects: PermissionsRedirects{
+						ManageRedirects: false,
+					},
 				},
 			},
 		},
