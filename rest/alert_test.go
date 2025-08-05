@@ -197,6 +197,47 @@ func TestAlert(t *testing.T) {
 			require.Contains(t, err.Error(), "test error")
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		})
+
+		t.Run("Success SSO Alert", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			notifierList := []string{
+				"66d07ca6e113eb00014fe257",
+				"66d07caf8519c000011cdda6",
+				"6707da567cd4f300012cd7e4",
+			}
+			alertToCreate := alerting.NewSSOAlert("sso_alert", notifierList)
+			alertResponse := alertList[0]
+
+			// Pass by value here. alertToCreate will be modified by client.Alerts.Create
+			require.Nil(t, mock.AddAlertCreateTestCase(nil, nil, *alertToCreate, *alertResponse))
+
+			_, err := client.Alerts.Create(alertToCreate)
+			require.Nil(t, err)
+			// alerttoCreate will be modified by the call to Create and fully populated.
+			compareAlerts(t, alertResponse, alertToCreate)
+		})
+
+		t.Run("Success Redirect Alert", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			notifierList := []string{
+				"66d07ca6e113eb00014fe257",
+				"66d07caf8519c000011cdda6",
+				"6707da567cd4f300012cd7e4",
+			}
+
+			alertToCreate := alerting.NewRedirectAlert("redirect_alert", notifierList)
+			alertResponse := alertList[0]
+
+			// Pass by value here. alertToCreate will be modified by client.Alerts.Create
+			require.Nil(t, mock.AddAlertCreateTestCase(nil, nil, *alertToCreate, *alertResponse))
+
+			_, err := client.Alerts.Create(alertToCreate)
+			require.Nil(t, err)
+			// alerttoCreate will be modified by the call to Create and fully populated.
+			compareAlerts(t, alertResponse, alertToCreate)
+		})
 	})
 
 	t.Run("Update", func(t *testing.T) {

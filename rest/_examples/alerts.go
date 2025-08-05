@@ -94,6 +94,26 @@ func main() {
 	}
 	alertID := *alert.ID
 
+	ssoAlert := alerting.NewSSOAlert("my sso alert", []string{emailList.ID})
+	prettyPrint("Creating SSO alert: ", ssoAlert)
+	_, err = client.Alerts.Create(ssoAlert)
+	if err != nil && err != api.ErrAlertExists {
+		log.Fatal(err)
+	}
+	if ssoAlert.ID != nil {
+		defer client.Alerts.Delete(*ssoAlert.ID)
+	}
+
+	redirectAlert := alerting.NewRedirectAlert("my redirect alert", []string{emailList.ID})
+	prettyPrint("Creating Redirect alert: ", redirectAlert)
+	_, err = client.Alerts.Create(redirectAlert)
+	if err != nil && err != api.ErrAlertExists {
+		log.Fatal(err)
+	}
+	if redirectAlert.ID != nil {
+		defer client.Alerts.Delete(*redirectAlert.ID)
+	}
+
 	// Pass the id and the field(s) to change on Update.
 	updatedName := "myalerttest.com - updated"
 	alertUpdate := &alerting.Alert{

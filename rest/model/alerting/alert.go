@@ -18,8 +18,15 @@ type Alert struct {
 }
 
 var (
-	zoneAlertType   string = "zone"
-	recordAlertType string = "record"
+	zoneAlertType     string = "zone"
+	recordAlertType   string = "record"
+	ssoAlertType      string = "account"
+	redirectAlertType string = "redirects"
+)
+
+var (
+	ssoAlertSubtype      string = "saml_certificate_expired"
+	redirectAlertSubtype string = "certificate_renewal_failed"
 )
 
 func NewZoneAlert(alertName string, subtype string, notifierListIds []string, zoneNames []string) *Alert {
@@ -40,5 +47,25 @@ func NewRecordAlert(notifierListIds []string, recordIds []string, subtype string
 		Data:            nil,
 		NotifierListIds: notifierListIds,
 		RecordIds:       recordIds,
+	}
+}
+
+func NewSSOAlert(alertName string, notifierListIds []string) *Alert {
+	return &Alert{
+		Name:            &alertName,
+		Type:            &ssoAlertType,
+		Subtype:         &ssoAlertSubtype,
+		Data:            nil,
+		NotifierListIds: notifierListIds,
+	}
+}
+
+func NewRedirectAlert(alertName string, notifierListIds []string) *Alert {
+	return &Alert{
+		Name:            &alertName,
+		Type:            &redirectAlertType,
+		Subtype:         &redirectAlertSubtype,
+		Data:            nil,
+		NotifierListIds: notifierListIds,
 	}
 }
