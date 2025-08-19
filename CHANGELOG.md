@@ -1,3 +1,9 @@
+## 2.15.0 (August 20th, 2025)
+
+FEATURES:
+
+* Adds support for new Alerts
+
 ## 2.14.4 (June 13th, 2025)
 
 FEATURES:
