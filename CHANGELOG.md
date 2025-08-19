@@ -1,3 +1,9 @@
+## 2.15.0 (August 19th, 2025)
+
+FEATURES:
+
+* Add Usage Alerts (account scope) with CRUD, list, and client-side validation
+
 ## 2.14.4 (June 13th, 2025)
 
 FEATURES:
