@@ -1,5 +1,7 @@
 package dns
 
+import "encoding/json"
+
 type SearchResult struct {
 	Next         string          `json:"next"`
 	Limit        int             `json:"limit"`
@@ -34,5 +36,5 @@ type SearchRecordV2 struct {
 }
 
 type SearchAnswer struct {
-	Answer []string `json:"answer"`
+	Answer json.RawMessage `json:"answer"`
 }
