@@ -1,3 +1,9 @@
+## 2.15.1 (August 26th, 2025)
+
+ENHANCEMENTS:
+
+* Refactored Usage Alerts to use thin helpers that leverage the existing alert functionality
+
 ## 2.15.0 (August 19th, 2025)
 
 FEATURES:

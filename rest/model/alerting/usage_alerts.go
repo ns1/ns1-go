@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+// ValidationError creates a formatted validation error
+func ValidationError(msg string) error {
+	return fmt.Errorf("validation error: %s", msg)
+}
+
 // AlertTypeAccount is the alert type for account-scoped alerts
 const AlertTypeAccount = "account"
 
@@ -26,13 +31,13 @@ var UsageSubtypes = struct {
 }
 
 // AllowedUsageSubtypes is a map of valid usage alert subtypes
-var AllowedUsageSubtypes = map[string]struct{}{
-	UsageSubtypes.QueryUsage:       {},
-	UsageSubtypes.RecordUsage:      {},
-	UsageSubtypes.ChinaQueryUsage:  {},
-	UsageSubtypes.RumDecisionUsage: {},
-	UsageSubtypes.FilterChainUsage: {},
-	UsageSubtypes.MonitorUsage:     {},
+var AllowedUsageSubtypes = map[string]bool{
+	UsageSubtypes.QueryUsage:       true,
+	UsageSubtypes.RecordUsage:      true,
+	UsageSubtypes.ChinaQueryUsage:  true,
+	UsageSubtypes.RumDecisionUsage: true,
+	UsageSubtypes.FilterChainUsage: true,
+	UsageSubtypes.MonitorUsage:     true,
 }
 
 // UsageAlertData contains the threshold percentage for usage alerts
