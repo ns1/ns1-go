@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -68,7 +69,6 @@ func processSearchAnswer(answer *dns.SearchAnswer) error {
 // ZoneSearchService handles 'dns/zone/search' endpoint.
 type ZoneSearchService service
 
-// Find takes query parameters and returns matching DNS zones.
 func (s *ZoneSearchService) Search(params string) ([]*dns.ZoneSearchResult, *http.Response, error) {
 	path := fmt.Sprintf("dns/zone/search?%s", params)
 
@@ -77,11 +77,31 @@ func (s *ZoneSearchService) Search(params string) ([]*dns.ZoneSearchResult, *htt
 		return nil, nil, err
 	}
 
-	var r []*dns.ZoneSearchResult
-	resp, err := s.client.Do(req, &r)
+	var raw json.RawMessage
+	resp, err := s.client.Do(req, &raw)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return r, resp, nil
+	trimmed := bytes.TrimSpace(raw)
+	if len(trimmed) == 0 {
+		return nil, resp, fmt.Errorf("empty response body")
+	}
+
+	switch trimmed[0] {
+	case '[':
+		var arr []*dns.ZoneSearchResult
+		if err := json.Unmarshal(raw, &arr); err != nil {
+			return nil, resp, err
+		}
+		return arr, resp, nil
+	case '{':
+		var obj dns.ZoneSearchResult
+		if err := json.Unmarshal(raw, &obj); err != nil {
+			return nil, resp, err
+		}
+		return []*dns.ZoneSearchResult{&obj}, resp, nil
+	default:
+		return nil, resp, fmt.Errorf("unexpected JSON format")
+	}
 }

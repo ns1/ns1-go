@@ -3,19 +3,10 @@ package dns
 import "encoding/json"
 
 type ZoneSearchResult struct {
-	Next         string        `json:"next"`
-	Limit        int           `json:"limit"`
-	TotalResults int           `json:"total_results"`
-	Results      []*ZoneSearch `json:"results"`
-}
-
-type ZoneSearch struct {
-	Domain     string    `json:"domain"`
-	Type       string    `json:"type"`
-	TTL        int       `json:"ttl"`
-	ZoneFQDN   string    `json:"zone_fqdn"`
-	ZoneHandle string    `json:"zone_handle"`
-	Answers    []*Answer `json:"answers"`
+	Next         string    `json:"next"`
+	Limit        int       `json:"limit"`
+	TotalResults int       `json:"total_results"`
+	Results      []*Record `json:"results"`
 }
 
 // New correct types
