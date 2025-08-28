@@ -1,8 +1,9 @@
-## 2.15.0 (August 20th, 2025)
+## 2.15.0 (August 28th, 2025)
 
 FEATURES:
 
 * Adds support for new Alerts
+* Fix types for `RecordSearch.Search` and `ZoneSearch.Search`
 
 ## 2.14.4 (June 13th, 2025)
 
