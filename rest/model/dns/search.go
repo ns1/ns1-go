@@ -2,14 +2,14 @@ package dns
 
 import "encoding/json"
 
-type SearchResult struct {
-	Next         string          `json:"next"`
-	Limit        int             `json:"limit"`
-	TotalResults int             `json:"total_results"`
-	Results      []*SearchRecord `json:"results"`
+type ZoneSearchResult struct {
+	Next         string        `json:"next"`
+	Limit        int           `json:"limit"`
+	TotalResults int           `json:"total_results"`
+	Results      []*ZoneSearch `json:"results"`
 }
 
-type SearchRecord struct {
+type ZoneSearch struct {
 	Domain     string    `json:"domain"`
 	Type       string    `json:"type"`
 	TTL        int       `json:"ttl"`
@@ -19,14 +19,14 @@ type SearchRecord struct {
 }
 
 // New correct types
-type SearchResultV2 struct {
-	Next         string            `json:"next"`
-	Limit        int               `json:"limit"`
-	TotalResults int               `json:"total_results"`
-	Results      []*SearchRecordV2 `json:"results"`
+type RecordSearchResult struct {
+	Next         string          `json:"next"`
+	Limit        int             `json:"limit"`
+	TotalResults int             `json:"total_results"`
+	Results      []*RecordSearch `json:"results"`
 }
 
-type SearchRecordV2 struct {
+type RecordSearch struct {
 	Domain     string          `json:"domain"`
 	Type       string          `json:"type"`
 	TTL        int             `json:"ttl"`
@@ -36,5 +36,7 @@ type SearchRecordV2 struct {
 }
 
 type SearchAnswer struct {
-	Answer json.RawMessage `json:"answer"`
+	// Answer json.RawMessage `json:"answer"`
+	Raw   json.RawMessage `json:"answer"`
+	Rdata []string        `json:"-"`
 }
