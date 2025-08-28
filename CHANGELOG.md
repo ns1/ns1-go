@@ -1,14 +1,9 @@
-## 2.15.1 (August 26th, 2025)
-
-ENHANCEMENTS:
-
-* Refactored Usage Alerts to use thin helpers that leverage the existing alert functionality
-
-## 2.15.0 (August 19th, 2025)
+## 2.15.0 (August 28th, 2025)
 
 FEATURES:
 
-* Add Usage Alerts (account scope) with CRUD, list, and client-side validation
+* Adds support for new Alerts
+* Fix types for `RecordSearch.Search` and `ZoneSearch.Search`
 
 ## 2.14.4 (June 13th, 2025)
 
