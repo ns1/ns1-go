@@ -35,8 +35,12 @@ type Zone struct {
 
 	// Networks contains the network ids the zone is available. Most zones
 	// will be in the NSONE Global Network(which is id 0).
-	NetworkIDs []int         `json:"networks,omitempty"`
-	Records    []*ZoneRecord `json:"records,omitempty"`
+	// Deprecated: maintained for source compatibility in Go code.
+	// Not marshaled to JSON.
+	NetworkIDs []int `json:"-"`
+	// New: distinguishes unset (nil) vs explicit empty ([]).
+	Networks *[]int        `json:"networks,omitempty"`
+	Records  []*ZoneRecord `json:"records,omitempty"`
 
 	// Primary contains info to enable slaving of the zone by third party dns servers.
 	Primary *ZonePrimary `json:"primary,omitempty"`
@@ -49,6 +53,41 @@ type Zone struct {
 
 	// Contains the key/value tag information associated to the zone
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
+}
+
+// UnmarshalJSON ensures backward compatibility by populating NetworkIDs from Networks
+func (z *Zone) UnmarshalJSON(data []byte) error {
+	type Alias Zone
+	aux := &struct {
+		*Alias
+		Networks *[]int `json:"networks"`
+	}{
+		Alias: (*Alias)(z),
+	}
+
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	// Preserve presence semantics
+	z.Networks = aux.Networks
+
+	if aux.Networks != nil {
+		// Copy to avoid sharing memory
+		z.NetworkIDs = append([]int(nil), *aux.Networks...)
+	} else {
+		z.NetworkIDs = nil
+	}
+
+	return nil
+}
+
+// EnsureNetworksFromLegacy ensures the Networks field is populated from NetworkIDs
+func (z *Zone) EnsureNetworksFromLegacy() {
+	if z.Networks == nil && len(z.NetworkIDs) > 0 {
+		v := append([]int(nil), z.NetworkIDs...)
+		z.Networks = &v
+	}
 }
 
 func (z Zone) String() string {
@@ -176,6 +215,7 @@ func (z *Zone) LinkTo(to string) {
 	z.Primary = nil
 	z.DNSServers = nil
 	z.NetworkIDs = nil
+	z.Networks = nil // Also clear the new field
 	z.NetworkPools = nil
 	z.Hostmaster = ""
 	z.Pool = ""

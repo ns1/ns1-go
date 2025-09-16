@@ -74,6 +74,9 @@ func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
 func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
+	// Ensure Networks field is populated from NetworkIDs
+	z.EnsureNetworksFromLegacy()
+
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("PUT", path, &z)
@@ -102,6 +105,9 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
 func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
+	// Ensure Networks field is populated from NetworkIDs
+	z.EnsureNetworksFromLegacy()
+
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
 	req, err := s.client.NewRequest("POST", path, &z)

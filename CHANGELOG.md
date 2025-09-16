@@ -1,3 +1,9 @@
+## 2.16.0 (Unreleased)
+
+FEATURES:
+
+* Distinguish unset vs empty zone.networks
+
 ## 2.15.0 (August 28th, 2025)
 
 FEATURES:
