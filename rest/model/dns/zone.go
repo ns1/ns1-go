@@ -35,11 +35,10 @@ type Zone struct {
 
 	// Networks contains the network ids the zone is available. Most zones
 	// will be in the NSONE Global Network(which is id 0).
-	// Deprecated: maintained for source compatibility in Go code.
-	// Not marshaled to JSON.
 	NetworkIDs []int `json:"-"`
-	// New: distinguishes unset (nil) vs explicit empty ([]).
-	Networks *[]int        `json:"networks,omitempty"`
+	// networks is the internal field that distinguishes between unset (nil)
+	// vs explicit empty ([]) during JSON marshaling.
+	networks *[]int        `json:"networks,omitempty"`
 	Records  []*ZoneRecord `json:"records,omitempty"`
 
 	// Primary contains info to enable slaving of the zone by third party dns servers.
@@ -55,7 +54,19 @@ type Zone struct {
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
 }
 
-// UnmarshalJSON ensures backward compatibility by populating NetworkIDs from Networks
+// Networks returns the networks field pointer value.
+// This maintains backward compatibility with code that uses the Networks field.
+func (z *Zone) Networks() *[]int {
+	return z.networks
+}
+
+// SetNetworks sets the networks field to the provided value.
+// This maintains backward compatibility with code that uses the Networks field.
+func (z *Zone) SetNetworks(networks *[]int) {
+	z.networks = networks
+}
+
+// UnmarshalJSON ensures backward compatibility by populating NetworkIDs from networks
 func (z *Zone) UnmarshalJSON(data []byte) error {
 	type Alias Zone
 	aux := &struct {
@@ -70,7 +81,7 @@ func (z *Zone) UnmarshalJSON(data []byte) error {
 	}
 
 	// Preserve presence semantics
-	z.Networks = aux.Networks
+	z.networks = aux.Networks
 
 	if aux.Networks != nil {
 		// Copy to avoid sharing memory
@@ -82,11 +93,11 @@ func (z *Zone) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EnsureNetworksFromLegacy ensures the Networks field is populated from NetworkIDs
+// EnsureNetworksFromLegacy ensures the networks field is populated from NetworkIDs
 func (z *Zone) EnsureNetworksFromLegacy() {
-	if z.Networks == nil && len(z.NetworkIDs) > 0 {
+	if z.networks == nil && len(z.NetworkIDs) > 0 {
 		v := append([]int(nil), z.NetworkIDs...)
-		z.Networks = &v
+		z.networks = &v
 	}
 }
 
@@ -215,7 +226,7 @@ func (z *Zone) LinkTo(to string) {
 	z.Primary = nil
 	z.DNSServers = nil
 	z.NetworkIDs = nil
-	z.Networks = nil // Also clear the new field
+	z.networks = nil // Also clear the new field
 	z.NetworkPools = nil
 	z.Hostmaster = ""
 	z.Pool = ""

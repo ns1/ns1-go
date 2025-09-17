@@ -67,6 +67,12 @@ func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response
 		return nil, resp, err
 	}
 
+	// Ensure NetworkIDs is properly populated from networks field
+	// This is important for backward compatibility
+	if z.Networks() != nil {
+		z.NetworkIDs = append([]int(nil), *z.Networks()...)
+	}
+
 	return &z, resp, nil
 }
 
@@ -74,8 +80,15 @@ func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response
 //
 // NS1 API docs: https://ns1.com/api/#zones-put
 func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
-	// Ensure Networks field is populated from NetworkIDs
-	z.EnsureNetworksFromLegacy()
+	// Always prioritize NetworkIDs over networks field
+	// This is the opposite of EnsureNetworksFromLegacy
+	if len(z.NetworkIDs) > 0 {
+		networks := append([]int(nil), z.NetworkIDs...)
+		z.SetNetworks(&networks)
+	} else {
+		// If NetworkIDs is empty, still ensure networks field is populated if needed
+		z.EnsureNetworksFromLegacy()
+	}
 
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
@@ -105,8 +118,15 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#zones-post
 func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
-	// Ensure Networks field is populated from NetworkIDs
-	z.EnsureNetworksFromLegacy()
+	// Always prioritize NetworkIDs over networks field
+	// This is the opposite of EnsureNetworksFromLegacy
+	if len(z.NetworkIDs) > 0 {
+		networks := append([]int(nil), z.NetworkIDs...)
+		z.SetNetworks(&networks)
+	} else {
+		// If NetworkIDs is empty, still ensure networks field is populated if needed
+		z.EnsureNetworksFromLegacy()
+	}
 
 	path := fmt.Sprintf("zones/%s", z.Zone)
 

@@ -1,6 +1,6 @@
 ## 2.16.0 (Unreleased)
 
-FEATURES:
+BUG FIXES:
 
 * Distinguish unset vs empty zone.networks
 

@@ -11,9 +11,11 @@ func TestZoneNetworks_MarshalJSON(t *testing.T) {
 	// Test Case 1: nil Networks should be omitted
 	z := Zone{
 		Zone:       "example.com",
-		Networks:   nil,
 		NetworkIDs: nil,
 	}
+	// Explicitly set networks to nil
+	z.SetNetworks(nil)
+
 	data, err := json.Marshal(z)
 	assert.NoError(t, err)
 	assert.NotContains(t, string(data), "networks")
@@ -22,9 +24,10 @@ func TestZoneNetworks_MarshalJSON(t *testing.T) {
 	empty := []int{}
 	z = Zone{
 		Zone:       "example.com",
-		Networks:   &empty,
 		NetworkIDs: nil,
 	}
+	z.SetNetworks(&empty)
+
 	data, err = json.Marshal(z)
 	assert.NoError(t, err)
 	assert.Contains(t, string(data), `"networks":[]`)
@@ -33,9 +36,10 @@ func TestZoneNetworks_MarshalJSON(t *testing.T) {
 	networks := []int{1, 2, 3}
 	z = Zone{
 		Zone:       "example.com",
-		Networks:   &networks,
 		NetworkIDs: nil,
 	}
+	z.SetNetworks(&networks)
+
 	data, err = json.Marshal(z)
 	assert.NoError(t, err)
 	assert.Contains(t, string(data), `"networks":[1,2,3]`)
@@ -47,8 +51,8 @@ func TestZoneNetworks_UnmarshalJSON(t *testing.T) {
 	var z Zone
 	err := json.Unmarshal([]byte(jsonStr), &z)
 	assert.NoError(t, err)
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, []int{1, 2, 3}, *z.Networks)
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, []int{1, 2, 3}, *z.Networks())
 	assert.Equal(t, []int{1, 2, 3}, z.NetworkIDs)
 
 	// Test Case 2: JSON with empty networks array should result in empty slices
@@ -56,8 +60,8 @@ func TestZoneNetworks_UnmarshalJSON(t *testing.T) {
 	z = Zone{}
 	err = json.Unmarshal([]byte(jsonStr), &z)
 	assert.NoError(t, err)
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, 0, len(*z.Networks))
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, 0, len(*z.Networks()))
 	assert.Equal(t, 0, len(z.NetworkIDs))
 
 	// Test Case 3: JSON without networks field should result in nil fields
@@ -65,7 +69,7 @@ func TestZoneNetworks_UnmarshalJSON(t *testing.T) {
 	z = Zone{}
 	err = json.Unmarshal([]byte(jsonStr), &z)
 	assert.NoError(t, err)
-	assert.Nil(t, z.Networks)
+	assert.Nil(t, z.Networks())
 	assert.Nil(t, z.NetworkIDs)
 }
 
@@ -74,33 +78,36 @@ func TestZone_EnsureNetworksFromLegacy(t *testing.T) {
 	networkIDs := []int{1, 2, 3}
 	z := Zone{
 		Zone:       "example.com",
-		Networks:   nil,
 		NetworkIDs: networkIDs,
 	}
+	z.SetNetworks(nil)
+
 	z.EnsureNetworksFromLegacy()
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, networkIDs, *z.Networks)
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, networkIDs, *z.Networks())
 
 	// Test Case 2: When Networks is already set, it shouldn't change
 	networks := []int{4, 5, 6}
 	z = Zone{
 		Zone:       "example.com",
-		Networks:   &networks,
 		NetworkIDs: networkIDs,
 	}
+	z.SetNetworks(&networks)
+
 	z.EnsureNetworksFromLegacy()
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, networks, *z.Networks)
-	assert.NotEqual(t, networkIDs, *z.Networks)
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, networks, *z.Networks())
+	assert.NotEqual(t, networkIDs, *z.Networks())
 
 	// Test Case 3: When both are empty/nil
 	z = Zone{
 		Zone:       "example.com",
-		Networks:   nil,
 		NetworkIDs: nil,
 	}
+	z.SetNetworks(nil)
+
 	z.EnsureNetworksFromLegacy()
-	assert.Nil(t, z.Networks)
+	assert.Nil(t, z.Networks())
 	assert.Nil(t, z.NetworkIDs)
 }
 
@@ -114,8 +121,8 @@ func TestZoneNetworks_IntegrationFlow(t *testing.T) {
 
 	// Step 1: Call EnsureNetworksFromLegacy to populate Networks
 	z.EnsureNetworksFromLegacy()
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, z.NetworkIDs, *z.Networks)
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, z.NetworkIDs, *z.Networks())
 
 	// Step 2: Marshal to JSON
 	data, err := json.Marshal(z)
@@ -124,7 +131,7 @@ func TestZoneNetworks_IntegrationFlow(t *testing.T) {
 
 	// Step 3: Change to empty networks
 	empty := []int{}
-	z.Networks = &empty
+	z.SetNetworks(&empty)
 	z.NetworkIDs = nil
 
 	// Step 4: Marshal again to verify empty array is sent
@@ -136,7 +143,7 @@ func TestZoneNetworks_IntegrationFlow(t *testing.T) {
 	jsonStr := `{"zone":"example.com","networks":[4,5]}`
 	err = json.Unmarshal([]byte(jsonStr), &z)
 	assert.NoError(t, err)
-	assert.NotNil(t, z.Networks)
-	assert.Equal(t, []int{4, 5}, *z.Networks)
+	assert.NotNil(t, z.Networks())
+	assert.Equal(t, []int{4, 5}, *z.Networks())
 	assert.Equal(t, []int{4, 5}, z.NetworkIDs)
 }
