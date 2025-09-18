@@ -68,14 +68,34 @@ func (z *Zone) SetNetworks(networks *[]int) {
 
 // MarshalJSON ensures NetworkIDs is properly serialized to JSON
 func (z Zone) MarshalJSON() ([]byte, error) {
-	// Use NetworkIDs as the source of truth
-	if len(z.NetworkIDs) > 0 {
-		networks := append([]int(nil), z.NetworkIDs...)
-		z.networks = &networks
+	// Create a clone of the zone to avoid infinite recursion
+	type Alias Zone
+	aux := struct {
+		*Alias
+		Networks []int `json:"networks,omitempty"`
+	}{
+		Alias: (*Alias)(&z),
 	}
 
-	type Alias Zone
-	return json.Marshal((*Alias)(&z))
+	// Only include networks field if NetworkIDs is non-nil
+	if z.NetworkIDs != nil {
+		// For empty slices, we need a special case to ensure []
+		// is included in the output despite the omitempty tag
+		if len(z.NetworkIDs) == 0 {
+			// Create a temporary struct without omitempty
+			type AuxWithoutOmitEmpty struct {
+				*Alias
+				Networks []int `json:"networks"`
+			}
+			return json.Marshal(&AuxWithoutOmitEmpty{
+				Alias:    aux.Alias,
+				Networks: []int{},
+			})
+		}
+		aux.Networks = z.NetworkIDs
+	}
+
+	return json.Marshal(&aux)
 }
 
 // UnmarshalJSON ensures backward compatibility by populating NetworkIDs from networks
