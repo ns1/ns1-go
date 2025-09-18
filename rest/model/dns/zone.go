@@ -55,15 +55,27 @@ type Zone struct {
 }
 
 // Networks returns the networks field pointer value.
-// This maintains backward compatibility with code that uses the Networks field.
+// Deprecated: Use NetworkIDs instead. This method will be removed in a future version.
 func (z *Zone) Networks() *[]int {
 	return z.networks
 }
 
 // SetNetworks sets the networks field to the provided value.
-// This maintains backward compatibility with code that uses the Networks field.
+// Deprecated: Use NetworkIDs instead. This method will be removed in a future version.
 func (z *Zone) SetNetworks(networks *[]int) {
 	z.networks = networks
+}
+
+// MarshalJSON ensures NetworkIDs is properly serialized to JSON
+func (z Zone) MarshalJSON() ([]byte, error) {
+	// Use NetworkIDs as the source of truth
+	if len(z.NetworkIDs) > 0 {
+		networks := append([]int(nil), z.NetworkIDs...)
+		z.networks = &networks
+	}
+
+	type Alias Zone
+	return json.Marshal((*Alias)(&z))
 }
 
 // UnmarshalJSON ensures backward compatibility by populating NetworkIDs from networks
@@ -83,21 +95,28 @@ func (z *Zone) UnmarshalJSON(data []byte) error {
 	// Preserve presence semantics
 	z.networks = aux.Networks
 
-	if aux.Networks != nil {
-		// Copy to avoid sharing memory
-		z.NetworkIDs = append([]int(nil), *aux.Networks...)
-	} else {
-		z.NetworkIDs = nil
-	}
+	// Update NetworkIDs from networks field
+	z.ensureNetworkIDsFromJSON()
 
 	return nil
 }
 
 // EnsureNetworksFromLegacy ensures the networks field is populated from NetworkIDs
+// Deprecated: This is now handled automatically during JSON marshaling
 func (z *Zone) EnsureNetworksFromLegacy() {
 	if z.networks == nil && len(z.NetworkIDs) > 0 {
 		v := append([]int(nil), z.NetworkIDs...)
 		z.networks = &v
+	}
+}
+
+// ensureNetworkIDsFromJSON is an internal function to ensure NetworkIDs is populated
+// from the networks field after JSON unmarshaling
+func (z *Zone) ensureNetworkIDsFromJSON() {
+	if z.networks != nil {
+		z.NetworkIDs = append([]int(nil), *z.networks...)
+	} else {
+		z.NetworkIDs = nil
 	}
 }
 
