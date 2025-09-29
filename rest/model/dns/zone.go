@@ -35,7 +35,8 @@ type Zone struct {
 
 	// Networks contains the network ids the zone is available. Most zones
 	// will be in the NSONE Global Network(which is id 0).
-	NetworkIDs []int         `json:"networks,omitempty"`
+	NetworkIDs []int         `json:"-"`
+	Networks   *[]int        `json:"networks,omitempty"`
 	Records    []*ZoneRecord `json:"records,omitempty"`
 
 	// Primary contains info to enable slaving of the zone by third party dns servers.
@@ -49,6 +50,40 @@ type Zone struct {
 
 	// Contains the key/value tag information associated to the zone
 	Tags map[string]string `json:"tags,omitempty"` // Only relevant for DDI
+}
+
+func (z Zone) MarshalJSON() ([]byte, error) {
+	type Alias Zone
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(&z),
+	}
+
+	if z.NetworkIDs != nil {
+		aux.Networks = &z.NetworkIDs
+	}
+
+	return json.Marshal(aux)
+}
+
+func (z *Zone) UnmarshalJSON(data []byte) error {
+	type Alias Zone
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(z),
+	}
+
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	if aux.Networks != nil {
+		z.NetworkIDs = *aux.Networks
+	}
+
+	return nil
 }
 
 func (z Zone) String() string {
