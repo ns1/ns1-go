@@ -35,9 +35,10 @@ type Zone struct {
 
 	// Networks contains the network ids the zone is available. Most zones
 	// will be in the NSONE Global Network(which is id 0).
-	NetworkIDs []int         `json:"-"`
-	Networks   *[]int        `json:"networks"`
-	Records    []*ZoneRecord `json:"records,omitempty"`
+	NetworkIDs []int `json:"-"`
+	// Networks is an Auxiliary field to help with JSON marshalling/unmarshalling of NetworkIDs for internal use only
+	Networks *[]int        `json:"networks"`
+	Records  []*ZoneRecord `json:"records,omitempty"`
 
 	// Primary contains info to enable slaving of the zone by third party dns servers.
 	Primary *ZonePrimary `json:"primary,omitempty"`
