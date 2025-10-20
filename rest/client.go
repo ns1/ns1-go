@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	clientVersion = "2.15.0"
+	clientVersion = "2.15.1"
 
 	defaultBase                   = "https://api.nsone.net"
 	defaultEndpoint               = defaultBase + "/v1/"
