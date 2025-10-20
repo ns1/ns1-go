@@ -1,3 +1,9 @@
+## 2.15.1 (October 20th, 2025)
+
+BUG FIXES:
+
+* Fix data source update incorrectly adding the id into the body
+
 ## 2.15.0 (August 28th, 2025)
 
 FEATURES:
