@@ -65,6 +65,7 @@ type Client struct {
 	Jobs                 *JobsService
 	MonitorRegions       *MonitorRegionsService
 	PulsarJobs           *PulsarJobsService
+	PulsarDecisions      *PulsarDecisionsService
 	Notifications        *NotificationsService
 	Records              *RecordsService
 	Applications         *ApplicationsService
@@ -113,6 +114,7 @@ func NewClient(httpClient Doer, options ...func(*Client)) *Client {
 	c.Jobs = (*JobsService)(&c.common)
 	c.MonitorRegions = (*MonitorRegionsService)(&c.common)
 	c.PulsarJobs = (*PulsarJobsService)(&c.common)
+	c.PulsarDecisions = (*PulsarDecisionsService)(&c.common)
 	c.Notifications = (*NotificationsService)(&c.common)
 	c.Records = (*RecordsService)(&c.common)
 	c.Applications = (*ApplicationsService)(&c.common)
