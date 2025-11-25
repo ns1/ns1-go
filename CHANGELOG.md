@@ -1,3 +1,9 @@
+## 2.15.1 (November 25th, 2025)
+
+FEATURES:
+
+* Fix zone create with empty networks field
+
 ## 2.15.0 (August 28th, 2025)
 
 FEATURES:
