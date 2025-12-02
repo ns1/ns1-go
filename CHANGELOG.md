@@ -2,7 +2,7 @@
 
 FEATURES:
 
-* Adds support for pulsar decision
+* Adds support for pulsar decision endpoints
 
 ## 2.15.2 (November 25th, 2025)
 
