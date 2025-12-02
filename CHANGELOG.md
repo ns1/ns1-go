@@ -1,3 +1,9 @@
+## 2.16.0 (December 2nd, 2025)
+
+FEATURES:
+
+* Adds support for pulsar decision
+
 ## 2.15.2 (November 25th, 2025)
 
 BUG FIXES:
