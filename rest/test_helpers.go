@@ -11,7 +11,7 @@ func setup(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
-	client := NewClient(http.DefaultClient, 
+	client := NewClient(http.DefaultClient,
 		SetEndpoint(server.URL),
 		SetAPIKey("test-key"))
 
