@@ -308,7 +308,7 @@ func TestZone(t *testing.T) {
 				}
 
 				require.Nil(t, mock.AddTestCase(
-					http.MethodPut, "/zones/"+zoneName+"/export/zonefile", http.StatusOK,
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusOK,
 					nil, nil, map[string]interface{}{}, expectedStatus,
 				))
 
@@ -325,7 +325,7 @@ func TestZone(t *testing.T) {
 				defer mock.ClearTestCases()
 
 				require.Nil(t, mock.AddTestCase(
-					http.MethodPut, "/zones/"+zoneName+"/export/zonefile", http.StatusNotFound,
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusNotFound,
 					nil, nil, map[string]interface{}{}, `{"message": "zone not found"}`,
 				))
 
@@ -339,7 +339,7 @@ func TestZone(t *testing.T) {
 				defer mock.ClearTestCases()
 
 				require.Nil(t, mock.AddTestCase(
-					http.MethodPut, "/zones/"+zoneName+"/export/zonefile", http.StatusInternalServerError,
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusInternalServerError,
 					nil, nil, map[string]interface{}{}, `{"message": "internal server error"}`,
 				))
 
