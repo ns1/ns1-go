@@ -132,10 +132,10 @@ download:
 	fmt.Printf("File size: %d bytes\n", buf.Len())
 
 	// Optionally, print the first few lines of the zone file
-	fmt.Println("\nFirst 500 characters of zone file:")
+	fmt.Println("\nFirst 1500 characters of zone file:")
 	content := buf.String()
-	if len(content) > 500 {
-		fmt.Println(content[:500] + "...")
+	if len(content) > 1500 {
+		fmt.Println(content[:1500] + "...")
 	} else {
 		fmt.Println(content)
 	}
