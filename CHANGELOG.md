@@ -1,3 +1,9 @@
+## 2.17.0 (December 19th, 2025)
+
+FEATURES:
+
+* Adds support for zonefile export
+
 ## 2.16.0 (December 2nd, 2025)
 
 FEATURES:
