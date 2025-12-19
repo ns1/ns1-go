@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -185,6 +186,78 @@ func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, 
 	// paginated response.
 	zone.Records = append(zone.Records, tmpZone.Records...)
 	return resp, nil
+}
+
+// ExportZonefile initiates the export of a zone file (BIND / RFC-1035 format) for the specified zone
+// or returns the current status. This operation is idempotent; calling it repeatedly returns the
+// current status if no zone updates have been made.
+func (s *ZonesService) ExportZonefile(zone string) (*dns.ZoneFileExportStatus, *http.Response, error) {
+	path := fmt.Sprintf("export/zonefile/%s", zone)
+
+	req, err := s.client.NewRequest("PUT", path, map[string]interface{}{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var status dns.ZoneFileExportStatus
+	resp, err := s.client.Do(req, &status)
+	if err != nil {
+		var e *Error
+		if errors.As(err, &e) && e.Message == "zone not found" {
+			return nil, resp, ErrZoneMissing
+		}
+		return nil, resp, err
+	}
+
+	return &status, resp, nil
+}
+
+// GetExportZonefileStatus returns the current status of the zone file export for the specified zone.
+// This endpoint does not initiate a new export.
+func (s *ZonesService) GetExportZonefileStatus(zone string) (*dns.ZoneFileExportStatus, *http.Response, error) {
+	path := fmt.Sprintf("export/zonefile/%s/status", zone)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var status dns.ZoneFileExportStatus
+	resp, err := s.client.Do(req, &status)
+	if err != nil {
+		var e *Error
+		if errors.As(err, &e) && e.Message == "zone not found" {
+			return nil, resp, ErrZoneMissing
+		}
+		return nil, resp, err
+	}
+
+	return &status, resp, nil
+}
+
+// DownloadZonefile downloads the generated zone file for the specified zone.
+// Returns a bytes.Buffer containing the zone file contents.
+// The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Response, error) {
+	path := fmt.Sprintf("export/zonefile/%s", zone)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var buf bytes.Buffer
+
+	resp, err := s.client.Do(req, &buf)
+	if err != nil {
+		var e *Error
+		if errors.As(err, &e) && e.Message == "zone not found" {
+			return nil, resp, ErrZoneMissing
+		}
+		return nil, resp, err
+	}
+
+	return &buf, resp, nil
 }
 
 var (

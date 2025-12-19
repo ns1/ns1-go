@@ -70,3 +70,42 @@ func (s *Service) AddZoneDeleteTestCase(
 		responseHeaders, "", "",
 	)
 }
+
+// AddZoneExportZonefileTestCase sets up a test case for the api.Client.Zones.ExportZonefile()
+// function
+func (s *Service) AddZoneExportZonefileTestCase(
+	name string,
+	requestHeaders, responseHeaders http.Header,
+	response *dns.ZoneFileExportStatus,
+) error {
+	return s.AddTestCase(
+		http.MethodPut, "/zones/"+name+"/export/zonefile", http.StatusOK, requestHeaders,
+		responseHeaders, map[string]interface{}{}, response,
+	)
+}
+
+// AddGetExportZonefileStatusTestCase sets up a test case for the api.Client.Zones.GetExportZonefileStatus()
+// function
+func (s *Service) AddGetExportZonefileStatusTestCase(
+	name string,
+	requestHeaders, responseHeaders http.Header,
+	response *dns.ZoneFileExportStatus,
+) error {
+	return s.AddTestCase(
+		http.MethodGet, "/export/zonefile/"+name+"/status", http.StatusOK, requestHeaders,
+		responseHeaders, "", response,
+	)
+}
+
+// AddDownloadZonefileTestCase sets up a test case for the api.Client.Zones.DownloadZonefile()
+// function
+func (s *Service) AddDownloadZonefileTestCase(
+	name string,
+	requestHeaders, responseHeaders http.Header,
+	response string,
+) error {
+	return s.AddTestCase(
+		http.MethodGet, "/export/zonefile/"+name, http.StatusOK, requestHeaders,
+		responseHeaders, "", response,
+	)
+}

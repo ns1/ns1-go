@@ -223,3 +223,15 @@ func (z *Zone) LinkTo(to string) {
 	z.Link = &to
 	z.DNSSEC = nil
 }
+
+// ZoneFileExportStatus wraps the response from the zone file export endpoint
+type ZoneFileExportStatus struct {
+	// Status of the export operation (e.g., "GENERATING", "COMPLETE", "ERROR")
+	Status string `json:"status"`
+
+	// Message provides additional information about the export status
+	Message string `json:"message,omitempty"`
+
+	// GeneratedAt timestamp when the export was generated
+	GeneratedAt string `json:"generated_at,omitempty"`
+}
