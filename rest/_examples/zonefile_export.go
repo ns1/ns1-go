@@ -21,6 +21,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	api "gopkg.in/ns1/ns1-go.v2/rest"
@@ -88,23 +89,25 @@ func main() {
 		}
 		fmt.Println()
 
-		switch exportStatus.Status {
-		case "COMPLETED":
+		if exportStatus.Status == "COMPLETED" {
 			fmt.Printf("Export completed at: %s\n", exportStatus.GeneratedAt)
-			goto download
-		case "FAILED":
+			break
+		}
+		if exportStatus.Status == "FAILED" {
 			log.Fatalf("Export failed: %s", exportStatus.Message)
-		case "QUEUED", "GENERATING":
+		}
+		if slices.Contains([]string{"QUEUED", "GENERATING"}, exportStatus.Status) {
 			// Continue polling
 			time.Sleep(pollInterval)
-		default:
-			log.Fatalf("Unknown exportStatus: %s", exportStatus.Status)
+			continue
 		}
+		log.Fatalf("Unknown exportStatus: %s", exportStatus.Status)
 	}
 
-	log.Fatal("Export did not complete within the expected time")
+	if exportStatus.Status != "COMPLETED" {
+		log.Fatal("Export did not complete within the expected time")
+	}
 
-download:
 	// Step 3: Download the zone file
 	fmt.Println("\nDownloading zone file...")
 	buf, resp, err := client.Zones.DownloadZonefile(zoneName)
@@ -137,7 +140,6 @@ download:
 	fmt.Printf("Zone file saved to: %s\n", filename)
 	fmt.Printf("File size: %d bytes\n", buf.Len())
 
-	// Optionally, print the first few lines of the zone file
 	fmt.Println("\nFirst 1500 characters of zone file:")
 	content := buf.String()
 	if len(content) > 1500 {
