@@ -15,6 +15,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -49,7 +50,12 @@ func init() {
 func main() {
 	// Step 1: Initiate the zone file export
 	fmt.Printf("Initiating zone file export for %s...\n", zoneName)
-	status, _, err := client.Zones.ExportZonefile(zoneName)
+	exportStatus, resp, err := client.Zones.ExportZonefile(zoneName)
+
+	// print http response data
+	jsonBytes, _ := json.MarshalIndent(exportStatus, "", "  ")
+	fmt.Printf("Received %s; Body: %s\n", resp.Status, jsonBytes)
+
 	if err != nil {
 		if errors.Is(err, api.ErrZoneMissing) {
 			log.Fatalf("Zone %s not found", zoneName)
@@ -57,9 +63,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Export initiated. Status: %s\n", status.Status)
-	if status.Message != "" {
-		fmt.Printf("Message: %s\n", status.Message)
+	fmt.Printf("Export initiated. Status: %s\n", exportStatus.Status)
+	if exportStatus.Message != "" {
+		fmt.Printf("Message: %s\n", exportStatus.Message)
 	}
 
 	// Step 2: Poll for export completion
@@ -68,7 +74,7 @@ func main() {
 	pollInterval := 2 * time.Second
 
 	for i := 0; i < maxAttempts; i++ {
-		status, _, err = client.Zones.GetExportZonefileStatus(zoneName)
+		exportStatus, _, err = client.Zones.GetExportZonefileStatus(zoneName)
 		if err != nil {
 			if errors.Is(err, api.ErrZoneMissing) {
 				log.Fatalf("No export found for zone %s", zoneName)
@@ -76,23 +82,23 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Attempt %d/%d - Status: %s", i+1, maxAttempts, status.Status)
-		if status.Message != "" {
-			fmt.Printf(" - %s", status.Message)
+		fmt.Printf("Attempt %d/%d - Status: %s", i+1, maxAttempts, exportStatus.Status)
+		if exportStatus.Message != "" {
+			fmt.Printf(" - %s", exportStatus.Message)
 		}
 		fmt.Println()
 
-		switch status.Status {
+		switch exportStatus.Status {
 		case "COMPLETED":
-			fmt.Printf("Export completed at: %s\n", status.GeneratedAt)
+			fmt.Printf("Export completed at: %s\n", exportStatus.GeneratedAt)
 			goto download
 		case "FAILED":
-			log.Fatalf("Export failed: %s", status.Message)
+			log.Fatalf("Export failed: %s", exportStatus.Message)
 		case "QUEUED", "GENERATING":
 			// Continue polling
 			time.Sleep(pollInterval)
 		default:
-			log.Fatalf("Unknown status: %s", status.Status)
+			log.Fatalf("Unknown exportStatus: %s", exportStatus.Status)
 		}
 	}
 
