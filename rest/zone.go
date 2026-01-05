@@ -240,24 +240,11 @@ func (s *ZonesService) GetExportZonefileStatus(zone string) (*dns.ZoneFileExport
 // Returns a bytes.Buffer containing the zone file contents.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
 func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Response, error) {
-	path := fmt.Sprintf("export/zonefile/%s", zone)
-
-	req, err := s.client.NewRequest("GET", path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	var buf bytes.Buffer
-
-	resp, err := s.client.Do(req, &buf)
+	resp, err := s.DownloadZonefileStream(zone, &buf)
 	if err != nil {
-		var e *Error
-		if errors.As(err, &e) && e.Message == "zone not found" {
-			return nil, resp, ErrZoneMissing
-		}
 		return nil, resp, err
 	}
-
 	return &buf, resp, nil
 }
 
