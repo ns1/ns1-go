@@ -4,12 +4,12 @@
 //  1. Initiate the zone file export
 //  2. Poll for export completion status
 //  3. Download the completed zone file
+//  4. Writes the zonefile to cwd, then prints the first 1500 characters to stdout
 //
 // Usage:
 //
 //	export NS1_APIKEY="your-api-key-here"
-//	export NS1_ZONENAME="example.com"
-//	go run zonefile_export.go
+//	go run zonefile_export.go "example.com"
 //
 // The zone file will be saved to a file named after the zone (e.g., example.com.txt).
 package main
@@ -28,7 +28,6 @@ import (
 )
 
 var client *api.Client
-var zoneName string
 
 // Helper that initializes rest api client from environment variable.
 func init() {
@@ -36,12 +35,7 @@ func init() {
 	if k == "" {
 		log.Fatal("NS1_APIKEY environment variable is not set, giving up")
 	}
-	z := os.Getenv("NS1_ZONENAME")
-	if z == "" {
-		log.Fatal("NS1_ZONENAME environment variable is not set, giving up")
-	}
 
-	zoneName = z
 	httpClient := &http.Client{Timeout: time.Second * 10}
 	// Adds logging to each http request.
 	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
@@ -49,13 +43,20 @@ func init() {
 }
 
 func main() {
-	// Step 1: Initiate the zone file export
-	fmt.Printf("Initiating zone file export for %s...\n", zoneName)
+
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: go run zonefile_export.go <zone-name>")
+	}
+
+	zoneName := os.Args[1]
+
+	// Initiate the zone file export
+	log.Printf("Initiating zone file export for %s...\n", zoneName)
 	exportStatus, resp, err := client.Zones.ExportZonefile(zoneName)
 
 	// print http response data
 	jsonBytes, _ := json.MarshalIndent(exportStatus, "", "  ")
-	fmt.Printf("Received %s; Body: %s\n", resp.Status, jsonBytes)
+	log.Printf("Received %s; Body: %s\n", resp.Status, jsonBytes)
 
 	if err != nil {
 		if errors.Is(err, api.ErrZoneMissing) {
@@ -64,13 +65,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Export initiated. Status: %s\n", exportStatus.Status)
+	msg := fmt.Sprintf("Export initiated. Status: %s", exportStatus.Status)
 	if exportStatus.Message != "" {
-		fmt.Printf("Message: %s\n", exportStatus.Message)
+		msg = fmt.Sprintf("%s; Message: %s", msg, exportStatus.Message)
 	}
+	log.Println(msg)
 
-	// Step 2: Poll for export completion
-	fmt.Println("\nPolling for export completion...")
+	// Poll for export completion
+	log.Println("Polling for export completion...")
 	maxAttempts := 30
 	pollInterval := 2 * time.Second
 
@@ -83,14 +85,14 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Attempt %d/%d - Status: %s", i+1, maxAttempts, exportStatus.Status)
+		msg = fmt.Sprintf("Attempt %d/%d - Status: %s", i+1, maxAttempts, exportStatus.Status)
 		if exportStatus.Message != "" {
-			fmt.Printf(" - %s", exportStatus.Message)
+			msg = fmt.Sprintf("%s - %s", msg, exportStatus.Message)
 		}
-		fmt.Println()
+		log.Print(msg)
 
 		if exportStatus.Status == "COMPLETED" {
-			fmt.Printf("Export completed at: %s\n", exportStatus.GeneratedAt)
+			log.Printf("Export completed at: %s\n", exportStatus.GeneratedAt)
 			break
 		}
 		if exportStatus.Status == "FAILED" {
@@ -108,8 +110,8 @@ func main() {
 		log.Fatal("Export did not complete within the expected time")
 	}
 
-	// Step 3: Download the zone file
-	fmt.Println("\nDownloading zone file...")
+	// Download the zone file
+	log.Println("Downloading zone file...")
 	buf, resp, err := client.Zones.DownloadZonefile(zoneName)
 	if err != nil {
 		if errors.Is(err, api.ErrZoneMissing) {
@@ -121,7 +123,7 @@ func main() {
 	// Get filename from Content-Disposition header if available
 	filename := fmt.Sprintf("%s.txt", zoneName)
 	if contentDisposition := resp.Header.Get("Content-Disposition"); contentDisposition != "" {
-		fmt.Printf("Content-Disposition: %s\n", contentDisposition)
+		log.Printf("Content-Disposition: %s\n", contentDisposition)
 		// You could parse the filename from the header here if needed
 	}
 
@@ -137,10 +139,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Zone file saved to: %s\n", filename)
-	fmt.Printf("File size: %d bytes\n", buf.Len())
+	log.Printf("Zone file saved to: %s\n", filename)
+	log.Printf("File size: %d bytes\n", buf.Len())
 
-	fmt.Println("\nFirst 1500 characters of zone file:")
+	log.Println("\nFirst 1500 characters of zone file:")
 	content := buf.String()
 	if len(content) > 1500 {
 		fmt.Println(content[:1500] + "...")
