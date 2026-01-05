@@ -10,14 +10,18 @@
 //
 //	export NS1_APIKEY="your-api-key-here"
 //	go run zonefile_export.go "example.com"
+//	go run zonefile_export.go -stream "example.com"  # Use streaming mode for large files
 //
 // The zone file will be saved to a file named after the zone (e.g., example.com.txt).
+// Use -stream flag to download directly to disk without loading into memory (more efficient for large zones).
 package main
 
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -43,12 +47,16 @@ func init() {
 }
 
 func main() {
+	// Parse command-line flags
+	useStream := flag.Bool("stream", false, "Use streaming mode to download directly to disk (more memory efficient)")
+	flag.Parse()
 
-	if len(os.Args) < 2 {
-		log.Fatal("Usage: go run zonefile_export.go <zone-name>")
+	// Get zone name from remaining arguments
+	if flag.NArg() < 1 {
+		log.Fatal("Usage: go run zonefile_export.go [-stream] <zone-name>")
 	}
 
-	zoneName := os.Args[1]
+	zoneName := flag.Arg(0)
 
 	// Initiate the zone file export
 	log.Printf("Initiating zone file export for %s...\n", zoneName)
@@ -62,7 +70,7 @@ func main() {
 		if errors.Is(err, api.ErrZoneMissing) {
 			log.Fatalf("Zone %s not found", zoneName)
 		}
-		log.Fatal(err)
+		log.Fatalf("Failed to initiate zone file export: %v", err)
 	}
 
 	msg := fmt.Sprintf("Export initiated. Status: %s", exportStatus.Status)
@@ -82,7 +90,7 @@ func main() {
 			if errors.Is(err, api.ErrZoneMissing) {
 				log.Fatalf("No export found for zone %s", zoneName)
 			}
-			log.Fatal(err)
+			log.Fatalf("Failed to get export status (attempt %d/%d): %v", i+1, maxAttempts, err)
 		}
 
 		msg = fmt.Sprintf("Attempt %d/%d - Status: %s", i+1, maxAttempts, exportStatus.Status)
@@ -111,42 +119,91 @@ func main() {
 	}
 
 	// Download the zone file
-	log.Println("Downloading zone file...")
-	buf, resp, err := client.Zones.DownloadZonefile(zoneName)
-	if err != nil {
-		if errors.Is(err, api.ErrZoneMissing) {
-			log.Fatalf("Zone file not found for %s", zoneName)
-		}
-		log.Fatal(err)
-	}
-
-	// Get filename from Content-Disposition header if available
 	filename := fmt.Sprintf("%s.txt", zoneName)
-	if contentDisposition := resp.Header.Get("Content-Disposition"); contentDisposition != "" {
-		log.Printf("Content-Disposition: %s\n", contentDisposition)
-		// You could parse the filename from the header here if needed
-	}
 
-	// Save to file
-	file, err := os.Create(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	if *useStream {
+		// Streaming mode: download directly to disk without loading into memory
+		log.Println("Downloading zone file (streaming mode)...")
 
-	_, err = file.Write(buf.Bytes())
-	if err != nil {
-		log.Fatal(err)
-	}
+		file, err := os.Create(filename)
+		if err != nil {
+			log.Fatalf("Failed to create output file %s: %v", filename, err)
+		}
+		defer file.Close()
 
-	log.Printf("Zone file saved to: %s\n", filename)
-	log.Printf("File size: %d bytes\n", buf.Len())
+		resp, err := client.Zones.DownloadZonefileStream(zoneName, file)
+		if err != nil {
+			if errors.Is(err, api.ErrZoneMissing) {
+				log.Fatalf("Zone file not found for %s", zoneName)
+			}
+			log.Fatalf("Failed to download zone file (streaming mode): %v", err)
+		}
+
+		// Get filename from Content-Disposition header if available
+		if contentDisposition := resp.Header.Get("Content-Disposition"); contentDisposition != "" {
+			log.Printf("Content-Disposition: %s\n", contentDisposition)
+		}
+
+		// Get file size
+		fileInfo, err := file.Stat()
+		if err != nil {
+			log.Fatalf("Failed to get file info for %s: %v", filename, err)
+		}
+
+		log.Printf("Zone file saved to: %s\n", filename)
+		log.Printf("File size: %d bytes\n", fileInfo.Size())
+	} else {
+		// Standard mode: load into memory then write to disk
+		log.Println("Downloading zone file (standard mode)...")
+
+		buf, resp, err := client.Zones.DownloadZonefile(zoneName)
+		if err != nil {
+			if errors.Is(err, api.ErrZoneMissing) {
+				log.Fatalf("Zone file not found for %s", zoneName)
+			}
+			log.Fatalf("Failed to download zone file (standard mode): %v", err)
+		}
+
+		// Get filename from Content-Disposition header if available
+		if contentDisposition := resp.Header.Get("Content-Disposition"); contentDisposition != "" {
+			log.Printf("Content-Disposition: %s\n", contentDisposition)
+			// You could parse the filename from the header here if needed
+		}
+
+		// Save to file
+		file, err := os.Create(filename)
+		if err != nil {
+			log.Fatalf("Failed to create output file %s: %v", filename, err)
+		}
+		defer file.Close()
+
+		_, err = file.Write(buf.Bytes())
+		if err != nil {
+			log.Fatalf("Failed to write zone file to %s: %v", filename, err)
+		}
+
+		log.Printf("Zone file saved to: %s\n", filename)
+		log.Printf("File size: %d bytes\n", buf.Len())
+	}
 
 	log.Println("\nFirst 1500 characters of zone file:")
-	content := buf.String()
-	if len(content) > 1500 {
-		fmt.Println(content[:1500] + "...")
+
+	previewFile, err := os.Open(filename)
+	if err != nil {
+		log.Fatalf("Could not open file for preview: %v\n", err)
 	} else {
-		fmt.Println(content)
+		defer previewFile.Close()
+
+		preview := make([]byte, 1500)
+		n, err := previewFile.Read(preview)
+		if err != nil && err != io.EOF {
+			log.Printf("Warning: Could not read file preview: %v\n", err)
+		} else {
+			if n >= 1500 {
+				fmt.Println(string(preview) + "...")
+			} else {
+				fmt.Println(string(preview[:n]))
+			}
+		}
 	}
 }

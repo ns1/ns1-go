@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"gopkg.in/ns1/ns1-go.v2/rest/model/dns"
@@ -258,6 +259,30 @@ func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Respo
 	}
 
 	return &buf, resp, nil
+}
+
+// DownloadZonefileStream downloads the generated zone file for the specified zone
+// and streams it directly to the provided io.Writer.
+// This is more memory-efficient for large zone files as it doesn't buffer the entire content.
+// The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+func (s *ZonesService) DownloadZonefileStream(zone string, w io.Writer) (*http.Response, error) {
+	path := fmt.Sprintf("export/zonefile/%s", zone)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, w)
+	if err != nil {
+		var e *Error
+		if errors.As(err, &e) && e.Message == "zone not found" {
+			return resp, ErrZoneMissing
+		}
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 var (

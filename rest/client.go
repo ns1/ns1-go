@@ -210,9 +210,17 @@ func (c Client) Do(req *http.Request, v interface{}, params ...Param) (*http.Res
 	}
 
 	if v != nil {
-		// For non-JSON responses, the desired destination might be a bytes buffer
+		// For non-JSON responses, the desired destination might be a bytes buffer or io.Writer
 		if buf, ok := v.(*bytes.Buffer); ok {
 			if _, err := io.Copy(buf, resp.Body); err != nil {
+				return nil, err
+			}
+			return resp, err
+		}
+
+		// Support any io.Writer for streaming responses
+		if w, ok := v.(io.Writer); ok {
+			if _, err := io.Copy(w, resp.Body); err != nil {
 				return nil, err
 			}
 			return resp, err
