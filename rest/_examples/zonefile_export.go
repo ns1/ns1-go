@@ -41,28 +41,23 @@ func init() {
 	}
 
 	httpClient := &http.Client{Timeout: time.Second * 10}
-	// Adds logging to each http request.
 	doer := api.Decorate(httpClient, api.Logging(log.New(os.Stdout, "", log.LstdFlags)))
 	client = api.NewClient(doer, api.SetAPIKey(k))
 }
 
 func main() {
-	// Parse command-line flags
 	useStream := flag.Bool("stream", false, "Use streaming mode to download directly to disk (more memory efficient)")
 	flag.Parse()
 
-	// Get zone name from remaining arguments
 	if flag.NArg() < 1 {
 		log.Fatal("Usage: go run zonefile_export.go [-stream] <zone-name>")
 	}
 
 	zoneName := flag.Arg(0)
 
-	// Initiate the zone file export
 	log.Printf("Initiating zone file export for %s...\n", zoneName)
 	exportStatus, resp, err := client.Zones.ExportZonefile(zoneName)
 
-	// print http response data
 	jsonBytes, _ := json.MarshalIndent(exportStatus, "", "  ")
 	log.Printf("Received %s; Body: %s\n", resp.Status, jsonBytes)
 
@@ -79,7 +74,6 @@ func main() {
 	}
 	log.Println(msg)
 
-	// Poll for export completion
 	log.Println("Polling for export completion...")
 	maxAttempts := 30
 	pollInterval := 2 * time.Second
@@ -118,7 +112,6 @@ func main() {
 		log.Fatal("Export did not complete within the expected time")
 	}
 
-	// Download the zone file
 	filename := fmt.Sprintf("%s.txt", zoneName)
 
 	if *useStream {
