@@ -226,7 +226,7 @@ func (z *Zone) LinkTo(to string) {
 
 // ZoneFileExportStatus wraps the response from the zone file export endpoint
 type ZoneFileExportStatus struct {
-	// Status of the export operation (e.g., "GENERATING", "COMPLETE", "ERROR")
+	// Status of the export operation (e.g., "GENERATING", "COMPLETED", "ERROR")
 	Status string `json:"status"`
 
 	// Message provides additional information about the export status

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -236,23 +237,21 @@ func (s *ZonesService) GetExportZonefileStatus(zone string) (*dns.ZoneFileExport
 	return &status, resp, nil
 }
 
-// DownloadZonefile downloads the generated zone file for the specified zone.
-// Returns a bytes.Buffer containing the zone file contents.
+// DownloadZonefile downloads the generated zone file for the specified zone. Returns a bytes.Buffer containing the zone file contents.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
 func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Response, error) {
 	var buf bytes.Buffer
-	resp, err := s.DownloadZonefileStream(zone, &buf)
+	resp, err := s.DownloadZonefileWriter(zone, &buf)
 	if err != nil {
 		return nil, resp, err
 	}
 	return &buf, resp, nil
 }
 
-// DownloadZonefileStream downloads the generated zone file for the specified zone
-// and streams it directly to the provided io.Writer.
+// DownloadZonefileWriter downloads the generated zone file for the specified zone, and streams it directly to the provided io.Writer.
 // This is more memory-efficient for large zone files as it doesn't buffer the entire content.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
-func (s *ZonesService) DownloadZonefileStream(zone string, w io.Writer) (*http.Response, error) {
+func (s *ZonesService) DownloadZonefileWriter(zone string, w io.Writer) (*http.Response, error) {
 	path := fmt.Sprintf("export/zonefile/%s", zone)
 
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -270,6 +269,30 @@ func (s *ZonesService) DownloadZonefileStream(zone string, w io.Writer) (*http.R
 	}
 
 	return resp, nil
+}
+
+// DownloadZonefileReader downloads the generated zone file for the specified zone and returns a buffered reader for line-by-line processing.
+// The caller is responsible for closing the http.Response.Body when done.
+// The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+func (s *ZonesService) DownloadZonefileReader(zone string) (*bufio.Reader, *http.Response, error) {
+	path := fmt.Sprintf("export/zonefile/%s", zone)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var reader *bufio.Reader
+	resp, err := s.client.Do(req, &reader)
+	if err != nil {
+		var e *Error
+		if errors.As(err, &e) && e.Message == "zone not found" {
+			return nil, resp, ErrZoneMissing
+		}
+		return nil, resp, err
+	}
+
+	return reader, resp, nil
 }
 
 var (

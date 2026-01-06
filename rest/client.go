@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -199,7 +200,11 @@ func (c Client) Do(req *http.Request, v interface{}, params ...Param) (*http.Res
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	// Check if caller wants a bufio.Reader - if so, don't close the body as they need to read from it incrementally
+	if _, ok := v.(**bufio.Reader); !ok {
+		defer resp.Body.Close()
+	}
 
 	rl := parseRate(resp)
 	c.RateLimitFunc(rl)
@@ -210,6 +215,12 @@ func (c Client) Do(req *http.Request, v interface{}, params ...Param) (*http.Res
 	}
 
 	if v != nil {
+		// Support bufio.Reader for chunking, caller must close resp.Body when done reading
+		if reader, ok := v.(**bufio.Reader); ok {
+			*reader = bufio.NewReader(resp.Body)
+			return resp, nil
+		}
+
 		// For non-JSON responses, the desired destination might be a bytes buffer or io.Writer
 		if buf, ok := v.(*bytes.Buffer); ok {
 			if _, err := io.Copy(buf, resp.Body); err != nil {
