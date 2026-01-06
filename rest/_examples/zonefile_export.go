@@ -49,7 +49,7 @@ func main() {
 	useStream := flag.Bool("stream", false, "Use streaming mode to download directly to disk (more memory efficient)")
 	flag.Parse()
 
-	if flag.NArg() < 1 {
+	if flag.NArg() != 1 {
 		log.Fatal("Usage: go run zonefile_export.go [-stream] <zone-name>")
 	}
 
