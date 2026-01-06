@@ -58,7 +58,10 @@ func main() {
 	log.Printf("Initiating zone file export for %s...\n", zoneName)
 	exportStatus, resp, err := client.Zones.ExportZonefile(zoneName)
 
-	jsonBytes, _ := json.MarshalIndent(exportStatus, "", "  ")
+	jsonBytes, err := json.MarshalIndent(exportStatus, "", "  ")
+	if err != nil {
+	    log.Fatalf("Error processing JSON response: %v", err)
+	}
 	log.Printf("Received %s; Body: %s\n", resp.Status, jsonBytes)
 
 	if err != nil {
