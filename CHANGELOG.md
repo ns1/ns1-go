@@ -1,3 +1,10 @@
+## 2.17.0 (December 19th, 2025)
+
+FEATURES:
+
+* Adds support for zonefile export
+* Add support in http client for io.Writer and bufio.Reader streaming
+
 ## 2.16.0 (December 2nd, 2025)
 
 FEATURES:

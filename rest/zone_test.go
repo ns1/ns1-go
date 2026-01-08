@@ -294,7 +294,485 @@ func TestZone(t *testing.T) {
 			_, err := client.Zones.Delete("delete.zone")
 			require.Equal(t, api.ErrZoneMissing, err)
 		})
+
+		t.Run("ExportZonefile", func(t *testing.T) {
+			zoneName := "export.zone"
+
+			t.Run("Success", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				expectedStatus := &dns.ZoneFileExportStatus{
+					Status:      "GENERATING",
+					Message:     "export has been started",
+					GeneratedAt: "2025-12-08T18:15:00Z",
+				}
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusOK,
+					nil, nil, map[string]interface{}{}, expectedStatus,
+				))
+
+				status, resp, err := client.Zones.ExportZonefile(zoneName)
+				require.Nil(t, err)
+				require.NotNil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, expectedStatus.Status, status.Status)
+				require.Equal(t, expectedStatus.Message, status.Message)
+				require.Equal(t, expectedStatus.GeneratedAt, status.GeneratedAt)
+			})
+
+			t.Run("Error - zone not found", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusNotFound,
+					nil, nil, map[string]interface{}{}, `{"message": "zone not found"}`,
+				))
+
+				status, resp, err := client.Zones.ExportZonefile(zoneName)
+				require.Nil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, api.ErrZoneMissing, err)
+			})
+
+			t.Run("Error - HTTP", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodPut, "/export/zonefile/"+zoneName, http.StatusInternalServerError,
+					nil, nil, map[string]interface{}{}, `{"message": "internal server error"}`,
+				))
+
+				status, resp, err := client.Zones.ExportZonefile(zoneName)
+				require.Nil(t, status)
+				require.NotNil(t, err)
+				require.Contains(t, err.Error(), "internal server error")
+				require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+			})
+
+			t.Run("Error - Other", func(t *testing.T) {
+				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+				status, resp, err := c.Zones.ExportZonefile(zoneName)
+				require.Nil(t, resp)
+				require.Error(t, err)
+				require.Nil(t, status)
+			})
+		})
+
+		t.Run("GetExportZonefileStatus", func(t *testing.T) {
+			zoneName := "export.zone"
+
+			t.Run("Success - Completed", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				expectedStatus := &dns.ZoneFileExportStatus{
+					Status:      "completed",
+					GeneratedAt: "2012-04-23T18:25:43.511Z",
+				}
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusOK,
+					nil, nil, "", expectedStatus,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, err)
+				require.NotNil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, expectedStatus.Status, status.Status)
+				require.Equal(t, expectedStatus.GeneratedAt, status.GeneratedAt)
+			})
+
+			t.Run("Success - Generating", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				expectedStatus := &dns.ZoneFileExportStatus{
+					Status:  "generating",
+					Message: "Export is in progress.",
+				}
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusOK,
+					nil, nil, "", expectedStatus,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, err)
+				require.NotNil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, expectedStatus.Status, status.Status)
+				require.Equal(t, expectedStatus.Message, status.Message)
+			})
+
+			t.Run("Success - Failed", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				expectedStatus := &dns.ZoneFileExportStatus{
+					Status:  "failed",
+					Message: "An internal error occurred during export.",
+				}
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusOK,
+					nil, nil, "", expectedStatus,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, err)
+				require.NotNil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, expectedStatus.Status, status.Status)
+				require.Equal(t, expectedStatus.Message, status.Message)
+			})
+
+			t.Run("Error - No export found", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusNotFound,
+					nil, nil, "", `{"message": "No export found for the specified zone."}`,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, status)
+				require.NotNil(t, resp)
+				require.Error(t, err)
+			})
+
+			t.Run("Error - Zone not found", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusNotFound,
+					nil, nil, "", `{"message": "zone not found"}`,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, status)
+				require.NotNil(t, resp)
+				require.Equal(t, api.ErrZoneMissing, err)
+			})
+
+			t.Run("Error - HTTP", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddTestCase(
+					http.MethodGet, "/export/zonefile/"+zoneName+"/status", http.StatusInternalServerError,
+					nil, nil, "", `{"message": "internal server error"}`,
+				))
+
+				status, resp, err := client.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, status)
+				require.NotNil(t, err)
+				require.Contains(t, err.Error(), "internal server error")
+				require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+			})
+
+			t.Run("Error - Other", func(t *testing.T) {
+				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+				status, resp, err := c.Zones.GetExportZonefileStatus(zoneName)
+				require.Nil(t, resp)
+				require.Error(t, err)
+				require.Nil(t, status)
+			})
+		})
 	})
+
+	t.Run("DownloadZonefile", func(t *testing.T) {
+		zoneName := "export.zone"
+		zonefileContent := "; Zone file for export.zone\n$ORIGIN export.zone.\n@ IN SOA ns1.export.zone. admin.export.zone. 1 3600 600 604800 86400\n"
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusOK,
+				nil, nil, "", zonefileContent,
+			))
+
+			buf, resp, err := client.Zones.DownloadZonefile(zoneName)
+			require.Nil(t, err)
+			require.NotNil(t, buf)
+			require.NotNil(t, resp)
+			require.Equal(t, zonefileContent, buf.String())
+		})
+
+		t.Run("Error - No export found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "No export found."}`,
+			))
+
+			buf, resp, err := client.Zones.DownloadZonefile(zoneName)
+			require.Nil(t, buf)
+			require.NotNil(t, resp)
+			require.Error(t, err)
+		})
+
+		t.Run("Error - Zone not found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "zone not found"}`,
+			))
+
+			buf, resp, err := client.Zones.DownloadZonefile(zoneName)
+			require.Nil(t, buf)
+			require.NotNil(t, resp)
+			require.Equal(t, api.ErrZoneMissing, err)
+		})
+
+		t.Run("Error - HTTP", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusInternalServerError,
+				nil, nil, "", `{"message": "internal server error"}`,
+			))
+
+			buf, resp, err := client.Zones.DownloadZonefile(zoneName)
+			require.Nil(t, buf)
+			require.NotNil(t, err)
+			require.Contains(t, err.Error(), "internal server error")
+			require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		})
+
+		t.Run("Error - Other", func(t *testing.T) {
+			c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+			buf, resp, err := c.Zones.DownloadZonefile(zoneName)
+			require.Nil(t, resp)
+			require.Error(t, err)
+			require.Nil(t, buf)
+		})
+	})
+
+	t.Run("DownloadZonefileWriter", func(t *testing.T) {
+		zoneName := "export.zone"
+		zonefileContent := "; Zone file for export.zone\n$ORIGIN export.zone.\n@ IN SOA ns1.export.zone. admin.export.zone. 1 3600 600 604800 86400\n"
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusOK,
+				nil, nil, "", zonefileContent,
+			))
+
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := client.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.Nil(t, err)
+			require.NotNil(t, resp)
+			require.Equal(t, zonefileContent, string(buf))
+		})
+
+		t.Run("Success - Large Content", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			// Create a large zonefile content to test streaming
+			largeContent := ""
+			for i := 0; i < 1000; i++ {
+				largeContent += "; Comment line " + string(rune(i)) + "\n"
+			}
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusOK,
+				nil, nil, "", largeContent,
+			))
+
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := client.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.Nil(t, err)
+			require.NotNil(t, resp)
+			require.Equal(t, largeContent, string(buf))
+		})
+
+		t.Run("Error - Zone not found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "zone not found"}`,
+			))
+
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := client.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.NotNil(t, resp)
+			require.Equal(t, api.ErrZoneMissing, err)
+		})
+
+		t.Run("Error - No export found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "No export found."}`,
+			))
+
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := client.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.NotNil(t, resp)
+			require.Error(t, err)
+		})
+
+		t.Run("Error - HTTP", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusInternalServerError,
+				nil, nil, "", `{"message": "internal server error"}`,
+			))
+
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := client.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.NotNil(t, err)
+			require.Contains(t, err.Error(), "internal server error")
+			require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		})
+
+		t.Run("Error - Other", func(t *testing.T) {
+			c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+			var buf []byte
+			writer := &testWriter{buf: &buf}
+			resp, err := c.Zones.DownloadZonefileWriter(zoneName, writer)
+			require.Nil(t, resp)
+			require.Error(t, err)
+		})
+	})
+
+	t.Run("DownloadZonefileReader", func(t *testing.T) {
+		zoneName := "export.zone"
+		zonefileContent := "; Zone file for export.zone\n$ORIGIN export.zone.\n@ IN SOA ns1.export.zone. admin.export.zone. 1 3600 600 604800 86400\n@ IN NS ns1.export.zone.\n"
+
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusOK,
+				nil, nil, "", zonefileContent,
+			))
+
+			reader, resp, err := client.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, err)
+			require.NotNil(t, reader)
+			require.NotNil(t, resp)
+
+			// Read line by line
+			var lines []string
+			for {
+				line, err := reader.ReadString('\n')
+				if err != nil {
+					break
+				}
+				lines = append(lines, line)
+			}
+
+			// Close the response body
+			resp.Body.Close()
+
+			// Verify content
+			require.Greater(t, len(lines), 0)
+			require.Contains(t, lines[0], "Zone file for export.zone")
+		})
+
+		t.Run("Success - Line by line processing", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			multiLineContent := "; Comment 1\n; Comment 2\n; Comment 3\n$ORIGIN example.com.\n@ IN SOA ns1.example.com. admin.example.com. 1 3600 600 604800 86400\n"
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusOK,
+				nil, nil, "", multiLineContent,
+			))
+
+			reader, resp, err := client.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, err)
+			require.NotNil(t, reader)
+			require.NotNil(t, resp)
+
+			// Read and count lines
+			lineCount := 0
+			for {
+				_, err := reader.ReadString('\n')
+				if err != nil {
+					break
+				}
+				lineCount++
+			}
+
+			resp.Body.Close()
+
+			require.Equal(t, 5, lineCount)
+		})
+
+		t.Run("Error - Zone not found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "zone not found"}`,
+			))
+
+			reader, resp, err := client.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, reader)
+			require.NotNil(t, resp)
+			require.Equal(t, api.ErrZoneMissing, err)
+		})
+
+		t.Run("Error - No export found", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusNotFound,
+				nil, nil, "", `{"message": "No export found."}`,
+			))
+
+			reader, resp, err := client.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, reader)
+			require.NotNil(t, resp)
+			require.Error(t, err)
+		})
+
+		t.Run("Error - HTTP", func(t *testing.T) {
+			defer mock.ClearTestCases()
+
+			require.Nil(t, mock.AddTestCase(
+				http.MethodGet, "/export/zonefile/"+zoneName, http.StatusInternalServerError,
+				nil, nil, "", `{"message": "internal server error"}`,
+			))
+
+			reader, resp, err := client.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, reader)
+			require.NotNil(t, err)
+			require.Contains(t, err.Error(), "internal server error")
+			require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		})
+
+		t.Run("Error - Other", func(t *testing.T) {
+			c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+			reader, resp, err := c.Zones.DownloadZonefileReader(zoneName)
+			require.Nil(t, resp)
+			require.Error(t, err)
+			require.Nil(t, reader)
+		})
+	})
+}
+
+// testWriter is a simple io.Writer implementation for testing
+type testWriter struct {
+	buf *[]byte
+}
+
+func (w *testWriter) Write(p []byte) (n int, err error) {
+	*w.buf = append(*w.buf, p...)
+	return len(p), nil
 }
 
 type errorClient struct{}
