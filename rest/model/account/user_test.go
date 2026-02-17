@@ -96,6 +96,13 @@ func TestUnmarshalUsers(t *testing.T) {
         "manage_lists": false,
         "manage_jobs": false,
         "view_jobs": false
+      },
+      "redirects": {
+        "manage_redirects": true
+      },
+      "insights": {
+        "manage_insights": true,
+        "view_insights": true
       }
     },
     "teams": ["520422919f782d37dffb588a"],
@@ -147,7 +154,11 @@ func TestUnmarshalUsers(t *testing.T) {
 						DeleteJobs:  false,
 					},
 					Redirects: PermissionsRedirects{
-						ManageRedirects: false,
+						ManageRedirects: true,
+					},
+					Insights: PermissionsInsights{
+						ViewInsights:   true,
+						ManageInsights: true,
 					},
 				},
 			},
