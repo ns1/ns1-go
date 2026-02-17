@@ -8,7 +8,7 @@ type PermissionsMap struct {
 	Monitoring PermissionsMonitoring `json:"monitoring"`
 	Security   *PermissionsSecurity  `json:"security,omitempty"`
 	Redirects  PermissionsRedirects  `json:"redirects"`
-	Insights   PermissionsInsights   `json:"insights,omitempty"`
+	Insights   PermissionsInsights   `json:"insights"`
 }
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
