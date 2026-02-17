@@ -8,6 +8,7 @@ type PermissionsMap struct {
 	Monitoring PermissionsMonitoring `json:"monitoring"`
 	Security   *PermissionsSecurity  `json:"security,omitempty"`
 	Redirects  PermissionsRedirects  `json:"redirects"`
+	Insights   PermissionsInsights   `json:"insights"`
 }
 
 // PermissionsDNS wraps a User's "permissions.dns" attribute
@@ -71,4 +72,10 @@ type PermissionsRecord struct {
 // PermissionsRedirects wraps a User's "permissions.redirects" attribute
 type PermissionsRedirects struct {
 	ManageRedirects bool `json:"manage_redirects"`
+}
+
+// PermissionsRedirects wraps a User's "permissions.insights" attribute
+type PermissionsInsights struct {
+	ManageInsights bool `json:"manage_insights,omitempty"`
+	ViewInsights   bool `json:"view_insights,omitempty"`
 }

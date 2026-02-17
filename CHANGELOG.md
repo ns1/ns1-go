@@ -1,3 +1,9 @@
+## 2.17.1 (February 17th, 2026)
+
+FEATURES:
+
+* Adds support for DNS Insights permissions
+
 ## 2.17.0 (December 19th, 2025)
 
 FEATURES:
