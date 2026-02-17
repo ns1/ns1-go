@@ -1,4 +1,4 @@
-## 2.17.1 (February 19th, 2026)
+## 2.17.1 (February 17th, 2026)
 
 FEATURES:
 
