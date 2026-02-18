@@ -1,3 +1,9 @@
+## 2.17.2 (February 18th, 2026)
+
+FEATURES:
+
+* Remove omitempty from the new DNS Insights permissions
+
 ## 2.17.1 (February 17th, 2026)
 
 FEATURES:
