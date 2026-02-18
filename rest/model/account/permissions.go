@@ -76,6 +76,6 @@ type PermissionsRedirects struct {
 
 // PermissionsRedirects wraps a User's "permissions.insights" attribute
 type PermissionsInsights struct {
-	ManageInsights bool `json:"manage_insights,omitempty"`
-	ViewInsights   bool `json:"view_insights,omitempty"`
+	ManageInsights bool `json:"manage_insights"`
+	ViewInsights   bool `json:"view_insights"`
 }
