@@ -142,9 +142,62 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 	return resp, nil
 }
 
+// UpdateSecret updates an API key secret's enabled status or expiration date.
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-secrets-secretid-put
+func (s *APIKeysService) UpdateSecret(secretID string, edit *account.APIKeySecretEdit) (*account.APIKeySecret, *http.Response, error) {
+	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
+
+	req, err := s.client.NewRequest("PUT", path, edit)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var secret account.APIKeySecret
+	resp, err := s.client.Do(req, &secret)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if resourceMissingMatch(err.(*Error).Message) {
+				return nil, resp, ErrSecretMissing
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &secret, resp, nil
+}
+
+// DeleteSecret deletes an API key secret.
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-secrets-secretid-delete
+func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
+	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
+
+	req, err := s.client.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if resourceMissingMatch(err.(*Error).Message) {
+				return resp, ErrSecretMissing
+			}
+		}
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 var (
 	// ErrKeyExists bundles PUT create error.
 	ErrKeyExists = errors.New("key already exists")
 	// ErrKeyMissing bundles GET/POST/DELETE error.
 	ErrKeyMissing = errors.New("key does not exist")
+	// ErrSecretMissing bundles secret GET/PUT/DELETE error.
+	ErrSecretMissing = errors.New("secret does not exist")
 )
