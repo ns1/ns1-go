@@ -147,12 +147,11 @@ func TestUpdateSecret(t *testing.T) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
-		var edit account.APIKeySecretEdit
-		require.NoError(t, json.Unmarshal(b, &edit))
-		assert.NotNil(t, edit.Enabled)
-		assert.False(t, *edit.Enabled)
-		assert.NotNil(t, edit.ExpiresAt)
-		assert.Equal(t, "2026-06-01", *edit.ExpiresAt)
+		var secret account.APIKeySecret
+		require.NoError(t, json.Unmarshal(b, &secret))
+		assert.Equal(t, "secret-123", secret.ID)
+		assert.False(t, secret.Enabled)
+		assert.Equal(t, "2026-06-01", secret.ExpiresAt)
 
 		// Return updated secret
 		response := account.APIKeySecret{
@@ -169,14 +168,13 @@ func TestUpdateSecret(t *testing.T) {
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL))
 
-	enabled := false
-	expiresAt := "2026-06-01"
-	edit := &account.APIKeySecretEdit{
-		Enabled:   &enabled,
-		ExpiresAt: &expiresAt,
+	secret := &account.APIKeySecret{
+		ID:        "secret-123",
+		Enabled:   false,
+		ExpiresAt: "2026-06-01",
 	}
 
-	secret, _, err := c.APIKeys.UpdateSecret("secret-123", edit)
+	_, err := c.APIKeys.UpdateSecret(secret)
 	require.NoError(t, err)
 	assert.Equal(t, "secret-123", secret.ID)
 	assert.False(t, secret.Enabled)
@@ -190,11 +188,10 @@ func TestUpdateSecretEnabledOnly(t *testing.T) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
-		var edit account.APIKeySecretEdit
-		require.NoError(t, json.Unmarshal(b, &edit))
-		assert.NotNil(t, edit.Enabled)
-		assert.True(t, *edit.Enabled)
-		assert.Nil(t, edit.ExpiresAt)
+		var secret account.APIKeySecret
+		require.NoError(t, json.Unmarshal(b, &secret))
+		assert.Equal(t, "secret-456", secret.ID)
+		assert.True(t, secret.Enabled)
 
 		response := account.APIKeySecret{
 			ID:        "secret-456",
@@ -210,12 +207,12 @@ func TestUpdateSecretEnabledOnly(t *testing.T) {
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL))
 
-	enabled := true
-	edit := &account.APIKeySecretEdit{
-		Enabled: &enabled,
+	secret := &account.APIKeySecret{
+		ID:      "secret-456",
+		Enabled: true,
 	}
 
-	secret, _, err := c.APIKeys.UpdateSecret("secret-456", edit)
+	_, err := c.APIKeys.UpdateSecret(secret)
 	require.NoError(t, err)
 	assert.True(t, secret.Enabled)
 }
@@ -262,12 +259,12 @@ func TestUpdateSecretMissing(t *testing.T) {
 	defer ts.Close()
 	c := NewClient(nil, SetEndpoint(ts.URL))
 
-	enabled := true
-	edit := &account.APIKeySecretEdit{
-		Enabled: &enabled,
+	secret := &account.APIKeySecret{
+		ID:      "non-existent",
+		Enabled: true,
 	}
 
-	_, _, err := c.APIKeys.UpdateSecret("non-existent", edit)
+	_, err := c.APIKeys.UpdateSecret(secret)
 	require.Error(t, err)
 	assert.Equal(t, ErrSecretMissing, err)
 }
