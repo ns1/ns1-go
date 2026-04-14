@@ -26,9 +26,3 @@ type APIKeySecret struct {
 	LastAccess string `json:"last_access,omitempty"`
 	Enabled    bool   `json:"enabled,omitempty"`
 }
-
-// APIKeySecretEdit is used to update an API key secret
-type APIKeySecretEdit struct {
-	Enabled   *bool   `json:"enabled,omitempty"`
-	ExpiresAt *string `json:"expires_at,omitempty"`
-}
