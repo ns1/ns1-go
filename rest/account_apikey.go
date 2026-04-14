@@ -143,28 +143,29 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 }
 
 // UpdateSecret updates an API key secret's enabled status or expiration date.
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-put
+func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Response, error) {
+	path := fmt.Sprintf("apikeys/v1/secrets/%s", secret.ID)
 
-func (s *APIKeysService) UpdateSecret(secretID string, edit *account.APIKeySecretEdit) (*account.APIKeySecret, *http.Response, error) {
-	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
-
-	req, err := s.client.NewRequest("PUT", path, edit)
+	req, err := s.client.NewRequest("PUT", path, secret)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	var secret account.APIKeySecret
+	// Update secret fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &secret)
 	if err != nil {
 		switch err.(type) {
 		case *Error:
 			if resourceMissingMatch(err.(*Error).Message) {
-				return nil, resp, ErrSecretMissing
+				return resp, ErrSecretMissing
 			}
 		}
-		return nil, resp, err
+		return resp, err
 	}
 
-	return &secret, resp, nil
+	return resp, nil
 }
 
 // DeleteSecret deletes an API key secret.
