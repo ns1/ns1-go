@@ -14,6 +14,10 @@ import (
 
 var client *api.Client
 
+func boolPtr(b bool) *bool {
+	return &b
+}
+
 // Helper that initializes rest api client from environment variable.
 func init() {
 	k := os.Getenv("NS1_APIKEY")
@@ -97,7 +101,7 @@ func main() {
 		secretToUpdate := retrievedKey.Secrets[0]
 
 		// Modify the secret
-		secretToUpdate.Enabled = false
+		secretToUpdate.Enabled = boolPtr(false)
 
 		// Update it
 		if _, err := client.APIKeys.UpdateSecret(secretToUpdate); err != nil {
@@ -131,7 +135,7 @@ func main() {
 		secretToEnable := retrievedKey.Secrets[0]
 
 		// Re-enable the secret
-		secretToEnable.Enabled = true
+		secretToEnable.Enabled = boolPtr(true)
 
 		// Update it
 		if _, err := client.APIKeys.UpdateSecret(secretToEnable); err != nil {
@@ -155,7 +159,64 @@ func main() {
 		fmt.Printf("Deleted secret: %s\n", secretToDelete)
 	}
 
-	// Example 8: Pretty print the final state
+	// Example 8: Get secret details (admin operation)
+	if len(retrievedKey.Secrets) > 0 {
+		fmt.Println("\n=== Getting Secret Details ===")
+		secretID := retrievedKey.Secrets[0].ID
+		secretDetails, _, err := client.APIKeys.GetSecret(secretID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Secret ID: %s\n", secretDetails.ID)
+		fmt.Printf("Enabled: %t\n", *secretDetails.Enabled)
+		fmt.Printf("Expires At: %s\n", secretDetails.ExpiresAt)
+		if secretDetails.LastAccess != "" {
+			fmt.Printf("Last Access: %s\n", secretDetails.LastAccess)
+		}
+	}
+
+	// Example 9: Renew a secret (admin operation)
+	if len(retrievedKey.Secrets) > 0 {
+		fmt.Println("\n=== Renewing a Secret ===")
+		secretID := retrievedKey.Secrets[0].ID
+		newSecret, _, err := client.APIKeys.RenewSecret(secretID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("New Secret Created:\n")
+		fmt.Printf("  Secret ID: %s\n", newSecret.ID)
+		fmt.Printf("  Secret Key: %s\n", newSecret.Key) // Only visible once!
+		fmt.Printf("  Expires At: %s\n", newSecret.ExpiresAt)
+		fmt.Printf("  Enabled: %t\n", *newSecret.Enabled)
+		fmt.Println("\n⚠️  IMPORTANT: Save the secret key immediately - it won't be shown again!")
+	}
+
+	// Example 10: Self-service operations (using the API key itself)
+	// Note: These would typically be called by the API key itself, not an admin
+	fmt.Println("\n=== Self-Service Operations ===")
+	fmt.Println("(These operations allow an API key to manage itself)")
+
+	// Get own secret details
+	selfSecret, _, err := client.APIKeys.GetSecretSelf()
+	if err != nil {
+		// This might fail if not using the actual secret for auth
+		fmt.Printf("GetSecretSelf (expected to work with actual secret): %v\n", err)
+	} else {
+		fmt.Printf("Current Secret ID: %s\n", selfSecret.ID)
+		fmt.Printf("Expires At: %s\n", selfSecret.ExpiresAt)
+	}
+
+	// Renew own secret
+	renewedSelf, _, err := client.APIKeys.RenewSecretSelf()
+	if err != nil {
+		// This might fail if not using the actual secret for auth
+		fmt.Printf("RenewSecretSelf (expected to work with actual secret): %v\n", err)
+	} else {
+		fmt.Printf("Renewed Secret ID: %s\n", renewedSelf.ID)
+		fmt.Printf("New Secret Key: %s\n", renewedSelf.Key)
+	}
+
+	// Example 11: Pretty print the final state
 	fmt.Println("\n=== Final API Key State ===")
 	finalKey, _, err := client.APIKeys.Get(newKey.ID)
 	if err != nil {
