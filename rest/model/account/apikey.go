@@ -24,5 +24,5 @@ type APIKeySecret struct {
 	Key        string `json:"secret,omitempty"`
 	ExpiresAt  string `json:"expires_at,omitempty"`
 	LastAccess string `json:"last_access,omitempty"`
-	Enabled    bool   `json:"enabled,omitempty"`
+	Enabled    *bool  `json:"enabled,omitempty"`
 }

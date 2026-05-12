@@ -192,6 +192,118 @@ func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
 	return resp, nil
 }
 
+// GetSecret retrieves details of a specific API key secret by its ID.
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-get
+func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
+	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var secret account.APIKeySecret
+	resp, err := s.client.Do(req, &secret)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if resourceMissingMatch(err.(*Error).Message) {
+				return nil, resp, ErrSecretMissing
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &secret, resp, nil
+}
+
+// GetSecretSelf retrieves details of the API key secret used in the current request.
+// This allows an API key to query its own secret information without needing manage_apikeys permission.
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-get
+func (s *APIKeysService) GetSecretSelf() (*account.APIKeySecret, *http.Response, error) {
+	path := "apikeys/v1/secrets/self"
+
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var secret account.APIKeySecret
+	resp, err := s.client.Do(req, &secret)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "invalid authentication credentials" {
+				return nil, resp, ErrInvalidAuth
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &secret, resp, nil
+}
+
+// RenewSecret creates a new secret for an API key specified by its secret ID.
+// This generates a new secret value with an updated expiration date.
+// The API key must have an expiry_duration set, and cannot have more than 2 active secrets.
+// Returns the new secret with the plaintext secret value (only time it's visible).
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-renew-post
+func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
+	path := fmt.Sprintf("apikeys/v1/secrets/%s/renew", secretID)
+
+	req, err := s.client.NewRequest("POST", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var secret account.APIKeySecret
+	resp, err := s.client.Do(req, &secret)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if resourceMissingMatch(err.(*Error).Message) {
+				return nil, resp, ErrSecretMissing
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &secret, resp, nil
+}
+
+// RenewSecretSelf renews the API key secret used in the current request.
+// This generates a new secret value with an updated expiration date.
+// This allows an API key to renew itself without needing manage_apikeys permission.
+// The API key must have an expiry_duration set, and cannot have more than 2 active secrets.
+// Returns the new secret with the plaintext secret value (only time it's visible).
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-renew-post
+func (s *APIKeysService) RenewSecretSelf() (*account.APIKeySecret, *http.Response, error) {
+	path := "apikeys/v1/secrets/self/renew"
+
+	req, err := s.client.NewRequest("POST", path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var secret account.APIKeySecret
+	resp, err := s.client.Do(req, &secret)
+	if err != nil {
+		switch err.(type) {
+		case *Error:
+			if err.(*Error).Message == "invalid authentication credentials" {
+				return nil, resp, ErrInvalidAuth
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &secret, resp, nil
+}
+
 var (
 	// ErrKeyExists bundles PUT create error.
 	ErrKeyExists = errors.New("key already exists")
@@ -199,4 +311,6 @@ var (
 	ErrKeyMissing = errors.New("key does not exist")
 	// ErrSecretMissing bundles secret GET/PUT/DELETE error.
 	ErrSecretMissing = errors.New("secret does not exist")
+	// ErrInvalidAuth bundles authentication error for self-service endpoints.
+	ErrInvalidAuth = errors.New("invalid authentication credentials")
 )
