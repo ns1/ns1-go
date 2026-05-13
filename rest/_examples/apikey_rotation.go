@@ -59,7 +59,9 @@ func main() {
 		fmt.Printf("  Secret ID: %s\n", newKey.Secrets[0].ID)
 		fmt.Printf("  Secret Key: %s\n", newKey.Secrets[0].Key) // Only shown on creation!
 		fmt.Printf("  Expires At: %s\n", newKey.Secrets[0].ExpiresAt)
-		fmt.Printf("  Enabled: %t\n", newKey.Secrets[0].Enabled)
+		if newKey.Secrets[0].Enabled != nil {
+			fmt.Printf("  Enabled: %t\n", *newKey.Secrets[0].Enabled)
+		}
 	}
 
 	// Example 2: Get an API key and view its secrets
@@ -76,7 +78,9 @@ func main() {
 		fmt.Printf("  ID: %s\n", secret.ID)
 		fmt.Printf("  Expires At: %s\n", secret.ExpiresAt)
 		fmt.Printf("  Last Access: %s\n", secret.LastAccess)
-		fmt.Printf("  Enabled: %t\n", secret.Enabled)
+		if secret.Enabled != nil {
+			fmt.Printf("  Enabled: %t\n", *secret.Enabled)
+		}
 		// Note: The actual secret key is NOT returned after creation
 	}
 
@@ -109,7 +113,9 @@ func main() {
 		}
 
 		fmt.Printf("Disabled secret: %s\n", secretToUpdate.ID)
-		fmt.Printf("  Enabled: %t\n", secretToUpdate.Enabled)
+		if secretToUpdate.Enabled != nil {
+			fmt.Printf("  Enabled: %t\n", *secretToUpdate.Enabled)
+		}
 	}
 
 	// Example 5: Update a secret's expiration date
@@ -143,7 +149,9 @@ func main() {
 		}
 
 		fmt.Printf("Re-enabled secret: %s\n", secretToEnable.ID)
-		fmt.Printf("  Enabled: %t\n", secretToEnable.Enabled)
+		if secretToEnable.Enabled != nil {
+			fmt.Printf("  Enabled: %t\n", *secretToEnable.Enabled)
+		}
 	}
 
 	// Example 7: Delete a secret
