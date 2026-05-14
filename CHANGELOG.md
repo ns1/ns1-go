@@ -1,3 +1,9 @@
+## 2.18.0 (TBD)
+
+FEATURES:
+
+* Add support for API Key expiry and secret renewal
+
 ## 2.17.2 (February 18th, 2026)
 
 FEATURES:
