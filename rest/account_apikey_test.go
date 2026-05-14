@@ -360,7 +360,8 @@ func TestGetSecretSelfInvalidAuth(t *testing.T) {
 
 	_, _, err := c.APIKeys.GetSecretSelf()
 	require.Error(t, err)
-	assert.Equal(t, ErrInvalidAuth, err)
+	// GetSecretSelf now calls GetSecret("self"), which returns the raw error
+	assert.Contains(t, err.Error(), "invalid authentication credentials")
 }
 
 func TestRenewSecret(t *testing.T) {
@@ -470,7 +471,8 @@ func TestRenewSecretSelfInvalidAuth(t *testing.T) {
 
 	_, _, err := c.APIKeys.RenewSecretSelf()
 	require.Error(t, err)
-	assert.Equal(t, ErrInvalidAuth, err)
+	// RenewSecretSelf now calls RenewSecret("self"), which returns the raw error
+	assert.Contains(t, err.Error(), "invalid authentication credentials")
 }
 
 func TestRenewSecretSelfNoExpiryDuration(t *testing.T) {

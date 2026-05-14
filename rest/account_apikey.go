@@ -223,26 +223,7 @@ func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *htt
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-get
 func (s *APIKeysService) GetSecretSelf() (*account.APIKeySecret, *http.Response, error) {
-	path := "apikeys/v1/secrets/self"
-
-	req, err := s.client.NewRequest("GET", path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var secret account.APIKeySecret
-	resp, err := s.client.Do(req, &secret)
-	if err != nil {
-		switch err.(type) {
-		case *Error:
-			if err.(*Error).Message == "invalid authentication credentials" {
-				return nil, resp, ErrInvalidAuth
-			}
-		}
-		return nil, resp, err
-	}
-
-	return &secret, resp, nil
+	return s.GetSecret("self")
 }
 
 // RenewSecret creates a new secret for an API key specified by its secret ID.
@@ -282,26 +263,7 @@ func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *h
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-renew-post
 func (s *APIKeysService) RenewSecretSelf() (*account.APIKeySecret, *http.Response, error) {
-	path := "apikeys/v1/secrets/self/renew"
-
-	req, err := s.client.NewRequest("POST", path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var secret account.APIKeySecret
-	resp, err := s.client.Do(req, &secret)
-	if err != nil {
-		switch err.(type) {
-		case *Error:
-			if err.(*Error).Message == "invalid authentication credentials" {
-				return nil, resp, ErrInvalidAuth
-			}
-		}
-		return nil, resp, err
-	}
-
-	return &secret, resp, nil
+	return s.RenewSecret("self")
 }
 
 var (
@@ -311,6 +273,4 @@ var (
 	ErrKeyMissing = errors.New("key does not exist")
 	// ErrSecretMissing bundles secret GET/PUT/DELETE error.
 	ErrSecretMissing = errors.New("secret does not exist")
-	// ErrInvalidAuth bundles authentication error for self-service endpoints.
-	ErrInvalidAuth = errors.New("invalid authentication credentials")
 )

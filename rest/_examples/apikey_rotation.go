@@ -184,10 +184,11 @@ func main() {
 	}
 
 	// Example 9: Renew a secret (admin operation)
+	var newSecret *account.APIKeySecret
 	if len(retrievedKey.Secrets) > 0 {
 		fmt.Println("\n=== Renewing a Secret ===")
 		secretID := retrievedKey.Secrets[0].ID
-		newSecret, _, err := client.APIKeys.RenewSecret(secretID)
+		newSecret, _, err = client.APIKeys.RenewSecret(secretID)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -196,32 +197,36 @@ func main() {
 		fmt.Printf("  Secret Key: %s\n", newSecret.Key) // Only visible once!
 		fmt.Printf("  Expires At: %s\n", newSecret.ExpiresAt)
 		fmt.Printf("  Enabled: %t\n", *newSecret.Enabled)
-		fmt.Println("\n⚠️  IMPORTANT: Save the secret key immediately - it won't be shown again!")
+		fmt.Println("\nIMPORTANT: Save the secret key immediately - it won't be shown again!")
 	}
 
-	// Example 10: Self-service operations (using the API key itself)
-	// Note: These would typically be called by the API key itself, not an admin
-	fmt.Println("\n=== Self-Service Operations ===")
-	fmt.Println("(These operations allow an API key to manage itself)")
+	// Example 10: Self-service operations (using the renewed secret)
+	// Note: These operations allow an API key to manage itself
+	if newSecret != nil && newSecret.Key != "" {
+		fmt.Println("\n=== Self-Service Operations ===")
+		fmt.Println("(Demonstrating with the newly created secret)")
 
-	// Get own secret details
-	selfSecret, _, err := client.APIKeys.GetSecretSelf()
-	if err != nil {
-		// This might fail if not using the actual secret for auth
-		fmt.Printf("GetSecretSelf (expected to work with actual secret): %v\n", err)
-	} else {
-		fmt.Printf("Current Secret ID: %s\n", selfSecret.ID)
-		fmt.Printf("Expires At: %s\n", selfSecret.ExpiresAt)
-	}
+		// Create a new client using the renewed secret
+		secretClient := api.NewClient(
+			&http.Client{Timeout: time.Second * 10},
+			api.SetAPIKey(newSecret.Key),
+		)
 
-	// Renew own secret
-	renewedSelf, _, err := client.APIKeys.RenewSecretSelf()
-	if err != nil {
-		// This might fail if not using the actual secret for auth
-		fmt.Printf("RenewSecretSelf (expected to work with actual secret): %v\n", err)
-	} else {
-		fmt.Printf("Renewed Secret ID: %s\n", renewedSelf.ID)
-		fmt.Printf("New Secret Key: %s\n", renewedSelf.Key)
+		// Get own secret details
+		selfSecret, _, err := secretClient.APIKeys.GetSecretSelf()
+		if err != nil {
+			fmt.Printf("GetSecretSelf error: %v\n", err)
+		} else {
+			fmt.Printf("Current Secret ID: %s\n", selfSecret.ID)
+			fmt.Printf("Expires At: %s\n", selfSecret.ExpiresAt)
+			if selfSecret.Enabled != nil {
+				fmt.Printf("Enabled: %t\n", *selfSecret.Enabled)
+			}
+		}
+
+		// Note: RenewSecretSelf would create another secret, but we'll skip it
+		// to avoid creating too many secrets in this example
+		fmt.Println("\n(Skipping RenewSecretSelf to avoid creating too many secrets)")
 	}
 
 	// Example 11: Pretty print the final state
