@@ -11,6 +11,10 @@ import (
 // APIKeysService handles 'account/apikeys' endpoint.
 type APIKeysService service
 
+// The base for the apikey secrets api relative to /v1
+// client.NewRequest will call ResolveReference and remove /v1/../
+const apikeySecretsRelativeBase = "../apikeys/v1/secrets"
+
 // List returns all api keys in the account.
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-get
@@ -146,7 +150,7 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-put
 func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Response, error) {
-	path := fmt.Sprintf("apikeys/v1/secrets/%s", secret.ID)
+	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secret.ID)
 
 	req, err := s.client.NewRequest("PUT", path, secret)
 	if err != nil {
@@ -169,9 +173,10 @@ func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Respo
 }
 
 // DeleteSecret deletes an API key secret.
-
+//
+// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-delete
 func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
-	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
+	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secretID)
 
 	req, err := s.client.NewRequest("DELETE", path, nil)
 	if err != nil {
@@ -196,7 +201,7 @@ func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-get
 func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
-	path := fmt.Sprintf("apikeys/v1/secrets/%s", secretID)
+	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secretID)
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
@@ -233,7 +238,7 @@ func (s *APIKeysService) GetSecretSelf() (*account.APIKeySecret, *http.Response,
 //
 // NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-renew-post
 func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
-	path := fmt.Sprintf("apikeys/v1/secrets/%s/renew", secretID)
+	path := fmt.Sprintf("%s/%s/renew", apikeySecretsRelativeBase, secretID)
 
 	req, err := s.client.NewRequest("POST", path, nil)
 	if err != nil {
