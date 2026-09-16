@@ -1,3 +1,10 @@
+## Unreleased
+
+FEATURES:
+
+* Add support for redirects usage
+
+
 ## 2.18.0 (June 8th, 2026)
 
 FEATURES:

@@ -13,7 +13,7 @@ type ApplicationsService service
 
 // List returns all pulsar Applications
 //
-// NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getAllAppDetails
 func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "pulsar/apps", nil)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *ApplicationsService) List() ([]*pulsar.Application, *http.Response, err
 
 // Get takes a application id and returns application struct.
 //
-// NS1 API docs: https://ns1.com/api#get-list-pulsar-applications
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getAppDetailsAppId
 func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
@@ -43,9 +43,9 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 	var a pulsar.Application
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Resp.StatusCode == 404 {
+			if err.Resp.StatusCode == 404 {
 				return nil, resp, ErrApplicationMissing
 			}
 		}
@@ -58,7 +58,7 @@ func (s *ApplicationsService) Get(id string) (*pulsar.Application, *http.Respons
 // Create takes a *pulsar.Application and creates a new Application.
 //
 // The given application must have at least the name
-// NS1 API docs: https://ns1.com/api#put-create-a-pulsar-application
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createAppCustomer
 func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, error) {
 	req, err := s.client.NewRequest("PUT", "pulsar/apps", a)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *ApplicationsService) Create(a *pulsar.Application) (*http.Response, err
 
 // Update takes a *pulsar.Application and updates the application with same id on Ns1.
 //
-// NS1 API docs: https://ns1.com/api#post-modify-an-application
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#updateAppAppId
 func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", a.ID)
 
@@ -81,9 +81,9 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Resp.StatusCode == 404 {
+			if err.Resp.StatusCode == 404 {
 				return resp, ErrApplicationMissing
 			}
 		}
@@ -95,7 +95,7 @@ func (s *ApplicationsService) Update(a *pulsar.Application) (*http.Response, err
 
 // Delete takes a application Id, and removes an existing application
 //
-// NS1 API docs: https://ns1.com/api#delete-delete-a-pulsar-application
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#deleteAppAppId
 func (s *ApplicationsService) Delete(id string) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s", id)
 
@@ -106,9 +106,9 @@ func (s *ApplicationsService) Delete(id string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Resp.StatusCode == 404 {
+			if err.Resp.StatusCode == 404 {
 				return resp, ErrApplicationMissing
 			}
 		}

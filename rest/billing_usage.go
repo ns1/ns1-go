@@ -17,7 +17,7 @@ type BillingUsageService service
 const billingUsageRelativeBase = "../billing-usage/v1"
 
 // GetQueries takes the timeframe input "from" and "to", returns all its queries.
-// NS1 API docs: https://ns1.com/api/#billing-usage-queries-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageQueries
 func (bu *BillingUsageService) GetQueries(from int32, to int32) (*billingusage.Queries, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsageRelativeBase, billingusage.BillingUsageQueries, from, to)
 	req, err := bu.client.NewRequest(http.MethodGet, path, nil)
@@ -43,7 +43,7 @@ func (bu *BillingUsageService) GetQueries(from int32, to int32) (*billingusage.Q
 }
 
 // GetDecisions takes the timeframe input "from" and "to", returns all its decisions.
-// NS1 API docs: https://ns1.com/api/#billing-usage-decisions-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageDecisions
 func (bu *BillingUsageService) GetDecisions(from int32, to int32) (*billingusage.TotalUsage, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsageRelativeBase, billingusage.BillingUsageDecisions, from, to)
 
@@ -70,7 +70,7 @@ func (bu *BillingUsageService) GetDecisions(from int32, to int32) (*billingusage
 }
 
 // GetLimits takes the timeframe input "from" and "to", returns all its limits.
-// NS1 API docs: https://ns1.com/api/#billing-usage-limits-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageLimits
 func (bu *BillingUsageService) GetLimits(from int32, to int32) (*billingusage.Limits, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s?from=%d&to=%d", billingUsageRelativeBase, billingusage.BillingUsageLimits, from, to)
 
@@ -97,7 +97,7 @@ func (bu *BillingUsageService) GetLimits(from int32, to int32) (*billingusage.Li
 }
 
 // GetMonitors returns total no. of monitors.
-// NS1 API docs: https://ns1.com/api/#billing-usage-monitors-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageMonitors
 func (bu *BillingUsageService) GetMonitors() (*billingusage.TotalUsage, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", billingUsageRelativeBase, billingusage.BillingUsageMonitors)
 
@@ -124,7 +124,7 @@ func (bu *BillingUsageService) GetMonitors() (*billingusage.TotalUsage, *http.Re
 }
 
 // GetFilterChains returns total no. of filter-chains.
-// NS1 API docs: https://ns1.com/api/#billing-usage-filter-chains-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageFilterChains
 func (bu *BillingUsageService) GetFilterChains() (*billingusage.TotalUsage, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", billingUsageRelativeBase, billingusage.BillingUsageFilterChains)
 
@@ -151,7 +151,7 @@ func (bu *BillingUsageService) GetFilterChains() (*billingusage.TotalUsage, *htt
 }
 
 // GetRecords returns total no. of records.
-// NS1 API docs: https://ns1.com/api/#billing-usage-records-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageRecords
 func (bu *BillingUsageService) GetRecords() (*billingusage.TotalUsage, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", billingUsageRelativeBase, billingusage.BillingUsageRecords)
 
@@ -175,4 +175,31 @@ func (bu *BillingUsageService) GetRecords() (*billingusage.TotalUsage, *http.Res
 	}
 
 	return &records, resp, nil
+}
+
+// GetRedirects returns total no. of redirects.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getBillingUsageRedirects
+func (bu *BillingUsageService) GetRedirects() (*billingusage.TotalUsage, *http.Response, error) {
+	path := fmt.Sprintf("%s/%s", billingUsageRelativeBase, billingusage.BillingUsageRedirects)
+
+	req, err := bu.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var redirects billingusage.TotalUsage
+
+	resp, err := bu.client.Do(req, &redirects)
+	if err != nil {
+		var clientErr *Error
+		switch {
+		case errors.As(err, &clientErr):
+			if strings.HasSuffix(clientErr.Message, billingusage.NotFound) {
+				return nil, resp, billingusage.ErrBillingUsageNotFound
+			}
+		}
+		return nil, resp, err
+	}
+
+	return &redirects, resp, nil
 }

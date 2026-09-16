@@ -3,5 +3,5 @@
 // To understand the REST models and terminology,
 // please visit the ns1 web page:
 //
-//	https://ns1.com/
+//	https://www.ibm.com/docs/en/ns1-connect
 package ns1

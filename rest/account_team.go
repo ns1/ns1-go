@@ -13,7 +13,7 @@ type TeamsService service
 
 // List returns all teams in the account.
 //
-// NS1 API docs: https://ns1.com/api/#teams-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listTeams
 func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/teams", nil)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *TeamsService) List() ([]*account.Team, *http.Response, error) {
 
 // Get returns details of a single team.
 //
-// NS1 API docs: https://ns1.com/api/#teams-id-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getTeam
 func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
@@ -43,9 +43,9 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 	var t account.Team
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrTeamMissing
 			}
 		}
@@ -57,7 +57,7 @@ func (s *TeamsService) Get(id string) (*account.Team, *http.Response, error) {
 
 // Create takes a *Team and creates a new account team.
 //
-// NS1 API docs: https://ns1.com/api/#teams-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createTeams
 func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 	var (
 		req *http.Request
@@ -72,9 +72,9 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == fmt.Sprintf("team with name \"%s\" exists", t.Name) {
+			if err.Message == fmt.Sprintf("team with name \"%s\" exists", t.Name) {
 				return resp, ErrTeamExists
 			}
 		}
@@ -86,7 +86,7 @@ func (s *TeamsService) Create(t *account.Team) (*http.Response, error) {
 
 // Update changes the name or access rights for a team.
 //
-// NS1 API docs: https://ns1.com/api/#teams-id-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyTeam
 func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", t.ID)
 
@@ -103,9 +103,9 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 	// Update team fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &t)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrTeamMissing
 			}
 		}
@@ -117,7 +117,7 @@ func (s *TeamsService) Update(t *account.Team) (*http.Response, error) {
 
 // Delete deletes a team.
 //
-// NS1 API docs: https://ns1.com/api/#teams-id-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeTeam
 func (s *TeamsService) Delete(id string) (*http.Response, error) {
 	path := fmt.Sprintf("account/teams/%s", id)
 
@@ -128,9 +128,9 @@ func (s *TeamsService) Delete(id string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrTeamMissing
 			}
 		}

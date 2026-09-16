@@ -17,7 +17,7 @@ const apikeySecretsRelativeBase = "../apikeys/v1/secrets"
 
 // List returns all api keys in the account.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listApiKeys
 func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/apikeys", nil)
 	if err != nil {
@@ -36,7 +36,7 @@ func (s *APIKeysService) List() ([]*account.APIKey, *http.Response, error) {
 // Get returns details of an api key, including permissions, for a single API Key.
 // Note: do not use the API Key itself as the keyid in the URL — use the id of the key.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-id-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getApiKey
 func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
@@ -48,9 +48,9 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 	var a account.APIKey
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrKeyMissing
 			}
 
@@ -63,7 +63,7 @@ func (s *APIKeysService) Get(keyID string) (*account.APIKey, *http.Response, err
 
 // Create takes a *APIKey and creates a new account apikey.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createApikey
 func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 	var (
 		req *http.Request
@@ -78,9 +78,9 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 	// Update account fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == fmt.Sprintf("api key with name \"%s\" exists", a.Name) {
+			if err.Message == fmt.Sprintf("api key with name \"%s\" exists", a.Name) {
 				return resp, ErrKeyExists
 			}
 		}
@@ -92,7 +92,7 @@ func (s *APIKeysService) Create(a *account.APIKey) (*http.Response, error) {
 
 // Update changes the name or access rights for an API Key.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-id-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyApikey
 func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", a.ID)
 
@@ -109,9 +109,9 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 	// Update apikey fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &a)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrKeyMissing
 			}
 		}
@@ -123,7 +123,7 @@ func (s *APIKeysService) Update(a *account.APIKey) (*http.Response, error) {
 
 // Delete deletes an apikey.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-id-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeApiKey
 func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 	path := fmt.Sprintf("account/apikeys/%s", keyID)
 
@@ -134,9 +134,9 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrKeyMissing
 			}
 		}
@@ -148,7 +148,7 @@ func (s *APIKeysService) Delete(keyID string) (*http.Response, error) {
 
 // UpdateSecret updates an API key secret's enabled status or expiration date.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyApiKeySecret
 func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secret.ID)
 
@@ -160,9 +160,9 @@ func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Respo
 	// Update secret fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &secret)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrSecretMissing
 			}
 		}
@@ -174,7 +174,7 @@ func (s *APIKeysService) UpdateSecret(secret *account.APIKeySecret) (*http.Respo
 
 // DeleteSecret deletes an API key secret.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeApiKeySecret
 func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secretID)
 
@@ -185,9 +185,9 @@ func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrSecretMissing
 			}
 		}
@@ -199,7 +199,7 @@ func (s *APIKeysService) DeleteSecret(secretID string) (*http.Response, error) {
 
 // GetSecret retrieves details of a specific API key secret by its ID.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getApiKeySecret
 func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", apikeySecretsRelativeBase, secretID)
 
@@ -211,9 +211,9 @@ func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *htt
 	var secret account.APIKeySecret
 	resp, err := s.client.Do(req, &secret)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrSecretMissing
 			}
 		}
@@ -226,7 +226,7 @@ func (s *APIKeysService) GetSecret(secretID string) (*account.APIKeySecret, *htt
 // GetSecretSelf retrieves details of the API key secret used in the current request.
 // This allows an API key to query its own secret information without needing manage_apikeys permission.
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getApiKeySecretSelf
 func (s *APIKeysService) GetSecretSelf() (*account.APIKeySecret, *http.Response, error) {
 	return s.GetSecret("self")
 }
@@ -236,7 +236,7 @@ func (s *APIKeysService) GetSecretSelf() (*account.APIKeySecret, *http.Response,
 // The API key must have an expiry_duration set, and cannot have more than 2 active secrets.
 // Returns the new secret with the plaintext secret value (only time it's visible).
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-secretid-renew-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#renewApiKeySecret
 func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s/renew", apikeySecretsRelativeBase, secretID)
 
@@ -248,9 +248,9 @@ func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *h
 	var secret account.APIKeySecret
 	resp, err := s.client.Do(req, &secret)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrSecretMissing
 			}
 		}
@@ -266,7 +266,7 @@ func (s *APIKeysService) RenewSecret(secretID string) (*account.APIKeySecret, *h
 // The API key must have an expiry_duration set, and cannot have more than 2 active secrets.
 // Returns the new secret with the plaintext secret value (only time it's visible).
 //
-// NS1 API docs: https://ns1.com/api/#apikeys-v1-secrets-self-renew-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#renewApiKeySecretSelf
 func (s *APIKeysService) RenewSecretSelf() (*account.APIKeySecret, *http.Response, error) {
 	return s.RenewSecret("self")
 }

@@ -16,7 +16,7 @@ type ZonesService service
 
 // List returns all active zones and basic zone configuration details for each.
 //
-// NS1 API docs: https://ns1.com/api/#zones-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listZones
 func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "zones", nil)
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *ZonesService) List() ([]*dns.Zone, *http.Response, error) {
 //
 //	records Optional Query Parameter, if false records array in payload returns empty
 //
-// NS1 API docs: https://ns1.com/api/#zones-zone-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getZone
 func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 	if !records {
@@ -61,9 +61,9 @@ func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response
 		resp, err = s.client.Do(req, &z)
 	}
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "zone not found" {
+			if err.Message == "zone not found" {
 				return nil, resp, ErrZoneMissing
 			}
 		}
@@ -75,7 +75,7 @@ func (s *ZonesService) Get(zone string, records bool) (*dns.Zone, *http.Response
 
 // Create takes a *Zone and creates a new DNS zone.
 //
-// NS1 API docs: https://ns1.com/api/#zones-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createZone
 func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
@@ -87,11 +87,11 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "zone already exists" ||
-				err.(*Error).Message == "invalid: FQDN already exists" ||
-				err.(*Error).Message == "invalid: FQDN already exists in the view" {
+			if err.Message == "zone already exists" ||
+				err.Message == "invalid: FQDN already exists" ||
+				err.Message == "invalid: FQDN already exists in the view" {
 				return resp, ErrZoneExists
 			}
 		}
@@ -103,7 +103,7 @@ func (s *ZonesService) Create(z *dns.Zone) (*http.Response, error) {
 
 // Update takes a *Zone and modifies basic details of a DNS zone.
 //
-// NS1 API docs: https://ns1.com/api/#zones-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#updateZone
 func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", z.Zone)
 
@@ -115,9 +115,9 @@ func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 	// Update zones fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &z)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "zone not found" {
+			if err.Message == "zone not found" {
 				return resp, ErrZoneMissing
 			}
 		}
@@ -129,7 +129,7 @@ func (s *ZonesService) Update(z *dns.Zone) (*http.Response, error) {
 
 // Delete takes a zone and destroys an existing DNS zone and all records in the zone.
 //
-// NS1 API docs: https://ns1.com/api/#zones-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeZone
 func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s", zone)
 
@@ -140,9 +140,9 @@ func (s *ZonesService) Delete(zone string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "zone not found" {
+			if err.Message == "zone not found" {
 				return resp, ErrZoneMissing
 			}
 		}
@@ -193,6 +193,7 @@ func (s *ZonesService) nextRecords(v *interface{}, uri string) (*http.Response, 
 // ExportZonefile initiates the export of a zone file (BIND / RFC-1035 format) for the specified zone
 // or returns the current status. This operation is idempotent; calling it repeatedly returns the
 // current status if no zone updates have been made.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#putExportZonefile
 func (s *ZonesService) ExportZonefile(zone string) (*dns.ZoneFileExportStatus, *http.Response, error) {
 	path := fmt.Sprintf("export/zonefile/%s", zone)
 
@@ -216,6 +217,7 @@ func (s *ZonesService) ExportZonefile(zone string) (*dns.ZoneFileExportStatus, *
 
 // GetExportZonefileStatus returns the current status of the zone file export for the specified zone.
 // This endpoint does not initiate a new export.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getExportZonefileStatus
 func (s *ZonesService) GetExportZonefileStatus(zone string) (*dns.ZoneFileExportStatus, *http.Response, error) {
 	path := fmt.Sprintf("export/zonefile/%s/status", zone)
 
@@ -239,6 +241,7 @@ func (s *ZonesService) GetExportZonefileStatus(zone string) (*dns.ZoneFileExport
 
 // DownloadZonefile downloads the generated zone file for the specified zone. Returns a bytes.Buffer containing the zone file contents.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getExportZonefile
 func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Response, error) {
 	var buf bytes.Buffer
 	resp, err := s.DownloadZonefileWriter(zone, &buf)
@@ -251,6 +254,7 @@ func (s *ZonesService) DownloadZonefile(zone string) (*bytes.Buffer, *http.Respo
 // DownloadZonefileWriter downloads the generated zone file for the specified zone, and streams it directly to the provided io.Writer.
 // This is more memory-efficient for large zone files as it doesn't buffer the entire content.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getExportZonefile
 func (s *ZonesService) DownloadZonefileWriter(zone string, w io.Writer) (*http.Response, error) {
 	path := fmt.Sprintf("export/zonefile/%s", zone)
 
@@ -274,6 +278,7 @@ func (s *ZonesService) DownloadZonefileWriter(zone string, w io.Writer) (*http.R
 // DownloadZonefileReader downloads the generated zone file for the specified zone and returns a buffered reader for line-by-line processing.
 // The caller is responsible for closing the http.Response.Body when done.
 // The filename can be retrieved from the 'Content-Disposition' header in the http.Response.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getExportZonefile
 func (s *ZonesService) DownloadZonefileReader(zone string) (*bufio.Reader, *http.Response, error) {
 	path := fmt.Sprintf("export/zonefile/%s", zone)
 

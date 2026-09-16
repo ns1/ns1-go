@@ -12,7 +12,7 @@ type DataFeedsService service
 
 // List returns all data feeds connected to a given data source.
 //
-// NS1 API docs: https://ns1.com/api/#feeds-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listFeeds
 func (s *DataFeedsService) List(sourceID string) ([]*data.Feed, *http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s", sourceID)
 
@@ -32,7 +32,7 @@ func (s *DataFeedsService) List(sourceID string) ([]*data.Feed, *http.Response, 
 
 // Get takes a data source ID and a data feed ID and returns the details of a single data feed
 //
-// NS1 API docs: https://ns1.com/api/#feeds-feed-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getFeed
 func (s *DataFeedsService) Get(sourceID string, feedID string) (*data.Feed, *http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, feedID)
 
@@ -52,7 +52,7 @@ func (s *DataFeedsService) Get(sourceID string, feedID string) (*data.Feed, *htt
 
 // Create takes a *DataFeed and connects a new data feed to an existing data source.
 //
-// NS1 API docs: https://ns1.com/api/#feeds-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createFeed
 func (s *DataFeedsService) Create(sourceID string, df *data.Feed) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s", sourceID)
 
@@ -78,7 +78,7 @@ func (s *DataFeedsService) Create(sourceID string, df *data.Feed) (*http.Respons
 //   - Both the 'destinations' and 'networks' attributes are
 //     not updated during a POST.
 //
-// NS1 API docs: https://ns1.com/api/#feeds-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyFeed
 func (s *DataFeedsService) Update(sourceID string, df *data.Feed) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, df.ID)
 
@@ -98,7 +98,7 @@ func (s *DataFeedsService) Update(sourceID string, df *data.Feed) (*http.Respons
 
 // Delete takes a data source ID and a data feed ID and disconnects the feed from the data source and all attached destination metadata tables.
 //
-// NS1 API docs: https://ns1.com/api/#feeds-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeFeed
 func (s *DataFeedsService) Delete(sourceID string, feedID string) (*http.Response, error) {
 	path := fmt.Sprintf("data/feeds/%s/%s", sourceID, feedID)
 

@@ -174,3 +174,29 @@ func (s *Service) AddBillingUsageRecordFailTestCase(
 		method, path, returnStatus,
 		nil, nil, "", responseBody)
 }
+
+// AddBillingUsageRedirectsGetTestCase sets up a test case for the api.Client.BillingUsage.GetRedirects()
+// function.
+func (s *Service) AddBillingUsageRedirectsGetTestCase(
+	requestHeaders, responseHeaders http.Header,
+	response *billingusage.TotalUsage,
+) error {
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageRedirects)
+	return s.AddTestCase(
+		http.MethodGet, path, http.StatusOK, requestHeaders,
+		responseHeaders, "", response,
+	)
+}
+
+// AddBillingUsageRedirectsFailTestCase sets up a failing test case for the api.Client.BillingUsage.GetRedirects()
+// function.
+func (s *Service) AddBillingUsageRedirectsFailTestCase(
+	method string, returnStatus int,
+	requestHeaders, responseHeaders http.Header,
+	responseBody string,
+) error {
+	path := fmt.Sprintf("%s/%s", billingUsagePath, billingusage.BillingUsageRedirects)
+	return s.AddTestCase(
+		method, path, returnStatus,
+		nil, nil, "", responseBody)
+}

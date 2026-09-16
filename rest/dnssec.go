@@ -13,7 +13,7 @@ type DNSSECService service
 
 // Get takes a zone, and returns DNSSEC information.
 //
-// NS1 API docs: https://ns1.com/api#get-get-dnssec-details-for-a-zone
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDnssecInfo
 func (s *DNSSECService) Get(zone string) (*dns.ZoneDNSSEC, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/dnssec", zone)
 
@@ -26,12 +26,12 @@ func (s *DNSSECService) Get(zone string) (*dns.ZoneDNSSEC, *http.Response, error
 	resp, err := s.client.Do(req, &d)
 
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "zone not found" {
+			if err.Message == "zone not found" {
 				return nil, resp, ErrZoneMissing
 			}
-			if err.(*Error).Message == "DNSSEC is not enabled on the zone" {
+			if err.Message == "DNSSEC is not enabled on the zone" {
 				return nil, resp, ErrDNSECNotEnabled
 			}
 		}

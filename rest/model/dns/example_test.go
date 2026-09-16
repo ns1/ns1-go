@@ -17,7 +17,7 @@ func ExampleZone() {
 	// example.com
 }
 
-// Example references https://ns1.com/articles/primary-dns-with-ns1
+// Example references https://www.ibm.com/docs/en/ns1-connect?topic=started-configuring-ns1-connect-as-primary-dns-provider
 func ExampleZone_MakePrimary() {
 	// Secondary/slave dns server info.
 	secondary := dns.ZoneSecondaryServer{

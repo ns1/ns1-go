@@ -24,7 +24,7 @@ type alertListResponse struct {
 
 // List returns all configured alerts.
 //
-// NS1 API docs: https://ns1.com/api/#alerts-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listAlerts
 func (s *AlertsService) List() ([]*alerting.Alert, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", alertingRelativeBase, "alerts")
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -66,7 +66,7 @@ func (s *AlertsService) nextAlerts(v *interface{}, uri string) (*http.Response, 
 
 // Get returns the details of a specific alert.
 //
-// NS1 API docs: https://ns1.com/api/#alert-alertid-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getAlert
 func (s *AlertsService) Get(alertID string) (*alerting.Alert, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s", alertingRelativeBase, "alerts", alertID)
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -77,9 +77,9 @@ func (s *AlertsService) Get(alertID string) (*alerting.Alert, *http.Response, er
 	var alert alerting.Alert
 	resp, err := s.client.Do(req, &alert)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrAlertMissing
 			}
 		}
@@ -91,7 +91,7 @@ func (s *AlertsService) Get(alertID string) (*alerting.Alert, *http.Response, er
 
 // Create takes a *alerting.Alert and creates a new alert.
 //
-// NS1 API docs: https://ns1.com/api/#alert-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createAlert
 func (s *AlertsService) Create(alert *alerting.Alert) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", alertingRelativeBase, "alerts")
 	req, err := s.client.NewRequest("POST", path, &alert)
@@ -102,9 +102,9 @@ func (s *AlertsService) Create(alert *alerting.Alert) (*http.Response, error) {
 	// Update the alerts fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &alert)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Resp.StatusCode == http.StatusConflict {
+			if err.Resp.StatusCode == http.StatusConflict {
 				return resp, ErrAlertExists
 			}
 		}
@@ -116,7 +116,7 @@ func (s *AlertsService) Create(alert *alerting.Alert) (*http.Response, error) {
 
 // Update updates the fields specified in the passed alert object.
 //
-// NS1 API docs: https://ns1.com/api/#alert-alertid-patch
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyAlert
 func (s *AlertsService) Update(alert *alerting.Alert) (*http.Response, error) {
 	alertID := ""
 	if alert != nil && alert.ID != nil {
@@ -140,7 +140,7 @@ func (s *AlertsService) Update(alert *alerting.Alert) (*http.Response, error) {
 
 // Replace replaces the values in an alert with the values in the passed object.
 //
-// NS1 API docs: https://ns1.com/api/#alert-alertid-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#replaceAlert
 func (s *AlertsService) Replace(alert *alerting.Alert) (*http.Response, error) {
 	alertID := ""
 	if alert != nil && alert.ID != nil {
@@ -164,7 +164,7 @@ func (s *AlertsService) Replace(alert *alerting.Alert) (*http.Response, error) {
 
 // Delete deletes an existing alert.
 //
-// NS1 API docs: https://ns1.com/api/#alert-alertid-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeAlert
 func (s *AlertsService) Delete(alertID string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s", alertingRelativeBase, "alerts", alertID)
 	req, err := s.client.NewRequest("DELETE", path, nil)
@@ -182,7 +182,7 @@ func (s *AlertsService) Delete(alertID string) (*http.Response, error) {
 
 // Test an existing alert, triggers notifications for the given alert id.
 //
-// NS1 API docs: https://ns1.com/api/#alert-alertid-test
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#testAlert
 func (s *AlertsService) Test(alertID string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s/test", alertingRelativeBase, "alerts", alertID)
 	req, err := s.client.NewRequest("POST", path, nil)

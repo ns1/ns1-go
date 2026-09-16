@@ -7,11 +7,13 @@ import (
 )
 
 // SettingsService handles 'account/settings' endpoint.
+//
+// Deprecated: This service is deprecated and will be removed in a future release.
 type SettingsService service
 
 // Get returns the basic contact details associated with the account.
 //
-// NS1 API docs: https://ns1.com/api/#settings-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *SettingsService) Get() (*account.Setting, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/settings", nil)
 	if err != nil {
@@ -29,7 +31,7 @@ func (s *SettingsService) Get() (*account.Setting, *http.Response, error) {
 
 // Update changes most of the basic contact details, except customerid.
 //
-// NS1 API docs: https://ns1.com/api/#settings-post
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *SettingsService) Update(us *account.Setting) (*http.Response, error) {
 	req, err := s.client.NewRequest("POST", "account/settings", &us)
 	if err != nil {

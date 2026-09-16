@@ -13,7 +13,7 @@ type PulsarJobsService service
 
 // List takes an Application ID and returns all Jobs inside said Application.
 //
-// NS1 API docs: https://ns1.com/api/#getlist-jobs-within-an-app
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getJobsAppId
 func (s *PulsarJobsService) List(appID string) ([]*pulsar.Job, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", appID)
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -39,7 +39,7 @@ func (s *PulsarJobsService) List(appID string) ([]*pulsar.Job, *http.Response, e
 
 // Get takes an Application ID and Job Id and returns full configuration for a pulsar Job.
 //
-// NS1 API docs: https://ns1.com/api/#getview-job-details
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getJobDetailsAppIdJobId
 func (s *PulsarJobsService) Get(appID string, jobID string) (*pulsar.Job, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", appID, jobID)
 
@@ -71,7 +71,7 @@ func (s *PulsarJobsService) Get(appID string, jobID string) (*pulsar.Job, *http.
 
 // Create takes a *PulsarJob and an AppId and creates a new Pulsar Job in the specified Application with the specific name, typeid, host and url_path.
 //
-// NS1 API docs: https://ns1.com/api/#putcreate-a-pulsar-job
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createJobAppId
 func (s *PulsarJobsService) Create(j *pulsar.Job) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs", j.AppID)
 
@@ -98,7 +98,7 @@ func (s *PulsarJobsService) Create(j *pulsar.Job) (*http.Response, error) {
 // Update takes a *PulsarJob and modifies configuration details for an existing Pulsar job.
 //
 // Only the fields to be updated are required in the given job.
-// NS1 API docs: https://ns1.com/api/#postmodify-a-pulsar-job
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#updateJobAppIdJobId
 func (s *PulsarJobsService) Update(j *pulsar.Job) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", j.AppID, j.JobID)
 
@@ -128,7 +128,7 @@ func (s *PulsarJobsService) Update(j *pulsar.Job) (*http.Response, error) {
 
 // Delete takes a appId and jobId and removes an existing Pulsar job .
 //
-// NS1 API docs: https://ns1.com/api/#deletedelete-a-pulsar-job
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#deleteJobAppIdJobId
 func (s *PulsarJobsService) Delete(pulsarJob *pulsar.Job) (*http.Response, error) {
 	path := fmt.Sprintf("pulsar/apps/%s/jobs/%s", pulsarJob.AppID, pulsarJob.JobID)
 

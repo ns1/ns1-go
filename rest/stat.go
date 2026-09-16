@@ -20,6 +20,7 @@ func (s *StatsService) GetQPS() (float32, *http.Response, error) {
 // GetZoneQPS returns current queries per second (QPS) for a specific zone.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getQpsByZoneName
 func (s *StatsService) GetZoneQPS(zone string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", statsQPSEndpoint, zone)
 	return s.getQPS(path)
@@ -28,11 +29,13 @@ func (s *StatsService) GetZoneQPS(zone string) (float32, *http.Response, error) 
 // GetRecordQPS returns current queries per second (QPS) for a specific record.
 // The QPS number is lagged by approximately 30 seconds for statistics collection;
 // and the rate is computed over the preceding minute.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getQpsByZoneAndDomainAndRecord
 func (s *StatsService) GetRecordQPS(zone, record, t string) (float32, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s/%s/%s", statsQPSEndpoint, zone, record, t)
 	return s.getQPS(path)
 }
 
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getQps
 func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
@@ -51,9 +54,9 @@ func (s *StatsService) getQPS(path string) (float32, *http.Response, error) {
 	resp, err := s.client.Do(req, &value)
 
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			switch err.(*Error).Message {
+			switch err.Message {
 			case "zone not found":
 				return 0, nil, ErrZoneMissing
 			case "record not found":

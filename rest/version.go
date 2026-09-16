@@ -12,7 +12,7 @@ type VersionsService service
 
 // List returns all versions for a zone.
 //
-// NS1 API docs: https://ns1.com/api/#zones-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listZoneVersions
 func (s *VersionsService) List(zone string) ([]*dns.Version, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/versions", zone)
 	req, err := s.client.NewRequest("GET", path, nil)
@@ -33,7 +33,7 @@ func (s *VersionsService) List(zone string) ([]*dns.Version, *http.Response, err
 
 // Create creates a new version for a zone
 //
-// NS1 API docs: https://ns1.com/api/#zones-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createZoneVersion
 func (s *VersionsService) Create(zone string, force bool) (*dns.Version, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/versions?force=%t", zone, force)
 	req, err := s.client.NewRequest("PUT", path, nil)
@@ -53,7 +53,7 @@ func (s *VersionsService) Create(zone string, force bool) (*dns.Version, *http.R
 
 // Delete deletes a zone version
 //
-// NS1 API docs: https://ns1.com/api/#zones-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeZoneVersion
 func (s *VersionsService) Delete(zone string, versionID int) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/versions/%d", zone, versionID)
 	req, err := s.client.NewRequest("DELETE", path, nil)
@@ -73,7 +73,7 @@ func (s *VersionsService) Delete(zone string, versionID int) (*http.Response, er
 
 // Activate activates a zone version
 //
-// NS1 API docs: https://ns1.com/api/#zones-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#activateZoneVersion
 func (s *VersionsService) Activate(zone string, versionID int) (*http.Response, error) {
 	path := fmt.Sprintf("/v1/zones/%s/versions/%d/activate", zone, versionID)
 	req, err := s.client.NewRequest("POST", path, nil)

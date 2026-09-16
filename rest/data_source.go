@@ -12,7 +12,7 @@ type DataSourcesService service
 
 // List returns all connected data sources.
 //
-// NS1 API docs: https://ns1.com/api/#sources-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listSources
 func (s *DataSourcesService) List() ([]*data.Source, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "data/sources", nil)
 	if err != nil {
@@ -30,7 +30,7 @@ func (s *DataSourcesService) List() ([]*data.Source, *http.Response, error) {
 
 // Get takes an ID returns the details for a single data source.
 //
-// NS1 API docs: https://ns1.com/api/#sources-source-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getSource
 func (s *DataSourcesService) Get(id string) (*data.Source, *http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", id)
 
@@ -50,7 +50,7 @@ func (s *DataSourcesService) Get(id string) (*data.Source, *http.Response, error
 
 // Create takes a *DataSource and creates a new data source.
 //
-// NS1 API docs: https://ns1.com/api/#sources-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createSource
 func (s *DataSourcesService) Create(ds *data.Source) (*http.Response, error) {
 	req, err := s.client.NewRequest("PUT", "data/sources", &ds)
 	if err != nil {
@@ -69,7 +69,7 @@ func (s *DataSourcesService) Create(ds *data.Source) (*http.Response, error) {
 // Update takes a *DataSource modifies basic details of a data source.
 // NOTE: This does not 'publish' data. See the Publish method.
 //
-// NS1 API docs: https://ns1.com/api/#sources-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifySource
 func (s *DataSourcesService) Update(ds *data.Source) (*http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", ds.ID)
 	// must be omitted from the body
@@ -91,7 +91,7 @@ func (s *DataSourcesService) Update(ds *data.Source) (*http.Response, error) {
 
 // Delete takes an ID and removes an existing data source and all connected feeds from the source.
 //
-// NS1 API docs: https://ns1.com/api/#sources-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeSource
 func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
 	path := fmt.Sprintf("data/sources/%s", id)
 
@@ -110,7 +110,7 @@ func (s *DataSourcesService) Delete(id string) (*http.Response, error) {
 
 // Publish takes a datasources' id and data to publish.
 //
-// NS1 API docs: https://ns1.com/api/#feed-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#writeFeedData
 func (s *DataSourcesService) Publish(dsID string, data interface{}) (*http.Response, error) {
 	path := fmt.Sprintf("feed/%s", dsID)
 
