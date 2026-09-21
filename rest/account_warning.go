@@ -7,12 +7,14 @@ import (
 )
 
 // WarningsService handles 'account/usagewarnings' endpoint.
+//
+// Deprecated: This service is deprecated and will be removed in a future release.
 type WarningsService service
 
 // Get returns toggles and thresholds used when sending overage warning
 // alert messages to users with billing notifications enabled.
 //
-// NS1 API docs: https://ns1.com/api/#usagewarnings-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *WarningsService) Get() (*account.UsageWarning, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/usagewarnings", nil)
 	if err != nil {
@@ -30,7 +32,7 @@ func (s *WarningsService) Get() (*account.UsageWarning, *http.Response, error) {
 
 // Update changes alerting toggles and thresholds for overage warning alert messages.
 //
-// NS1 API docs: https://ns1.com/api/#usagewarnings-post
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *WarningsService) Update(uw *account.UsageWarning) (*http.Response, error) {
 	req, err := s.client.NewRequest("POST", "account/usagewarnings", &uw)
 	if err != nil {

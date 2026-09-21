@@ -1,4 +1,4 @@
-// Example referencing https://ns1.com/articles/automated-failover
+// Example referencing https://www.ibm.com/docs/en/ns1-connect?topic=configurations-configuring-automatic-failover
 package main
 
 import (

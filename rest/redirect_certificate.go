@@ -14,7 +14,7 @@ type RedirectCertificateService service
 
 // List returns the existing redirect certificates.
 //
-// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/Getting+Started
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getRedirectCertificates
 // Feature docs: https://www.ibm.com/docs/en/ns1-connect?topic=url-redirects
 func (s *RedirectCertificateService) List() ([]*redirect.Certificate, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "redirect/certificates", nil)
@@ -38,7 +38,7 @@ func (s *RedirectCertificateService) List() ([]*redirect.Certificate, *http.Resp
 
 // Get takes a redirect config id and returns a single config.
 //
-// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/Getting+Started
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getRedirectCertificate
 // Feature docs: https://www.ibm.com/docs/en/ns1-connect?topic=url-redirects
 func (s *RedirectCertificateService) Get(certId string) (*redirect.Certificate, *http.Response, error) {
 	path := fmt.Sprintf("redirect/certificates/%s", certId)
@@ -66,7 +66,7 @@ func (s *RedirectCertificateService) Get(certId string) (*redirect.Certificate, 
 
 // Create takes a *Certificate and creates a new redirect.
 //
-// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/Getting+Started
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#requestRedirectCertificate
 // Feature docs: https://www.ibm.com/docs/en/ns1-connect?topic=url-redirects
 func (s *RedirectCertificateService) Create(domain string) (*redirect.Certificate, *http.Response, error) {
 
@@ -93,7 +93,7 @@ func (s *RedirectCertificateService) Create(domain string) (*redirect.Certificat
 
 // Update takes a certificate id and requests it to be renewed.
 //
-// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/Getting+Started
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#renewRedirectCertificate
 // Feature docs: https://www.ibm.com/docs/en/ns1-connect?topic=url-redirects
 func (s *RedirectCertificateService) Update(certId string) (*http.Response, error) {
 
@@ -121,7 +121,7 @@ func (s *RedirectCertificateService) Update(certId string) (*http.Response, erro
 
 // Delete takes a certificate id and requests it to be revoked.
 //
-// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/Getting+Started
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#revokeRedirectCertificate
 // Feature docs: https://www.ibm.com/docs/en/ns1-connect?topic=url-redirects
 func (s *RedirectCertificateService) Delete(certId string) (*http.Response, error) {
 	path := fmt.Sprintf("redirect/certificates/%s", certId)

@@ -9,11 +9,13 @@ import (
 )
 
 // TsigService handles 'tsig' endpoint.
+//
+// Deprecated: This service is deprecated and will be removed in a future release.
 type TsigService service
 
 // List returns all tsig keys and basic tsig keys configuration details for each.
 //
-// NS1 API docs: https://ns1.com/api/#getlist-tsig-keys
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *TsigService) List() ([]*dns.TSIGKey, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "tsig", nil)
 	if err != nil {
@@ -32,7 +34,7 @@ func (s *TsigService) List() ([]*dns.TSIGKey, *http.Response, error) {
 
 // Get takes a TSIG key name and returns a single TSIG key and its basic configuration details.
 //
-// NS1 API docs: https://ns1.com/api/#getview-tsig-key-details
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", name)
 
@@ -59,7 +61,7 @@ func (s *TsigService) Get(name string) (*dns.TSIGKey, *http.Response, error) {
 
 // Create takes a *TSIGkey and creates a new TSIG key.
 //
-// NS1 API docs: https://ns1.com/api/#putcreate-a-tsig-key
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
@@ -85,7 +87,7 @@ func (s *TsigService) Create(tk *dns.TSIGKey) (*http.Response, error) {
 
 // Update takes a *TSIGKey and modifies basic details of a TSIG key.
 //
-// NS1 API docs: https://ns1.com/api/#postmodify-a-tsig-key
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", tk.Name)
 
@@ -111,7 +113,7 @@ func (s *TsigService) Update(tk *dns.TSIGKey) (*http.Response, error) {
 
 // Delete takes a TSIG key name and destroys an existing TSIG key.
 //
-// NS1 API docs: https://ns1.com/api/#deleteremove-a-tsig-key
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *TsigService) Delete(name string) (*http.Response, error) {
 	path := fmt.Sprintf("tsig/%s", name)
 
@@ -136,7 +138,11 @@ func (s *TsigService) Delete(name string) (*http.Response, error) {
 
 var (
 	// ErrTsigKeyExists bundles PUT create error.
+	//
+	// Deprecated: This variable is deprecated and will be removed in a future release.
 	ErrTsigKeyExists = errors.New("TSIG key already exists")
 	// ErrTsigKeyMissing bundles GET/POST/DELETE error.
+	//
+	// Deprecated: This variable is deprecated and will be removed in a future release.
 	ErrTsigKeyMissing = errors.New("TSIG key does not exist")
 )

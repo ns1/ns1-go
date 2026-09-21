@@ -13,7 +13,7 @@ type RecordsService service
 
 // Get takes a zone, domain and record type t and returns full configuration for a DNS record.
 //
-// NS1 API docs: https://ns1.com/api/#record-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getRecord
 func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 
@@ -40,7 +40,7 @@ func (s *RecordsService) Get(zone, domain, t string) (*dns.Record, *http.Respons
 // Create takes a *Record and creates a new DNS record in the specified zone, for the specified domain, of the given record type.
 //
 // The given record must have at least one answer.
-// NS1 API docs: https://ns1.com/api/#record-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createRecord
 func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
@@ -70,7 +70,7 @@ func (s *RecordsService) Create(r *dns.Record) (*http.Response, error) {
 // Update takes a *Record and modifies configuration details for an existing DNS record.
 //
 // Only the fields to be updated are required in the given record.
-// NS1 API docs: https://ns1.com/api/#record-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#updateRecord
 func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", r.Zone, r.Domain, r.Type)
 
@@ -101,7 +101,7 @@ func (s *RecordsService) Update(r *dns.Record) (*http.Response, error) {
 
 // Delete takes a zone, domain and record type t and removes an existing record and all associated answers and configuration details.
 //
-// NS1 API docs: https://ns1.com/api/#record-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeRecord
 func (s *RecordsService) Delete(zone string, domain string, t string) (*http.Response, error) {
 	path := fmt.Sprintf("zones/%s/%s/%s", zone, domain, t)
 

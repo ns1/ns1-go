@@ -13,7 +13,7 @@ type UsersService service
 
 // List returns all users in the account.
 //
-// NS1 API docs: https://ns1.com/api/#users-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listUsers
 func (s *UsersService) List() ([]*account.User, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/users", nil)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *UsersService) List() ([]*account.User, *http.Response, error) {
 
 // Get returns details of a single user.
 //
-// NS1 API docs: https://ns1.com/api/#users-user-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getUser
 func (s *UsersService) Get(username string) (*account.User, *http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", username)
 
@@ -43,9 +43,9 @@ func (s *UsersService) Get(username string) (*account.User, *http.Response, erro
 	var u account.User
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrUserMissing
 			}
 		}
@@ -57,7 +57,7 @@ func (s *UsersService) Get(username string) (*account.User, *http.Response, erro
 
 // Create takes a *User and creates a new account user.
 //
-// NS1 API docs: https://ns1.com/api/#users-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createUser
 func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 	var (
 		req *http.Request
@@ -72,9 +72,9 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 	// Update user fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "request failed:Login Name is already in use." {
+			if err.Message == "request failed:Login Name is already in use." {
 				return resp, ErrUserExists
 			}
 		}
@@ -86,7 +86,7 @@ func (s *UsersService) Create(u *account.User) (*http.Response, error) {
 
 // Update change contact details, notification settings, or access rights for a user.
 //
-// NS1 API docs: https://ns1.com/api/#users-user-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyUser
 func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", u.Username)
 
@@ -103,9 +103,9 @@ func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 	// Update user fields with data from api(ensure consistent)
 	resp, err := s.client.Do(req, &u)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "Unknown user" {
+			if err.Message == "Unknown user" {
 				return resp, ErrUserMissing
 			}
 		}
@@ -117,7 +117,7 @@ func (s *UsersService) Update(u *account.User) (*http.Response, error) {
 
 // Delete deletes a user.
 //
-// NS1 API docs: https://ns1.com/api/#users-user-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeUser
 func (s *UsersService) Delete(username string) (*http.Response, error) {
 	path := fmt.Sprintf("account/users/%s", username)
 
@@ -128,9 +128,9 @@ func (s *UsersService) Delete(username string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if err.(*Error).Message == "Unknown user" {
+			if err.Message == "Unknown user" {
 				return resp, ErrUserMissing
 			}
 		}

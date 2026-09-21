@@ -13,7 +13,7 @@ type JobsService service
 
 // List returns all monitoring jobs for the account.
 //
-// NS1 API docs: https://ns1.com/api/#jobs-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listMonitoringJobs
 func (s *JobsService) List() ([]*monitor.Job, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "monitoring/jobs", nil)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *JobsService) List() ([]*monitor.Job, *http.Response, error) {
 
 // Get takes an ID and returns details for a specific monitoring job.
 //
-// NS1 API docs: https://ns1.com/api/#jobs-jobid-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getMonitoringJob
 func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", id)
 
@@ -51,7 +51,7 @@ func (s *JobsService) Get(id string) (*monitor.Job, *http.Response, error) {
 
 // Create takes a *MonitoringJob and creates a new monitoring job.
 //
-// NS1 API docs: https://ns1.com/api/#jobs-put
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createMonitoringJobs
 func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s", "monitoring/jobs")
 
@@ -71,7 +71,7 @@ func (s *JobsService) Create(mj *monitor.Job) (*http.Response, error) {
 
 // Update takes a *MonitoringJob and change the configuration details of an existing monitoring job.
 //
-// NS1 API docs: https://ns1.com/api/#jobs-jobid-post
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyMonitoringJob
 func (s *JobsService) Update(mj *monitor.Job) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", mj.ID)
 
@@ -91,7 +91,7 @@ func (s *JobsService) Update(mj *monitor.Job) (*http.Response, error) {
 
 // Delete takes an ID and immediately terminates and deletes and existing monitoring job.
 //
-// NS1 API docs: https://ns1.com/api/#jobs-jobid-delete
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeMonitoringJob
 func (s *JobsService) Delete(id string) (*http.Response, error) {
 	path := fmt.Sprintf("%s/%s", "monitoring/jobs", id)
 
@@ -110,7 +110,7 @@ func (s *JobsService) Delete(id string) (*http.Response, error) {
 
 // History takes an ID and returns status log history for a specific monitoring job.
 //
-// NS1 API docs: https://ns1.com/api/#history-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getMonitoringHistory
 func (s *JobsService) History(id string, opts ...func(*url.Values)) ([]*monitor.StatusLog, *http.Response, error) {
 	v := url.Values{}
 	for _, opt := range opts {

@@ -12,6 +12,7 @@ const (
 	BillingUsageMonitors     = BillingUsage("monitors")
 	BillingUsageFilterChains = BillingUsage("filter-chains")
 	BillingUsageRecords      = BillingUsage("records")
+	BillingUsageRedirects    = BillingUsage("redirects")
 )
 
 var (

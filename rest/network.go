@@ -11,7 +11,7 @@ type NetworkService service
 
 // Get returns a list of all available NS1 DNS networks associated
 // with your account.
-// NS1 API docs: https://ns1.com/api?docId=403388
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listNetworks
 func (s *NetworkService) Get() ([]*dns.Network, *http.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "networks", nil)
 	if err != nil {

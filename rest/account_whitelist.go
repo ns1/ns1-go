@@ -12,6 +12,7 @@ import (
 type GlobalIPWhitelistService service
 
 // List returns all global IP whitelists in the account.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#listAccountIPWhitelistRecords
 func (s *GlobalIPWhitelistService) List() ([]*account.IPWhitelist, *http.Response, error) {
 	req, err := s.client.NewRequest("GET", "account/whitelist", nil)
 	if err != nil {
@@ -28,6 +29,7 @@ func (s *GlobalIPWhitelistService) List() ([]*account.IPWhitelist, *http.Respons
 }
 
 // Get returns details of a single global IP whitelist.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getAccountIPWhitelistRecord
 func (s *GlobalIPWhitelistService) Get(id string) (*account.IPWhitelist, *http.Response, error) {
 	path := fmt.Sprintf("account/whitelist/%s", id)
 
@@ -39,9 +41,9 @@ func (s *GlobalIPWhitelistService) Get(id string) (*account.IPWhitelist, *http.R
 	var wl account.IPWhitelist
 	resp, err := s.client.Do(req, &wl)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return nil, resp, ErrIPWhitelistMissing
 			}
 		}
@@ -52,6 +54,7 @@ func (s *GlobalIPWhitelistService) Get(id string) (*account.IPWhitelist, *http.R
 }
 
 // Create takes a *IPWhitelist and creates a new global IP whitelist.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#createAccountIPWhitelistRecord
 func (s *GlobalIPWhitelistService) Create(wl *account.IPWhitelist) (*http.Response, error) {
 	req, err := s.client.NewRequest("PUT", "account/whitelist", wl)
 	if err != nil {
@@ -67,6 +70,7 @@ func (s *GlobalIPWhitelistService) Create(wl *account.IPWhitelist) (*http.Respon
 }
 
 // Update changes the name or values for a global IP whitelist.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#modifyAccountIPWhitelistRecord
 func (s *GlobalIPWhitelistService) Update(wl *account.IPWhitelist) (*http.Response, error) {
 	path := fmt.Sprintf("account/whitelist/%s", wl.ID)
 
@@ -77,9 +81,9 @@ func (s *GlobalIPWhitelistService) Update(wl *account.IPWhitelist) (*http.Respon
 
 	resp, err := s.client.Do(req, &wl)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrIPWhitelistMissing
 			}
 		}
@@ -90,6 +94,7 @@ func (s *GlobalIPWhitelistService) Update(wl *account.IPWhitelist) (*http.Respon
 }
 
 // Delete deletes a global IP whitelist.
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#removeAccountIPWhitelistRecord
 func (s *GlobalIPWhitelistService) Delete(id string) (*http.Response, error) {
 	path := fmt.Sprintf("account/whitelist/%s", id)
 
@@ -100,9 +105,9 @@ func (s *GlobalIPWhitelistService) Delete(id string) (*http.Response, error) {
 
 	resp, err := s.client.Do(req, nil)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *Error:
-			if resourceMissingMatch(err.(*Error).Message) {
+			if resourceMissingMatch(err.Message) {
 				return resp, ErrIPWhitelistMissing
 			}
 		}

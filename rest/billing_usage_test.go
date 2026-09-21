@@ -278,4 +278,45 @@ func TestBillingUsageService(t *testing.T) {
 		})
 	})
 
+	// Tests for api.Client.BillingUsage.GetRedirects
+	t.Run("Get Billing Usage Redirects", func(t *testing.T) {
+		t.Run("Success", func(t *testing.T) {
+			defer mock.ClearTestCases()
+			redirects := &billingusage.TotalUsage{
+				TotalUsage: 139,
+			}
+			require.Nil(t, mock.AddBillingUsageRedirectsGetTestCase(nil, nil, redirects))
+
+			buRedirects, _, err := client.BillingUsage.GetRedirects()
+			require.Nil(t, err)
+			require.NotNil(t, buRedirects)
+			require.Equal(t, redirects.TotalUsage, buRedirects.TotalUsage)
+		})
+
+		t.Run("Error Get Billing Usage Redirects", func(t *testing.T) {
+			t.Run("HTTP", func(t *testing.T) {
+				defer mock.ClearTestCases()
+
+				require.Nil(t, mock.AddBillingUsageRedirectsFailTestCase(
+					http.MethodGet, http.StatusNotFound,
+					nil, nil, `{"message": "not found"}`,
+				))
+
+				buRedirects, resp, err := client.BillingUsage.GetRedirects()
+				require.Nil(t, buRedirects)
+				require.NotNil(t, err)
+				require.Contains(t, err.Error(), "not found")
+				require.Equal(t, http.StatusNotFound, resp.StatusCode)
+			})
+
+			t.Run("Other", func(t *testing.T) {
+				c := api.NewClient(errorClient{}, api.SetEndpoint(""))
+				dt, resp, err := c.BillingUsage.GetRedirects()
+				require.Nil(t, resp)
+				require.Error(t, err)
+				require.Nil(t, dt)
+			})
+		})
+	})
+
 }

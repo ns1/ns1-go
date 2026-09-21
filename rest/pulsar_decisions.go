@@ -65,7 +65,7 @@ func addQueryParams(path string, params *pulsar.DecisionsQueryParams) string {
 
 // GetDecisions retrieves decisions data with optional filtering parameters.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-analytics-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsData
 func (s *PulsarDecisionsService) GetDecisions(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsResponse, *http.Response, error) {
 	path := "pulsar/query/decisions"
 	if params != nil {
@@ -88,7 +88,7 @@ func (s *PulsarDecisionsService) GetDecisions(params *pulsar.DecisionsQueryParam
 
 // GetDecisionsGraphRegion retrieves regional graph data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-graph-region-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsGraphByRegionData
 func (s *PulsarDecisionsService) GetDecisionsGraphRegion(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsGraphRegionResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/graph/region"
 	if params != nil {
@@ -111,7 +111,7 @@ func (s *PulsarDecisionsService) GetDecisionsGraphRegion(params *pulsar.Decision
 
 // GetDecisionsGraphTime retrieves time-series graph data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-graph-time-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsGraphByTimeData
 func (s *PulsarDecisionsService) GetDecisionsGraphTime(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsGraphTimeResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/graph/time"
 	if params != nil {
@@ -134,7 +134,7 @@ func (s *PulsarDecisionsService) GetDecisionsGraphTime(params *pulsar.DecisionsQ
 
 // GetDecisionsArea retrieves area-based decisions data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-area-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsByAreaData
 func (s *PulsarDecisionsService) GetDecisionsArea(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsAreaResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/area"
 	if params != nil {
@@ -157,7 +157,7 @@ func (s *PulsarDecisionsService) GetDecisionsArea(params *pulsar.DecisionsQueryP
 
 // GetDecisionsASN retrieves ASN-based decisions data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-asn-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsByASNData
 func (s *PulsarDecisionsService) GetDecisionsASN(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsASNResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/asn"
 	if params != nil {
@@ -180,7 +180,7 @@ func (s *PulsarDecisionsService) GetDecisionsASN(params *pulsar.DecisionsQueryPa
 
 // GetDecisionsResultsTime retrieves time-based results data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-results-time-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsResultsTime
 func (s *PulsarDecisionsService) GetDecisionsResultsTime(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsResultsTimeResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/results/time"
 	if params != nil {
@@ -203,7 +203,7 @@ func (s *PulsarDecisionsService) GetDecisionsResultsTime(params *pulsar.Decision
 
 // GetDecisionsResultsArea retrieves area-based results data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-results-area-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getDecisionsResultsArea
 func (s *PulsarDecisionsService) GetDecisionsResultsArea(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsResultsAreaResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/results/area"
 	if params != nil {
@@ -226,7 +226,7 @@ func (s *PulsarDecisionsService) GetDecisionsResultsArea(params *pulsar.Decision
 
 // GetFiltersTime retrieves time-based filter data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-filters-time-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#getFiltersTime
 func (s *PulsarDecisionsService) GetFiltersTime(params *pulsar.DecisionsQueryParams) (*pulsar.FiltersTimeResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/filters/time"
 	if params != nil {
@@ -249,7 +249,7 @@ func (s *PulsarDecisionsService) GetFiltersTime(params *pulsar.DecisionsQueryPar
 
 // GetDecisionCustomer retrieves customer-specific decision data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decision-customer-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *PulsarDecisionsService) GetDecisionCustomer(customerID string, params *pulsar.DecisionsQueryParams) (*pulsar.DecisionCustomerResponse, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/query/decision/customer/%s", customerID)
 	if params != nil {
@@ -272,7 +272,7 @@ func (s *PulsarDecisionsService) GetDecisionCustomer(customerID string, params *
 
 // GetDecisionCustomerUndetermined retrieves undetermined customer-specific decision data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decision-customer-undetermined-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *PulsarDecisionsService) GetDecisionCustomerUndetermined(customerID string, params *pulsar.DecisionsQueryParams) (*pulsar.DecisionCustomerResponse, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/query/decision/customer/%s/undetermined", customerID)
 	if params != nil {
@@ -295,7 +295,7 @@ func (s *PulsarDecisionsService) GetDecisionCustomerUndetermined(customerID stri
 
 // GetDecisionRecord retrieves record-specific decision data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decision-record-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *PulsarDecisionsService) GetDecisionRecord(customerID, domain, recType string, params *pulsar.DecisionsQueryParams) (*pulsar.DecisionCustomerResponse, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/query/decision/customer/%s/record/%s/%s", customerID, domain, recType)
 	if params != nil {
@@ -318,7 +318,7 @@ func (s *PulsarDecisionsService) GetDecisionRecord(customerID, domain, recType s
 
 // GetDecisionRecordUndetermined retrieves undetermined record-specific decision data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decision-record-undetermined-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *PulsarDecisionsService) GetDecisionRecordUndetermined(customerID, domain, recType string, params *pulsar.DecisionsQueryParams) (*pulsar.DecisionCustomerResponse, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/query/decision/customer/%s/record/%s/%s/undetermined", customerID, domain, recType)
 	if params != nil {
@@ -341,7 +341,7 @@ func (s *PulsarDecisionsService) GetDecisionRecordUndetermined(customerID, domai
 
 // GetDecisionTotal retrieves total decision count.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decision-total-get
+// Deprecated: This method is deprecated and will be removed in a future release.
 func (s *PulsarDecisionsService) GetDecisionTotal(customerID string, params *pulsar.DecisionsQueryParams) (*pulsar.DecisionTotalResponse, *http.Response, error) {
 	path := fmt.Sprintf("pulsar/query/decision/customer/%s/total", customerID)
 	if params != nil {
@@ -364,7 +364,7 @@ func (s *PulsarDecisionsService) GetDecisionTotal(customerID string, params *pul
 
 // GetPulsarDecisionsRecords retrieves records-based decisions data.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-records-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#GetPulsarDecisionsRecords
 func (s *PulsarDecisionsService) GetPulsarDecisionsRecords(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsRecordsResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/records"
 	if params != nil {
@@ -387,7 +387,7 @@ func (s *PulsarDecisionsService) GetPulsarDecisionsRecords(params *pulsar.Decisi
 
 // GetPulsarDecisionsResultsRecord retrieves record-based results data for decisions.
 //
-// NS1 API docs: https://ns1.com/api/#pulsar-decisions-results-record-get
+// NS1 API docs: https://developer.ibm.com/apis/catalog/ns1--ibm-ns1-connect-api/api/API--ns1--ibm-ns1-connect-api#GetPulsarDecisionsResultsRecord
 func (s *PulsarDecisionsService) GetPulsarDecisionsResultsRecord(params *pulsar.DecisionsQueryParams) (*pulsar.DecisionsResultsRecordResponse, *http.Response, error) {
 	path := "pulsar/query/decisions/results/record"
 	if params != nil {
